@@ -34,5 +34,6 @@ in each ingestion script.
 
 ## License
 
-**PolyForm Noncommercial License 1.0.0** — free to use, run, study, modify and
-share for non-commercial purposes. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+**MIT License** — free to use, modify and redistribute, including for commercial
+purposes, as long as the copyright notice and the license text are kept. See
+[LICENSE](LICENSE) and [NOTICE](NOTICE).
