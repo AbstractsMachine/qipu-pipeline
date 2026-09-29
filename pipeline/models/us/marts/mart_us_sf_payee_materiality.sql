@@ -1,8 +1,8 @@
 -- =============================================================================
 -- Mart: SF payee materiality lines — "what a payment buys"
 --
--- Sources: stg_us_sf_payee_materiality (curated picks), core_us_sf_vouchers
---          (the amounts), stg_us_sf_catalog (provenance).
+-- Sources: int_us_sf_payee_materiality (curated picks + measured amounts)
+--          (the amounts), core_us_sf_source_catalog (provenance).
 -- Grain:  one row per curated line (slug).
 --
 -- The seed picks WHICH (vendor × department × sub_object × fiscal_year)
@@ -16,22 +16,7 @@
 -- =============================================================================
 
 WITH picks AS (
-    SELECT * FROM {{ ref('stg_us_sf_payee_materiality') }}
-),
-
-amounts AS (
-    SELECT
-        p.slug,
-        ANY_VALUE(v.object)   AS object,
-        SUM(v.vouchers_paid)  AS amount_usd,
-        COUNT(*)              AS n_voucher_lines
-    FROM picks p
-    INNER JOIN {{ ref('core_us_sf_vouchers') }} v
-        ON  v.vendor      = p.vendor
-        AND v.department  = p.department
-        AND v.sub_object  = p.sub_object
-        AND v.fiscal_year = p.fiscal_year
-    GROUP BY p.slug
+    SELECT * FROM {{ ref('int_us_sf_payee_materiality') }}
 ),
 
 provenance AS (
@@ -41,7 +26,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_vouchers'
 )
 
@@ -51,11 +36,11 @@ SELECT
     p.editorial_note,
     p.vendor,
     p.department,
-    a.object,
+    p.object,
     p.sub_object,
     p.fiscal_year,
-    a.amount_usd,
-    a.n_voucher_lines,
+    p.amount_usd,
+    p.n_voucher_lines,
     {{ us_sf_execution_status('p.fiscal_year', basis='actuals') }}  AS execution_status,
     p.method                               AS curation_method,
     p.added_at                             AS curated_at,
@@ -66,5 +51,4 @@ SELECT
     pr.rows_updated_at                     AS source_rows_updated_at,
     'USD'                                  AS unit
 FROM picks p
-INNER JOIN amounts a USING (slug)
 CROSS JOIN provenance pr

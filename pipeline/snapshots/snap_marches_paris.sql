@@ -3,13 +3,13 @@
   Les marchés peuvent être amendés (avenants, prolongations) → on
   capture chaque révision.
 
-  Clé unique : numero_marche.
+  Clé unique : num_marche (nom de colonne raw depuis la migration sync_ods_dataset).
 #}
 {% snapshot snap_marches_paris %}
 {{
     config(
       target_schema='dbt_paris_snapshots',
-      unique_key='numero_marche',
+      unique_key='num_marche',
       strategy='check',
       check_cols=[
         'objet_du_marche',
@@ -24,5 +24,5 @@
     )
 }}
 select * from {{ source('paris_raw', 'liste_des_marches_de_la_collectivite_parisienne') }}
-where numero_marche is not null
+where num_marche is not null
 {% endsnapshot %}

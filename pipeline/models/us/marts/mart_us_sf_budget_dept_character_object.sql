@@ -2,7 +2,7 @@
 -- Mart: SF adopted budget, department × character × object cells — the
 -- raw line-item detail one level below the fiche altitude
 --
--- Sources: core_us_sf_budget, stg_us_sf_catalog (provenance).
+-- Sources: core_us_sf_budget, core_us_sf_source_catalog (provenance).
 -- Grain:  fiscal_year × side × department × character × object.
 --
 -- WHY THIS IS RAW DETAIL, NOT A HEADLINE DRILL LEVEL (measured, docs/us/
@@ -40,7 +40,7 @@ provenance AS (
     SELECT DISTINCT
         dataset_page_url,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_budget'
 )
 

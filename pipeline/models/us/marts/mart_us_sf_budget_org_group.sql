@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: SF adopted budget by organization group — the page's top altitude
 --
--- Sources: core_us_sf_budget, stg_us_sf_catalog (provenance).
+-- Sources: core_us_sf_budget, core_us_sf_source_catalog (provenance).
 -- Grain:  fiscal_year × side × organization group, FY2010-FY2027 (all years:
 --         the 7 org groups and their labels are the ONLY dimension stable
 --         across the FY2018 chart-of-accounts break — verified live
@@ -34,7 +34,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_budget'
 )
 

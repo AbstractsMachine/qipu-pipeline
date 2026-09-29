@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: SF adopted budget by program — the operating/capital/admin strip
 --
--- Sources: core_us_sf_budget, stg_us_sf_catalog.
+-- Sources: core_us_sf_budget, core_us_sf_source_catalog.
 -- Grain:  fiscal_year × side × program.
 --
 -- WHY THIS IS A STRIP AND NOT A DRILL LEVEL (measured, docs/us/
@@ -34,7 +34,7 @@ provenance AS (
     SELECT DISTINCT
         dataset_page_url,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_budget'
 )
 

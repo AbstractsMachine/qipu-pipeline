@@ -49,10 +49,31 @@ def seed_targets() -> dict[str, list[str]]:
         out[r["slug"]] = qs
     return out
 
-REC_RE = re.compile(
-    r"<srw:record>.*?<dc:identifier>([^<]+)</dc:identifier>.*?<dc:date>([^<]+)</dc:date>.*?</srw:record>",
-    re.S,
-)
+# Un enregistrement SRU à la fois, PUIS l'identifiant et la date à l'intérieur.
+#
+# L'ancienne expression cherchait l'identifiant puis « la première date qui
+# suit », et rien ne l'empêchait de franchir la fin de l'enregistrement. Prouvé
+# le 2026-09-13 sur un XML fabriqué : un enregistrement sans date recevait la
+# date du SUIVANT, qui disparaissait ; une date écrite avant l'identifiant
+# décalait tout, un fascicule sur deux perdu. Symptôme publié : un Bulletin
+# « de 1912 » regrettant la démolition d'une piste cycliste survenue en 1967.
+REC_BLOC = re.compile(r"<srw:record>(.*?)</srw:record>", re.S)
+REC_ID = re.compile(r"<dc:identifier>([^<]+)</dc:identifier>")
+REC_DATE = re.compile(r"<dc:date>([^<]+)</dc:date>")
+
+
+def records(xml: str) -> list[dict]:
+    """Les fascicules d'une page SRU, chacun avec SA date. Un enregistrement
+    sans date garde une date vide plutôt que d'emprunter celle du voisin."""
+    out = []
+    for bloc in REC_BLOC.findall(xml):
+        ident = REC_ID.search(bloc)
+        if not ident:
+            continue
+        date = REC_DATE.search(bloc)
+        out.append({"gallica_url": ident.group(1).strip(),
+                    "issue_date": date.group(1).strip() if date else ""})
+    return out
 NUM_RE = re.compile(r"<srw:numberOfRecords>(\d+)</srw:numberOfRecords>")
 
 
@@ -91,8 +112,7 @@ def search_all(query: str, hard_cap: int = 2000) -> tuple[list[dict], int]:
             m = NUM_RE.search(xml)
             total = int(m.group(1)) if m else 0
         batch = [
-            {"gallica_url": ident.strip(), "issue_date": date.strip()}
-            for ident, date in REC_RE.findall(xml)
+            r for r in records(xml)
         ]
         rows.extend(batch)
         start += len(batch)
@@ -102,7 +122,32 @@ def search_all(query: str, hard_cap: int = 2000) -> tuple[list[dict], int]:
     return rows, total or 0
 
 
+def _self_test() -> int:
+    """Rejoue les trois cas qui mal-appariaient date et fascicule avec
+    l'ancienne expression. `python sync_gallica_bmo.py --self-test`."""
+    def rec(ident: str, date: str | None, date_avant: bool) -> str:
+        d = f"<dc:date>{date}</dc:date>" if date else ""
+        i = f"<dc:identifier>{ident}</dc:identifier>"
+        return f"<srw:record><dc:title>t</dc:title>{d + i if date_avant else i + d}</srw:record>"
+    attendu = [("A1", "1910"), ("A2", "1920"), ("A3", "1930"), ("A4", "1940")]
+    cas = {
+        "date après identifiant": ("".join(rec(f"A{n}", f"19{n}0", False) for n in range(1, 5)), attendu),
+        "date avant identifiant": ("".join(rec(f"A{n}", f"19{n}0", True) for n in range(1, 5)), attendu),
+        "enregistrement sans date": ("".join(rec(f"A{n}", None if n == 2 else f"19{n}0", False) for n in range(1, 5)),
+                                     [("A1", "1910"), ("A2", ""), ("A3", "1930"), ("A4", "1940")]),
+    }
+    echecs = 0
+    for nom, (xml, voulu) in cas.items():
+        obtenu = [(r["gallica_url"], r["issue_date"]) for r in records(xml)]
+        ok = obtenu == voulu
+        echecs += not ok
+        print(f"{'ok ' if ok else 'ÉCHEC'} {nom} : {obtenu}")
+    return 1 if echecs else 0
+
+
 def main() -> int:
+    if "--self-test" in sys.argv:
+        return _self_test()
     ap = argparse.ArgumentParser()
     # --query répétable : un lieu change de nom, et l'archive emploie le nom de
     # SON époque. Chercher « place de la Nation » dans un bulletin de 1890 ne

@@ -1,0 +1,125 @@
+# =============================================================================
+# Sources : Tables raw BigQuery — US local government finance
+#
+# Dataset: raw (open-data-france-484717.raw), namespaced `us_census_iuf_*`
+# (national) and `us_{ia,in,ma,fl,ca}_*` (state collections).
+# Synced via scripts/sync/sync_us_local_finance.py (California: sync_socrata.py
+# --block ca_sco), driven by
+# configs/countries/us.yaml (ADR-0010 D3 protocol adapters).
+#
+# RAW CONVENTION: every column is a STRING exactly as the source delivered
+# it, plus _source / _source_url / _synced_at. Typing happens once, in stg.
+#
+# TWO DOCUMENTS, NEVER MIXED UNLABELLED: a voted budget (what a town plans)
+# and actuals (what it spent, audited ~1-2 years later). Iowa and Indiana
+# publish both in one nomenclature; Massachusetts and Florida publish
+# actuals (MA also the voted TOTAL). Census publishes actuals only.
+#
+# FRESHNESS: every source is annual. Census publishes each March (~2 years
+# behind); states file 6-9 months after fiscal year end.
+# =============================================================================
+
+version: 2
+
+sources:
+  - name: us_local_finance_raw
+    description: "US local government finance raw tables (Census IUF + IA, IN, MA, FL state collections)"
+    database: open-data-france-484717
+    schema: raw
+    loaded_at_field: _synced_at
+    freshness:
+      warn_after: {count: 400, period: day}
+      error_after: {count: 800, period: day}
+    tables:
+      - name: us_census_iuf_finance
+        description: |
+          Census of Governments / Annual Survey of State and Local Government
+          Finances, Individual Unit File, 2017+. One row per (government,
+          item code). amount_thousands is in THOUSANDS of dollars. Census
+          years (2017, 2022) cover every local government (~90k); other years
+          are a size-stratified sample (~25k, every large city). 247 item
+          codes (2006 Classification Manual): E* current operations by
+          function, F* capital outlay, T* taxes, A-D charges and transfers.
+          2022 is inflated by one-time federal ARPA money.
+      - name: us_census_iuf_units
+        description: |
+          Unit directory (Fin_PID) per file year: 12-char id = FIPS state(2) +
+          type(1: 1 county, 2 municipality, 3 township, 4 special district,
+          5 school district) + FIPS county(3) + unit(6); name, population.
+      - name: us_ia_city_budget_actual_expenditures
+        description: |
+          Iowa DOM, data.iowa.gov dataset 925. Grain: fiscal_year × city ×
+          function (10 functions). `budget` and `actual` in the SAME row —
+          same nomenclature for both documents. Actuals lag ~2 fiscal years
+          (budget to FY2025, actual to FY2023 as of 2026-09).
+      - name: us_ia_city_budget_actual_revenues
+        description: |
+          Iowa DOM, data.iowa.gov dataset 928. Grain: fiscal_year × city ×
+          revenue_type, budget and actual in the same row.
+      - name: us_in_budget_line_items
+        description: |
+          Indiana DLGF Gateway, Line-Item Budget Estimate (Form 1), cities and
+          towns, 2019 → next year. Grain: unit × fund × department ×
+          expenditure category/subcategory × item. item_amt = published,
+          item_approved_amt = approved. Departments come from a state list,
+          shared with the AFR disbursements.
+      - name: us_in_afr_disbursements
+        description: |
+          Indiana SBOA Gateway Annual Financial Report, Disbursements by Fund
+          and Department, cities and towns, 2016+. Actual spending, same
+          department list and expenditure classes as the budget line items.
+      - name: us_ma_dls_general_fund_expenditures
+        description: |
+          Massachusetts DLS Schedule A, general fund expenditures by function
+          (10 functions), 351 municipalities, FY2002+. Actuals. Employee
+          benefits sit in "Fixed Costs", not inside each function (unlike
+          Census) — Education does not reconcile with Census E12 (0.73).
+      - name: us_ma_dls_general_fund_revenues
+        description: "Massachusetts DLS Schedule A, general fund revenues by source, 351 municipalities, FY2002+."
+      - name: us_ma_dls_operating_budget
+        description: |
+          Massachusetts DLS tax rate recap, operating budget TOTAL per
+          municipality (voted), FY2023 → current FY. Not split by function —
+          the recap files appropriations by funding source.
+      - name: us_fl_edr_municipal_expenditures
+        description: |
+          Florida EDR, from DFS Annual Financial Reports. Grain: municipality
+          workbook × fiscal year × account (Uniform Accounting System code,
+          e.g. 511 Legislative) with one column per fund type. level =
+          'group' rows are the function subtotals, 'account' rows the codes.
+      - name: us_fl_edr_municipal_revenues
+        description: "Florida EDR municipal revenues, same layout as expenditures (UAS revenue codes × fund type)."
+      - name: us_in_afr_debt
+        description: "Indiana SBOA Gateway, Annual Financial Report, Debt: one row per issue per year with its end-of-year principal balance, cities and towns, 2016+."
+      - name: us_ma_dls_tax_rates
+        description: "Massachusetts DLS tax rates by class ($/1,000), all municipalities, FY2003+."
+      - name: us_ma_dls_long_term_debt
+        description: "Massachusetts DLS long-term debt (Schedule A Parts 2 and 10), FY2005+."
+      - name: us_in_dlgf_certified_rates
+        description: "Indiana DLGF certified budget, levy, net AV and rate per $100, per unit × fund, pay years 2022+."
+      - name: us_fl_dor_municipal_millage
+        description: "Florida DOR Data Book Municipal Report: city millage and taxes levied, the two latest years."
+      - name: us_ia_dom_city_tax_rates
+        description: "Iowa DOM city property tax rates ($/1,000), total and debt service levy, FY2023+ (older files use another layout)."
+      - name: us_ia_treasurer_debt
+        description: "Iowa Treasurer outstanding obligations at June 30, every public body by section, FY2018+."
+      - name: us_ca_sco_city_lt_debt
+        description: "California SCO Cities Raw Data, long-term debt (bonds, COPs) per issue, FY2023-2024."
+      - name: us_ca_sco_city_other_lt_debt
+        description: "California SCO Cities Raw Data, other long-term debt (loans, notes) per issue, FY2023-2024."
+      - name: us_ia_city_budget_line_items
+        description: |
+          Iowa DOM, City Budget Expenditures by Fund and Fiscal Year (dataset
+          926): certified budget line items × program × fund, FY2009 → the
+          year just started. Same budget as 925 in more detail, two years
+          further. Five csv parts in the download zip.
+      - name: us_ca_sco_city_expenditures
+        description: |
+          California State Controller, Cities Annual Report (By the Numbers,
+          ju3w-4gxp), synced by sync_socrata.py --block ca_sco. Long format:
+          city × fiscal year × form line × fund category, FY2003+. Actuals.
+          No _source/_source_url columns (Socrata raw convention: the
+          catalog table raw.us_ca_sco_catalog holds the provenance).
+        loaded_at_field: _synced_at
+      - name: us_ca_sco_city_revenues
+        description: "California State Controller, Cities Annual Report revenues (rrtv-rsj9), same layout."

@@ -21,6 +21,9 @@
 --   - ode_type_organisme     (public | association | entreprise | …)
 --   - ode_contribution_nature (bool)
 --   - ode_beneficiaire_canonique (déduplication CASP etc.)
+--   - ode_identite / ode_nom_identite (identité de l'organisation toutes
+--     années, depuis dim_beneficiaire ; ode_nom_identite NULL si la graphie
+--     n'est rapprochée d'aucune autre)
 --
 -- Output: ~53k lignes, 2018-2024.
 -- =============================================================================
@@ -47,6 +50,12 @@ cache_thematique AS (
 
 mapping_entites AS (
     SELECT * FROM {{ ref('stg_mapping_entites') }}
+),
+
+-- Identité de l'organisation (registre dim_beneficiaire, toutes années).
+identites AS (
+    SELECT beneficiaire_normalise, identite, nom_identite
+    FROM {{ ref('dim_beneficiaire') }}
 ),
 
 -- ─── ÉTAPE 1 : Dédupliquer associations pour le JOIN ───────────────────────────
@@ -151,7 +160,9 @@ joined AS (
         md.thematique AS direction_thematique,
         ct.ode_thematique AS llm_thematique,
         ct.ode_sous_categorie AS llm_sous_categorie,
-        be.nom_canonique AS matched_nom_canonique
+        be.nom_canonique AS matched_nom_canonique,
+        idt.identite AS matched_identite,
+        idt.nom_identite AS matched_nom_identite
     FROM subventions s
     LEFT JOIN associations_unique a
         ON s.beneficiaire_normalise = a.beneficiaire_normalise
@@ -164,6 +175,8 @@ joined AS (
         ON s.beneficiaire_normalise = ct.beneficiaire_normalise
     LEFT JOIN best_entity be
         ON s.beneficiaire_normalise = be.beneficiaire_normalise
+    LEFT JOIN identites idt
+        ON s.beneficiaire_normalise = idt.beneficiaire_normalise
 )
 
 -- ─── ÉTAPE 5 : Construction des colonnes ode_* ─────────────────────────────────
@@ -232,6 +245,9 @@ SELECT
     END AS ode_contribution_nature,
 
     COALESCE(matched_nom_canonique, beneficiaire_normalise) AS ode_beneficiaire_canonique,
+
+    COALESCE(matched_identite, beneficiaire_normalise) AS ode_identite,
+    matched_nom_identite AS ode_nom_identite,
 
     CURRENT_TIMESTAMP() AS _dbt_updated_at
 

@@ -1,0 +1,247 @@
+{
+ "generated_at": "2026-09-23",
+ "method": "Translated in session from the Portuguese plain-language summary (vulgarize_recife_llm.py); same facts, proper names kept.",
+ "count": 60,
+ "items": {
+  "00000000000191": {
+   "resumo_en": "State-owned multiple-service bank, acts as the government's financial agent.",
+   "o_que_financia_en": "Financial intermediation: payment of payroll, banking fees, loans or current-account services for the City, under Encargos Gerais do Município."
+  },
+  "00000000000787": {
+   "resumo_en": "Banco do Brasil is a multiple-service bank, the government's financial agent.",
+   "o_que_financia_en": "Amounts paid by the Secretaria de Assistência Social are banking operations, such as payroll or transfers of social benefits, not services provided."
+  },
+  "00000208000100": {
+   "resumo_en": "State-owned multiple-service bank, acts as the government's financial agent.",
+   "o_que_financia_en": "Financial intermediation: credit operations, fees or banking services for the City, recorded under Encargos Gerais do Município."
+  },
+  "00323090000151": {
+   "resumo_en": "Soll Serviços supplies and manages outsourced labour.",
+   "o_que_financia_en": "The amount paid by the Secretaria de Saúde covers the supply of outsourced workers for services in the municipal health network."
+  },
+  "00360305000104": {
+   "resumo_en": "Caixa Econômica Federal is a public bank, the federal government's financial agent.",
+   "o_que_financia_en": "Transfers classified under Encargos Gerais do Município correspond to financial operations, such as debt payments or banking fees, not services provided."
+  },
+  "00360305004525": {
+   "resumo_en": "Caixa Econômica Federal is a public bank, the federal government's financial agent.",
+   "o_que_financia_en": "Transfers from the Secretaria de Infraestrutura to Caixa are financial movements such as payments, fees or loans, not services provided to the city."
+  },
+  "00392213000106": {
+   "resumo_en": "Engineering company that carries out building construction and renovation work.",
+   "o_que_financia_en": "The Secretaria de Educação pays for the construction, renovation or expansion of municipal schools."
+  },
+  "00394460005887": {
+   "resumo_en": "Federal body responsible for collecting taxes in Brazil.",
+   "o_que_financia_en": "Payments from the Secretaria de Transformação Digital for federal taxes, fees or tax obligations of the City."
+  },
+  "00394460022625": {
+   "resumo_en": "Federal body responsible for the judicial collection of the federal government's tax debts.",
+   "o_que_financia_en": "Payment of tax debts or instalment plans owed by the Secretaria de Transformação Digital to the Fazenda Nacional."
+  },
+  "00449936000102": {
+   "resumo_en": "Engineering company that carries out urban infrastructure works.",
+   "o_que_financia_en": "Payments from the Secretaria de Infraestrutura cover contracts for road, drainage or urbanisation works."
+  },
+  "00558943000134": {
+   "resumo_en": "Company providing outsourced services.",
+   "o_que_financia_en": "Outsourced services (operational support, cleaning or labour) contracted by the Secretaria de Assistência Social e Combate à Fome."
+  },
+  "00780851000102": {
+   "resumo_en": "Company that plans and carries out civil works.",
+   "o_que_financia_en": "Construction and renovation work on facilities or equipment of the Secretaria de Saúde in Recife."
+  },
+  "01781573000162": {
+   "resumo_en": "RPL Engenharia e Serviços supplies and manages outsourced labour.",
+   "o_que_financia_en": "The amount paid by the Secretaria de Assistência Social covers the supply of outsourced workers to work in the department's services."
+  },
+  "02633574000122": {
+   "resumo_en": "Company that maintains and cleans buildings and public spaces.",
+   "o_que_financia_en": "Payments from the Secretaria de Saúde cover cleaning and building maintenance services at health units in the municipality."
+  },
+  "03279285002779": {
+   "resumo_en": "Company specialising in environmental management and waste treatment.",
+   "o_que_financia_en": "Funds from the Secretaria de Infraestrutura for urban cleaning, collection or disposal of solid waste."
+  },
+  "03367118000140": {
+   "resumo_en": "Civil construction company specialising in engineering works.",
+   "o_que_financia_en": "Payments from the Secretaria de Saúde fund the construction or renovation of health units, such as hospitals and UPAs."
+  },
+  "03598189000154": {
+   "resumo_en": "Advertising agency.",
+   "o_que_financia_en": "Amounts paid by the Secretaria de Administração fund advertising and institutional campaigns for the City."
+  },
+  "03834750000157": {
+   "resumo_en": "Company specialising in street lighting services.",
+   "o_que_financia_en": "Maintenance, installation or modernisation of street lighting under the responsibility of the Secretaria de Projetos Especiais."
+  },
+  "05244336000113": {
+   "resumo_en": "Municipal authority that manages health and pension provision for public employees.",
+   "o_que_financia_en": "Funding of health benefits and pension assistance for municipal staff, managed by the Secretaria de Administração."
+  },
+  "05291944000189": {
+   "resumo_en": "Telecommunications company, probably providing internet or telephony.",
+   "o_que_financia_en": "The Secretaria de Saúde uses the service to maintain internet and telephone connections at health units."
+  },
+  "07005206000153": {
+   "resumo_en": "Vehicle hire company (car and fleet rental).",
+   "o_que_financia_en": "Rental of vehicles used by the Secretaria de Ordem Pública e Segurança for its operations and urban enforcement."
+  },
+  "07693988000160": {
+   "resumo_en": "Engineering company, probably linked to construction and infrastructure works.",
+   "o_que_financia_en": "Execution or supervision of infrastructure works contracted by the Secretaria de Infraestrutura in Recife."
+  },
+  "07749668000185": {
+   "resumo_en": "Municipal pension fund that manages staff retirement.",
+   "o_que_financia_en": "Transfer of pension contributions and charges from the municipality to pay retirement and pension benefits for Recife's staff."
+  },
+  "08064693000198": {
+   "resumo_en": "Engineering company specialising in concrete works and surfacing.",
+   "o_que_financia_en": "Funds from the Secretaria de Infraestrutura for paving, resurfacing or construction work."
+  },
+  "08135535000181": {
+   "resumo_en": "Civil construction company that carries out public works.",
+   "o_que_financia_en": "Amounts paid by the Secretaria de Infraestrutura cover contracts for public works, such as paving, drainage or urban renovation."
+  },
+  "08362490000188": {
+   "resumo_en": "Adserv supplies and manages outsourced labour.",
+   "o_que_financia_en": "Payment from the Secretaria de Saúde covers the hiring of outsourced workers to work in health units."
+  },
+  "09039744000194": {
+   "resumo_en": "Foundation that runs emergency and urgent-care hospitals.",
+   "o_que_financia_en": "Transfer from the Secretaria de Saúde to a non-profit organisation to maintain urgent and emergency hospital care."
+  },
+  "09039744001832": {
+   "resumo_en": "Foundation that runs emergency and urgent-care hospitals.",
+   "o_que_financia_en": "Transfer from the Secretaria de Saúde to a non-profit organisation to fund another emergency care unit under its management."
+  },
+  "09281162000110": {
+   "resumo_en": "Outsourcing company that supplies and manages labour.",
+   "o_que_financia_en": "Hiring of outsourced staff (cleaning, administrative support or similar) for schools under the Secretaria de Educação."
+  },
+  "09759606000180": {
+   "resumo_en": "Union of passenger transport companies, which manages the electronic ticketing system.",
+   "o_que_financia_en": "Funds from the Secretaria de Transformação Digital for operating the single-ticket system (VEM) on metropolitan public transport."
+  },
+  "09767633000102": {
+   "resumo_en": "Hospital foundation that provides inpatient care, without emergency care.",
+   "o_que_financia_en": "Transfer to a non-profit organisation from the Secretaria de Saúde to fund hospital services provided to the public."
+  },
+  "09769035000164": {
+   "resumo_en": "State-owned company responsible for water supply and sewage in Pernambuco.",
+   "o_que_financia_en": "Payments from the Secretaria de Educação cover water and sewage bills for municipal schools served by Compesa."
+  },
+  "10565000000192": {
+   "resumo_en": "Prefeitura da Cidade do Recife is the municipal government itself.",
+   "o_que_financia_en": "The amount classified as a grant under Encargos Gerais do Município represents an internal transfer within the City's own structure."
+  },
+  "10811370000162": {
+   "resumo_en": "Civil construction company, probably contracted for public works.",
+   "o_que_financia_en": "Payments from the Secretaria de Infraestrutura for civil engineering works or services contracted by the City."
+  },
+  "10835932000108": {
+   "resumo_en": "State-owned company that distributes electricity in Pernambuco.",
+   "o_que_financia_en": "Payment of electricity bills for buildings, squares, traffic lights and street lighting under Encargos Gerais do Município."
+  },
+  "10859817000173": {
+   "resumo_en": "Charitable hospital that provides urgent and emergency care.",
+   "o_que_financia_en": "This is a transfer (grant) to a non-profit organisation: funds from the Secretaria de Saúde pay for the running of Hospital Evangélico, including emergency care for the public."
+  },
+  "10869782000404": {
+   "resumo_en": "Charitable hospital that provides hospital care (excluding emergency care) in Recife.",
+   "o_que_financia_en": "Transfer from the Secretaria de Saúde to a non-profit organisation to fund hospital services provided to the public through the municipal SUS."
+  },
+  "10894988000486": {
+   "resumo_en": "Hospital da Mulher do Recife provides specialised hospital care.",
+   "o_que_financia_en": "This is a transfer (grant) from the Secretaria de Saúde to this non-profit organisation, to fund the hospital care provided to the public."
+  },
+  "11145893000180": {
+   "resumo_en": "Communications company, probably providing telephony or advertising services.",
+   "o_que_financia_en": "The Secretaria de Administração uses these funds to cover institutional communication or telecommunications services for the City."
+  },
+  "11164874000109": {
+   "resumo_en": "RC Nutry Alimentação supplies ready-made meals to institutions.",
+   "o_que_financia_en": "Payment from the Secretaria de Educação covers school meals supplied to municipal schools."
+  },
+  "11431327000134": {
+   "resumo_en": "State judiciary body, responsible for the justice system in Pernambuco.",
+   "o_que_financia_en": "Transfers from the Secretaria de Administração, probably linked to court costs, agreements or judicial obligations of the City."
+  },
+  "11436813000145": {
+   "resumo_en": "Company that outsources labour and administrative services.",
+   "o_que_financia_en": "Provision of outsourced services (cleaning, administrative support, labour) for units of the Secretaria de Saúde in Recife."
+  },
+  "11516861000143": {
+   "resumo_en": "Security and asset-protection company.",
+   "o_que_financia_en": "The Secretaria de Saúde contracts the services to ensure the security of municipal health units."
+  },
+  "11542750000101": {
+   "resumo_en": "Engineering company that probably carries out construction and renovation work.",
+   "o_que_financia_en": "Payments from the Secretaria de Saúde fund construction, renovation or building maintenance at health units in Recife."
+  },
+  "12285441000166": {
+   "resumo_en": "Engineering and technical consultancy company for urban projects.",
+   "o_que_financia_en": "Engineering and consultancy services for the municipal urban regeneration programme in socially and environmentally vulnerable areas."
+  },
+  "13031257000152": {
+   "resumo_en": "Building and property development company.",
+   "o_que_financia_en": "Construction or renovation work on health units contracted by the Secretaria de Saúde."
+  },
+  "14056350000184": {
+   "resumo_en": "Company providing outsourced services, such as cleaning and operational support.",
+   "o_que_financia_en": "Amounts paid by the Secretaria de Saúde cover outsourced support, cleaning or maintenance services at health units."
+  },
+  "15195617000187": {
+   "resumo_en": "Security and asset-protection company.",
+   "o_que_financia_en": "The Secretaria de Saúde pays for armed or unarmed security at municipal health units."
+  },
+  "18627195000160": {
+   "resumo_en": "Manufacturing and trading company, possibly supplying materials or equipment.",
+   "o_que_financia_en": "Payments from the Secretaria de Educação for school materials, equipment or supplies for municipal schools."
+  },
+  "26994558000123": {
+   "resumo_en": "Federal body that legally represents the federal government in court proceedings.",
+   "o_que_financia_en": "Amounts paid by the Secretaria de Planejamento are transfers or the enforcement of court decisions involving the federal government, managed by this federal body."
+  },
+  "37995880000193": {
+   "resumo_en": "Company that works on urban infrastructure projects.",
+   "o_que_financia_en": "The amount paid by the Secretaria de Infraestrutura covers paving, drainage or urbanisation works in the city."
+  },
+  "40884405000154": {
+   "resumo_en": "Company that hires out vehicles without a driver.",
+   "o_que_financia_en": "Rental of vehicles used by the Secretaria de Infraestrutura for operations and inspection of public works and urban services."
+  },
+  "41051046000117": {
+   "resumo_en": "Architecture and engineering company for urban projects.",
+   "o_que_financia_en": "Technical architecture and engineering services for the urban regeneration and resilience programme in vulnerable areas."
+  },
+  "41106188000134": {
+   "resumo_en": "Trading company, possibly supplying various products.",
+   "o_que_financia_en": "Payments from the Secretaria de Saúde for materials, supplies or products used in the municipal health network."
+  },
+  "45791369000106": {
+   "resumo_en": "Consórcio Recife Ambiental collects rubbish and non-hazardous waste.",
+   "o_que_financia_en": "Payment from the Secretaria de Infraestrutura covers waste collection and urban cleaning services in the municipality."
+  },
+  "50275110000134": {
+   "resumo_en": "Consortium of engineering companies for carrying out public works.",
+   "o_que_financia_en": "The Secretaria de Infraestrutura pays for road or urbanisation works carried out by the consortium."
+  },
+  "52009953000114": {
+   "resumo_en": "Consortium of companies, judging by the name, focused on building a bridge.",
+   "o_que_financia_en": "Funds from the Secretaria de Infraestrutura earmarked for the construction or renovation of a bridge in the city."
+  },
+  "53259823000100": {
+   "resumo_en": "Consortium responsible for building and operating sewage treatment plants.",
+   "o_que_financia_en": "Payments from the Secretaria de Saneamento cover construction and operation of the Cordeiro Sewage Treatment Plant (ETE), part of Recife's sanitation system."
+  },
+  "54483494000131": {
+   "resumo_en": "Consortium of engineering companies focused on sanitation works.",
+   "o_que_financia_en": "The Secretaria de Saneamento pays for sewage or urban drainage works carried out by the consortium."
+  },
+  "69034668000156": {
+   "resumo_en": "Company that manages benefit cards such as food and meal vouchers.",
+   "o_que_financia_en": "Payments from the Secretaria de Infraestrutura fund the benefit cards (food/meals) provided to the department's staff."
+  }
+ }
+}

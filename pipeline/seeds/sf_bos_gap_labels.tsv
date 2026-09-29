@@ -1,0 +1,233 @@
+# The last 759 rows that reached the end with an ACTION and no topic.
+# Read one sentence-shape at a time. Most are the historic Journal's own
+# debris: a record that begins mid-sentence, a supervisor's remark during
+# debate, a communication read into the minutes. Those are typed rather
+# than given a subject they do not have. The rest are contract awards,
+# repeals and appropriations, which do have one.
+# This pass may CHANGE record_type as well as fill the topic — a row that
+# begins 'Whereas, the City and County did, heretofore, pursuant' is cut in
+# half, not a decision with a missing subject.
+# shape	record_type	topic	subtopic	action
+may be introduced before the board of ordinances	page-furniture			other
+and ratifying and approving any action heretofore taken in	cut-in-half			other
+no as follows resolved that the following amounts be	decision	public-money	budget	appropriated
+no code no which resolution was presented to his	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+no as follows resolved that the sum of be	decision	public-money	budget	appropriated
+no as follows resolved that award of contract be	decision	public-money	budget	ordered
+no as follows whereas the city and county of	cut-in-half			other
+calendars and decisions of the supreme and appellate courts	decision	public-money	budget	ordered
+by adding south side of between first and ninth	decision	the-street	street-works	amended
+as defined herein received and assigned to budget and	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+no the title of which is recited above is	decision	running-the-city	code-changes	amended
+no adopted by the public utilities commission on april	decision	city-services	power-utilities	accepted
+no as follows resolved that the mayor and the	decision	running-the-city	vote-or-scheduling	ordered
+authorizing the city and county of san francisco to	decision	public-money	budget	ordered
+no as follows whereas the citizens of the marina	decision	running-the-city	oversight	other
+no file no there appearing no protestants the foregoing	decision	running-the-city	hearings-appeals	accepted
+shall take effect and be in force from and	decision	running-the-city	code-changes	amended
+no the mayor and the clerk of the board	decision	running-the-city	vote-or-scheduling	ordered
+no as follows resolved that the sum of is	decision	public-money	budget	appropriated
+no adopted by the public utilities commission on october	decision	city-services	power-utilities	accepted
+no approved august the title of which is recited	decision	running-the-city	code-changes	amended
+fiscal impact no budget and legislative analyst report received	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+approving an agreement between the city and county of	decision	city-services	power-utilities	ordered
+no communication from city and county officers headquarters certain	decision	running-the-city	vote-or-scheduling	other
+no resolved that the contract for furnishing and supplying	decision	public-money	budget	ordered
+no new series as follows resolved that the contract	decision	public-money	budget	ordered
+no anproved may be and is hereby repealed aves	decision	running-the-city	code-changes	amended
+from e c moulton relative to the merits of	decision	running-the-city	vote-or-scheduling	other
+of rejection is the action that onjilit to be	cut-in-half			other
+no jh file the following communications were received read	decision	running-the-city	vote-or-scheduling	other
+no adopted january is rescinded in so far as	decision	running-the-city	code-changes	amended
+no awarding contract to said firm be and the	decision	running-the-city	code-changes	amended
+he municipal railroad on page thereof	decision	running-the-city	vote-or-scheduling	ordered
+was adopted clerk to advertise for bids for official	decision	public-money	budget	ordered
+no approved july is hereby repealed ayes gallagher george	decision	running-the-city	code-changes	amended
+no whereas by an agreement and indenture made and	decision	public-money	budget	ordered
+gallagher moved that the clerk prepare a summary of	decision	running-the-city	vote-or-scheduling	ordered
+gallagher moved that the clerk be directed to obtain	decision	running-the-city	vote-or-scheduling	ordered
+no awarding the contracts for the furnishing and delivering	decision	public-money	budget	ordered
+no by striking out the words from southerly be	decision	the-street	street-works	amended
+no as follows resolved that the mayor or acting	decision	running-the-city	vote-or-scheduling	ordered
+passed at meeting of j stitt wilson s social	decision	running-the-city	vote-or-scheduling	other
+j r no whereas this board has been confronted	decision	running-the-city	vote-or-scheduling	ordered
+no as follows awarding the contracts for the furnishing	decision	public-money	budget	ordered
+no awarding contracts to certain firms for furnishing and	decision	public-money	budget	ordered
+no also copy of a reply from mr lilienthal	decision	running-the-city	vote-or-scheduling	other
+no approved october be and the same is hereby	decision	running-the-city	code-changes	amended
+no as follows resolved that the contract for printing	decision	public-money	budget	ordered
+favoring the creation and operation of seaboard terminals by	decision	city-services	port	other
+no as follows resolved by the board of that	cut-in-half			other
+no as follows resolved by the board of sui	cut-in-half			other
+fee crosman for the reduction of the electrical license	decision	running-the-city	vote-or-scheduling	other
+no are hereby repealed adopted by the foliowmg vote	decision	running-the-city	code-changes	amended
+no as follows resolved that a carlisle co be	decision	public-money	budget	ordered
+no be and the same is hereby repealed appropriations	decision	running-the-city	code-changes	amended
+no but was disapproved by the mayor on august	decision	running-the-city	vote-or-scheduling	other
+no adopted by this board november be and is	decision	running-the-city	code-changes	amended
+no approved december for aluminum trays is hereoy cancelled	decision	public-money	budget	ordered
+no sale of sub treasury building and erection of	decision	land-and-building	city-sells-land	ordered
+no new se ries as follows awarding contract to	decision	public-money	budget	ordered
+no as follows resolved that award of contract on	decision	public-money	budget	ordered
+no approved may the title of which is above	decision	running-the-city	code-changes	amended
+no of the board of our of o clock	cut-in-half			other
+no approved february is hereby repealed section this ordinance	decision	running-the-city	code-changes	amended
+of industrial association relative to labor dispute the following	decision	running-the-city	staff-and-jobs	other
+of kiwanis club relative to labor dispute the following	decision	running-the-city	staff-and-jobs	other
+the following was presented and read by the clerk	decision	running-the-city	vote-or-scheduling	other
+no as follows resolved that that the sum of	decision	public-money	budget	appropriated
+no to said the mccarthy company be it futher	decision	public-money	budget	ordered
+no ries as follows resolved that award of contract	decision	public-money	budget	ordered
+no as follows resolved that the city and county	cut-in-half			other
+no new se s as follows resolved that the	decision	public-money	budget	accepted
+no as follows whereas the richmond district is practically	decision	land-and-building	zoning	other
+no approved july is hereby repealed adopted by the	decision	running-the-city	code-changes	amended
+gallagher s motion i simply wanted to endeavor to	decision	land-and-building	city-leases	ordered
+no as follows whereas the board of april and	cut-in-half			other
+no code no does continue to exist and will	cut-in-half			other
+no dated april be and is hereby approved ayes	decision	running-the-city	vote-or-scheduling	ordered
+heretofore referred to the charter installation committee on april	decision	running-the-city	vote-or-scheduling	ordered
+no as follows whereas the city of san francisco	cut-in-half			other
+no adopted february relative to the use of city	decision	public-money	budget	amended
+no as follows resolved that inasmuch as persons in	decision	running-the-city	oversight	other
+no code no g which resolution was presented to	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+no dealing with the subject matter was referred on	decision	running-the-city	vote-or-scheduling	ordered
+items nos and in calendar june moved that the	decision	running-the-city	vote-or-scheduling	ordered
+no adopted by the board of adopted by the	decision	running-the-city	code-changes	amended
+no as follows resolved that the city attorney the	decision	running-the-city	vote-or-scheduling	ordered
+now l ending before your board for final passage	decision	running-the-city	vote-or-scheduling	other
+offered by was only the second time such action	cut-in-half			other
+no adopted by this board on september s is	decision	running-the-city	code-changes	amended
+no of the public utilities commission the mayor and	decision	city-services	power-utilities	accepted
+no as follows authorizing the mayor to direct the	decision	land-and-building	city-buys-land	ordered
+no as follows whereas the united states government owns	decision	land-and-building	city-buys-land	other
+no as follows whereas on the st day of	cut-in-half			other
+no verbal opinion of deputy city attorney walker peddicord	cut-in-half			other
+no mr brooks replied that he had requested the	cut-in-half			other
+no statement by county of san francisco desired to	cut-in-half			other
+no approximate perimeter area mason and sutter streets to	decision	land-and-building	zoning	amended
+no whaley of the department of public works to	cut-in-half			other
+no discussion g measure on the calendar until such	cut-in-half			other
+no opinion from deputy city attorney the question was	cut-in-half			other
+no the no objection and motion carried suspension of	cut-in-half			other
+no ment department of public works and the municipal	cut-in-half			other
+no communication from director of property iew of the	decision	running-the-city	vote-or-scheduling	other
+no amendment h improvements including personnel for operation and	decision	running-the-city	vote-or-scheduling	amended
+no in response to inquiry of ether or not	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+no et and all deficiencies in the construction corrected	cut-in-half			other
+no the clerk presented a communication from the controller	decision	running-the-city	vote-or-scheduling	other
+no super viso morrison stated that in his opinion	cut-in-half			other
+no director of public works tatarian urged that the	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+no the clerk presented a communication from alled on	decision	running-the-city	vote-or-scheduling	other
+no cution of planning and construction work which is	decision	running-the-city	vote-or-scheduling	amended
+no molinari nelder silver and walker seconded by adopted	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+no the clerk indicated he received communication dated february	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+file the following person was granted privilege of the	decision	running-the-city	vote-or-scheduling	other
+relating to the computation of aid grants also see	decision	city-services	health	amended
+finding that the general manager of the department of	decision	city-services	health	other
+no after exhausting his ten minute speaking period	cut-in-half			other
+which approved establishment of subscription service charge for receipt	decision	running-the-city	code-changes	amended
+no adopted september mr wallace wortman director of property	decision	land-and-building	city-sells-land	other
+no assessor s block lots and southeast comer and	decision	land-and-building	city-sells-land	ordered
+no assessor s block lots and adopted by the	decision	land-and-building	city-sells-land	ordered
+approving agreement whereby the city and county of san	decision	public-money	budget	ordered
+no assessor s block lot lc cated on the	decision	land-and-building	city-sells-land	ordered
+relating to allowable personal property and income disregard by	decision	city-services	health	amended
+no finally passed passed for second reading the following	decision	land-and-building	zoning	amended
+no adopted town hall youth service center	decision	city-services	schools	accepted
+no q s adopted august companion measure to file	decision	running-the-city	vote-or-scheduling	other
+requesting approval of the agreement for curation services with	decision	civic-life	commendations	ordered
+to the various officials and persons herein designated with	cut-in-half			other
+no as follows whereas ap iication has iieea made	cut-in-half			other
+no as follows whereas by reason of the dally	cut-in-half			other
+on motion of r comte d ancona faymonville magee	decision	running-the-city	vote-or-scheduling	ordered
+no ew series as follows transterrinj and dedicatinii the	decision	city-services	schools	ordered
+no is as follows resolved that the sum of	decision	public-money	budget	appropriated
+no as follows resolved that all public institutions and	decision	running-the-city	vote-or-scheduling	ordered
+no as follows resolved that the room adjoining the	decision	land-and-building	construction	ordered
+no s as follows resolved that the sum of	decision	public-money	budget	appropriated
+no xew series as follows resolved that the sum	decision	public-money	budget	appropriated
+no r oo as follows resolved that the sum	decision	public-money	budget	appropriated
+williams protesting against award of contract for printing block	decision	running-the-city	vote-or-scheduling	other
+no s as follows resolved that the award of	decision	public-money	budget	ordered
+no and request is hereby made that an answer	decision	running-the-city	vote-or-scheduling	other
+no ai passed november i to the public buildings	decision	running-the-city	vote-or-scheduling	ordered
+no as follows resolved that the board of ses	cut-in-half			other
+mclaugldin moved to amend hy strikiu out the word	decision	running-the-city	vote-or-scheduling	amended
+no as follows itesolved that the sum of be	decision	public-money	budget	appropriated
+no o from the grand jury recommending that the	decision	running-the-city	oversight	other
+no as follows resolved that all institutions or agencies	decision	public-money	budget	amended
+no ai i roved april g be and the	decision	running-the-city	code-changes	amended
+no aiiiiroved april be and the same is hereby	decision	running-the-city	code-changes	amended
+no gs ries as follows resolved that herbert be	decision	public-money	budget	ordered
+no as follows resolved that the clerk of the	decision	running-the-city	vote-or-scheduling	ordered
+boiifj of i acitic surety co nrniy coverin iiernnt	decision	doing-business	other-permits	granted
+no as follows resolved that a contract is hereby	decision	public-money	budget	ordered
+no awarding the contracts for furnishing and delivering supplies	decision	public-money	budget	ordered
+no awarding to neal publishing company the contract for	decision	public-money	budget	ordered
+no as follows resolved that a contract for furnishing	decision	public-money	budget	ordered
+no as follows resolved that the clerk of this	decision	running-the-city	vote-or-scheduling	ordered
+no for the reason that section of article xni	cut-in-half			other
+oarricd city engineer o shaughnessy to advise city of	decision	getting-around	transit	other
+no as follows resolved that contracts for furnishing the	decision	public-money	budget	ordered
+no as follows whereas there has been considerable thought	cut-in-half			other
+no are hereby repealed adopted by the following vote	decision	running-the-city	code-changes	amended
+no as follows resolved ihat the clerk is hereby	decision	running-the-city	vote-or-scheduling	ordered
+no as follows resolved that the contracts for furnishing	decision	public-money	budget	ordered
+no the title of which is recited in the	decision	running-the-city	code-changes	amended
+no a as follows awarding contract for furnishing during	decision	public-money	budget	ordered
+no is hereby confirmed section this ordinance shall take	decision	running-the-city	code-changes	amended
+no as follows whereas there has been transmitted to	cut-in-half			other
+no the title of which is above recited is	decision	running-the-city	code-changes	amended
+no l as follows liesolved that award of rontrart	decision	public-money	budget	ordered
+no s ew series as follows resolved that award	decision	public-money	budget	ordered
+no as follows resolved tliat the bond filed with	decision	public-money	budget	accepted
+no as follows resolved that the bond tiled with	decision	public-money	budget	accepted
+no as follows whereas all bids were rejected that	decision	public-money	budget	ordered
+no dated february be and the same is hereby	decision	running-the-city	vote-or-scheduling	ordered
+of intention the san francisco news is hereby designated	decision	public-money	budget	ordered
+no as follows resolved in accordance with the recommendation	decision	city-services	power-utilities	accepted
+no by john j sharon assistant secretary public utilities	decision	city-services	power-utilities	accepted
+no at its meeting november and to the end	cut-in-half			other
+no the fee therefor to be recommended by the	decision	public-money	taxes-revenue	amended
+no as follows whereas san francisco at present striving	cut-in-half			other
+prepared and presented by the committee itself pursuant to	decision	running-the-city	vote-or-scheduling	other
+no as follows whereas the marina one of our	decision	land-and-building	zoning	other
+no are hereby repealed recommended by the mayor recommended	decision	running-the-city	code-changes	amended
+no as follows whereas it is understood that negotiations	cut-in-half			other
+no are hereby repealed approved as to form by	decision	running-the-city	code-changes	amended
+no previously adopted by the board which was a	decision	running-the-city	vote-or-scheduling	other
+no as follows whereas that district south and east	decision	land-and-building	zoning	other
+no concerning permanent site for the u n o	decision	running-the-city	vote-or-scheduling	other
+no as follows resolved that the city attorney with	decision	running-the-city	vote-or-scheduling	ordered
+no adopted by the board of approved as to	decision	running-the-city	code-changes	amended
+no as follows whereas it has come to the	cut-in-half			other
+no statement by chief administrative officer the chief administrative	cut-in-half			other
+no discussion supcrivsor macphee chairman of the finance committee	cut-in-half			other
+no to the police committee no objection and motion	cut-in-half			other
+no adopted on april composed of the mayor the	decision	running-the-city	vote-or-scheduling	ordered
+no agreement to run from may to june adopted	decision	public-money	budget	ordered
+no communications the clerk presented cormnunications from the following	decision	running-the-city	vote-or-scheduling	other
+no discussion colonel mills informed the board that the	cut-in-half			other
+no discussion the clerk informed the members of the	cut-in-half			other
+no er department operations within one centralized facility and	cut-in-half			other
+no whatever work has been done must have been	cut-in-half			other
+no he asked if it was proper for him	cut-in-half			other
+no he explained that president johnson will not be	decision	running-the-city	vote-or-scheduling	ordered
+no in response to a statement by y postponed	cut-in-half			other
+no in response to a question by to construction	cut-in-half			other
+no supevisor ertola seconded by no objection motion adopted	cut-in-half			other
+no department of public health government efficiency and labor	decision	city-services	health	accepted
+authorizing the director of administrative services to execute amendment	decision	public-money	budget	amended
+no brewster joy west side of bayshore freeway south	decision	land-and-building	zoning	ordered
+in the ordinance provides for of the construction cost	decision	civic-life	commendations	amended
+no adopted on december the oard of l with	decision	public-money	budget	amended
+program fund according to mr bateman under the contract	decision	city-services	police	ordered
+funds the proposed ordinance would establish a bayview dispute	decision	city-services	police	ordered
+funds would be able to receive gifts or grants	decision	public-money	budget	amended
+for the period july through june received and assigned	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+no adopted clay and arguello streets	decision	the-street	street-works	ordered
+fiscal impact received and assigned to homelessness and behavioral	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+human services agency received from department received and assigned	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+municipal transportation agency fiscal impact received and assigned to	decision	running-the-city	vote-or-scheduling	voted-or-scheduled
+municipal transportation agency fiscal impact	decision	running-the-city	vote-or-scheduling	voted-or-scheduled

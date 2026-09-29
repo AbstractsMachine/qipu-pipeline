@@ -17,6 +17,44 @@
 version: 2
 
 models:
+  - name: int_br_recife_credor_ano
+    description: |
+      Recipient (organisation CNPJ) × year rollup of core_br_recife_despesa:
+      empenho count, empenhado / pago líquido / subvenção totals, number of
+      paying agencies and the principal agency (most empenho rows that year,
+      ties broken alphabetically so the value is stable across builds).
+    columns:
+      - name: recipient_key
+        tests: [not_null]
+      - name: ano
+        tests: [not_null]
+
+  - name: core_br_recife_credor
+    description: |
+      Recipient dimension — one row per organisation CNPJ: most frequent
+      name, latest-year principal agency, Receita Federal registry fields
+      (ode_razao_social, ode_cnae_*, ode_porte …), plain-language summary
+      (ode_resumo) and citizen theme (ode_tema: CNAE-section mapping, else
+      agency-regex mapping, else 'Outros'; ties broken deterministically).
+      Carries no amounts.
+    columns:
+      - name: cnpj
+        tests: [not_null, unique]
+      - name: ode_tema
+        tests: [not_null]
+
+  - name: core_br_recife_source_catalog
+    description: |
+      CKAN provenance dimension — one row per synced Recife resource
+      (source_id × resource_id). Marts join it to stamp source_url,
+      source_name, source_portal, source_license and rows_updated_at
+      (as_of); yearly resources roll up in the mart. Carries no amounts.
+    columns:
+      - name: source_id
+        tests: [not_null, unique]
+      - name: dataset_page_url
+        tests: [not_null]
+
   - name: core_br_recife_contratos
     description: |
       Contratos administrativos, one row per contract.
@@ -33,12 +71,21 @@ models:
         tests:
           - not_null
 
+  - name: core_br_recife_contratos_pncp
+    description: "Recife's contracts on the PNCP (core_br_municipio_contratos, id_municipio 2611606, Câmara excluded, revenue contracts excluded), with numero_chave written the city's way (« 5011.0023/2025 ») for the join with the city register in mart_br_recife_contratos."
+    columns:
+      - name: numero_controle_pncp
+        tests: [not_null, unique]
   - name: mart_br_recife_contratos
     description: |
       Contract mart with the plausibility guard. valor_implausivel flags any
       contract whose stated value exceeds the city's largest single-year
       committed spend — such an amount cannot be true of one contract and is
-      withheld from every published total.
+      withheld from every published total. Since 2026-09-23 it also carries
+      the PNCP: city contracts without an amount take the amount of the same
+      contract on the PNCP (valor_fonte = 'pncp'), contracts only the PNCP
+      lists are added (fonte = 'pncp'), and a_receber flags the few where the
+      city receives the amount (auction of a credit, onerous concession).
     columns:
       - name: contrato_id
         tests:
@@ -63,3 +110,177 @@ models:
             - comissao
             - processo_numero
             - processo_ano
+
+  # --- staging (documented 2026-08-26) ---
+  - name: stg_br_recife_catalog
+    description: "Typed view over raw.br_recife_catalog: one row per synced CKAN resource (dataset title, resource/page URLs, licence, last_modified → rows_updated_at)."
+  - name: stg_br_recife_contratos
+    description: "Typed view over raw.br_recife_contratos: one row per administrative contract with separate CNPJ/CPF columns (doc_tipo), both valorcontrato figures exposed, '.'-decimal amounts."
+  - name: stg_br_recife_despesa
+    description: "Typed union of raw.br_recife_despesa_credor_{2024,2025,2026}: one row per empenho × month; CPF/CNPJ split into doc + doc_tipo (is_org = CNPJ), Modalidade de Aplicação 50 → is_subvencao, monthly movement amounts."
+  - name: stg_br_recife_funcional
+    description: "Typed union of raw.br_recife_funcional_{2024,2025,2026}: monthly incremental execution by função × subfunção × programa × ação × fonte (dotação, empenhado, liquidado, pago)."
+  - name: stg_br_recife_licitacoes
+    description: "Concluídas (lot rows collapsed to one row per processo, principal supplier = largest lot value) unified with em-andamento tenders; Brazilian-format amounts normalised."
+  - name: stg_br_recife_places
+    description: "Six civic-facility families (UBS, USF, escolas, cultura, esporte, praças) mapped to one shape with swap-safe lat/lon extraction; one row per facility."
+  - name: stg_br_recife_place_obras
+    description: "Typed view over raw.br_recife_place_obras: per place slug, the number and total of public-works contracts whose objeto mentions the place (evidence, not a total spent)."
+  - name: stg_br_recife_enrich_cnpj
+    description: "Latest Receita Federal registry row per CNPJ from raw.br_recife_enrich_cnpj (razão social, CNAE code/description/section, porte, natureza jurídica, situação, município, UF)."
+  - name: stg_br_recife_enrich_vulgar
+    description: "Latest plain-language summary per CNPJ from raw.br_recife_enrich_vulgar (resumo, o_que_financia, generating model)."
+  - name: stg_br_recife_tema_map
+    description: "Wrapper over seed_mapping_tema_recife: (chave_tipo, chave) → citizen theme with a priority; chave_tipo ∈ {cnae_secao, orgao_regex}."
+
+  # --- core / marts (documented 2026-08-26) ---
+  - name: core_br_recife_despesa
+    description: "Row-level OBT of empenho × month rows from stg_br_recife_despesa with periodo_mes and recipient_key (CNPJ for organisations, NULL for individuals so no mart can surface a person)."
+    columns:
+      - name: ano
+        tests: [not_null]
+  - name: core_br_recife_funcional
+    description: "Row-level OBT of the execution-by-function rows (stg_br_recife_funcional pass-through); monthly increments, mês=0 = opening dotação."
+  - name: core_br_recife_licitacoes
+    description: "One row per tender processo (stg_br_recife_licitacoes pass-through)."
+  - name: core_br_recife_places
+    description: "Civic places with a stable slug (normalised name, ranked suffix on collisions), only facilities with a name and coordinates, plus ode_obras_total / ode_n_obras from the place ↔ works crosswalk."
+    columns:
+      - name: slug
+        tests: [not_null, unique]
+  - name: mart_br_recife_budget_mensal
+    description: "Empenhado / liquidado / pago per ano × mês (months 1–12) from core_br_recife_funcional, with funcional provenance."
+  - name: mart_br_recife_budget_funcao
+    description: "Empenhado / liquidado / pago and line count per ano × função × subfunção from core_br_recife_funcional, with each row's share of the year's pago and provenance."
+  - name: mart_br_recife_budget_dotacao
+    description: "The voted budget (dotação inicial, the LOA) and the updated one per ano × função from core_br_recife_funcional, with provenance. The year rail of the budget page shows the voted amount for the unfinished year."
+    columns:
+      - name: ano
+        tests: [not_null]
+      - name: funcao
+        tests: [not_null]
+  - name: stg_br_recife_despesa_orc
+    description: "Despesas orçamentárias 2002-2023 (older series), typed: órgão, função/subfunção, grupo/elemento, modalidade de aplicação, empenhado/liquidado/pago. No credor document — never joined to the 2024+ recipients."
+    columns:
+      - name: ano
+        tests: [not_null]
+  - name: mart_br_recife_funcao_hist
+    description: "Recife's budget by função over 2002-2023 from the older series: per ano × função, the total paid, the paid amount by forma (the natureza in plain words) and by órgão. Feeds the função fiche (funcao_hist.json)."
+    columns:
+      - name: ano
+        tests: [not_null]
+      - name: funcao_codigo
+        tests: [not_null]
+      - name: corte
+        tests:
+          - accepted_values:
+              values: ['total', 'forma', 'orgao']
+  - name: mart_br_recife_places
+    description: "Published civic places: core_br_recife_places columns plus the fixed portal source name/URL and unit."
+  - name: mart_br_recife_quem_recebe
+    description: "Organisation recipients per year (int_br_recife_credor_ano) with the stable name from core_br_recife_credor and credor-dataset provenance."
+  - name: mart_br_recife_recebe_enriched
+    description: "One row per organisation recipient: totals summed over years from int_br_recife_credor_ano, plus name, principal agency, Receita Federal fields, summary and theme from core_br_recife_credor."
+  - name: mart_br_recife_orgao_credor
+    description: "Paying agency × year × recipient CNPJ: pago (SUM of pago_liquido) and empenho count, recipient name from core_br_recife_credor. Serves the órgão pages and the recipient by-agency breakdown in export_br_recife.py."
+    columns:
+      - name: orgao
+        tests: [not_null]
+
+  # ---------------------------------------------------------------------------
+  # Every município (2026-09-18): SICONFI through Base dos Dados.
+  # ---------------------------------------------------------------------------
+  - name: stg_br_siconfi_despesas_funcao
+    description: "SICONFI DCA Anexo I-E, every município, 2017+, three stages, coded contas only."
+    columns:
+      - name: ano
+        tests: [not_null]
+      - name: id_municipio
+        tests: [not_null]
+  - name: stg_br_municipios
+    description: "The municípios directory with the latest population and the site slug."
+    columns:
+      - name: id_municipio
+        tests: [not_null, unique]
+      - name: slug
+        tests: [not_null, unique]
+  - name: core_br_municipios
+    description: "The municípios directory the marts join on (core layer over stg_br_municipios)."
+    columns:
+      - name: id_municipio
+        tests: [not_null, unique]
+      - name: slug
+        tests: [not_null, unique]
+  - name: core_br_municipio_despesas
+    description: "Despesas por função e subfunção × município × ano, pago / empenhado / liquidado."
+  - name: stg_br_siconfi_receitas
+    description: "DCA Anexo I-C, coded rows : ano × município × estágio × conta, with the depth of the account (0 total, 1 correntes/capital, 2 origem, 3 detalhe)."
+    columns:
+      - name: nivel
+        tests:
+          - accepted_values:
+              values: [0, 1, 2, 3, 4]
+              quote: false
+  - name: core_br_municipio_receitas
+    description: "Receitas × município × ano × conta : bruta, deduções (FUNDEB and the others) and liquida = bruta − deduções."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [ano, id_municipio, id_conta_bd]
+  - name: mart_br_municipio_receitas
+    description: "Revenue rows of every município's budget page : the total, the origens and their detail, gross, deductions, net."
+    columns:
+      - name: liquida
+        tests: [not_null]
+  - name: mart_br_municipio_budget
+    description: "Budget page rows of every município (função, subfunção, totals flagged)."
+  - name: stg_br_pncp_contratos
+    description: "One row per municipal contract on the PNCP, latest publication kept, Empenho rows and empty amounts left out."
+    columns:
+      - name: numero_controle_pncp
+        tests: [not_null, unique]
+      - name: id_municipio
+        tests: [not_null]
+  - name: core_br_municipio_contratos
+    description: "The contracts with the município's identity (slug, name) and the year the page files them under."
+    columns:
+      - name: numero_controle_pncp
+        tests: [not_null, unique]
+      - name: valor_suspeito
+        description: "More than 3× the município's largest yearly paid spending (SICONFI), or above R$ 1 bi without a SICONFI figure ; kept, never summed or ranked."
+        tests: [not_null]
+  - name: mart_br_municipio_contratos
+    description: "Per município × ano : every contract (framework calls with the same objeto and amount grouped, n_fornecedores), with objeto, supplier (CNPJ for a company, nothing for a person), paying unit, dates and amount, ranked by amount; n_ano / valor_ano the year's count and total."
+    columns:
+      - name: id_municipio
+        tests: [not_null]
+      - name: ano
+        tests: [not_null]
+  - name: mart_br_municipio_perfil
+    description: "Per município × ano (2017+): investment, staff, debt service paid (DCA Anexo I-D), loans and financing owed (balance sheet), IPTU / ISS / ITBI net (Anexo I-C), the mayor elected in 2024 and the first election of the same person's run, council seats (TSE)."
+    columns:
+      - name: id_municipio
+        tests: [not_null]
+      - name: ano
+        tests: [not_null]
+  - name: mart_br_municipio_pares
+    description: "Per ano × size band × função: the median paid per inhabitant among the municípios of the band (the « ailleurs » of the French commune page); funcao_codigo '00' is the total."
+    columns:
+      - name: faixa
+        tests: [not_null]
+  - name: mart_br_municipio_pares_perfil
+    description: "Per ano × size band × serie (divida, impostos): the median per inhabitant among the municípios of the band that report it — the balance-sheet loans (perfil.divida) and ISS + IPTU + ITBI."
+    columns:
+      - name: faixa
+        tests: [not_null]
+      - name: serie
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['divida', 'impostos']
+  - name: mart_br_municipios
+    description: "One row per município : identity, population, yearly totals, latest pago per inhabitant."
+    columns:
+      - name: id_municipio
+        tests: [not_null, unique]
+      - name: slug
+        tests: [not_null, unique]

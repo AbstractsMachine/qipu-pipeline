@@ -107,6 +107,127 @@ sources:
   # endereço…; datainiciovigencia; datafimvigencia; valorcontrato1/2;
   # situacaocontrato. Full history (back to 2004). Decimals use '.'.
   # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # C) Despesas orçamentárias 2002-2023 — the older series, ONE table per year
+  # with everything the 2024+ split datasets spread over three files: órgão,
+  # unidade, categoria/grupo/modalidade/ELEMENTO (natureza), função/subfunção,
+  # programa/ação, fonte, credor (código + nome), modalidade de licitação,
+  # valor empenhado/liquidado/pago (','-decimal). Row = empenho movement.
+  # Same 39-column header every year (md5-checked 2026-09-23). It gives the
+  # fiches 20 more years and the função page its « sob que forma » (elemento)
+  # and « quem recebe » (credor) — neither exists by função after 2023.
+  # ---------------------------------------------------------------------------
+  - id: orcamentaria_2002
+    type: ckan
+    resource_id: "c1f96596-830f-4933-9c14-d5199644471b"
+    target_table: br_recife_despesa_orc_2002
+    description: "Despesas orçamentárias — 2002 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2003
+    type: ckan
+    resource_id: "0aad91e2-04b4-463a-8202-44e51a84f2f4"
+    target_table: br_recife_despesa_orc_2003
+    description: "Despesas orçamentárias — 2003 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2004
+    type: ckan
+    resource_id: "6e441aa8-23a7-427e-8971-2018fda922f1"
+    target_table: br_recife_despesa_orc_2004
+    description: "Despesas orçamentárias — 2004 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2005
+    type: ckan
+    resource_id: "a1a35923-f027-4e07-a6f5-04a164eb2dfd"
+    target_table: br_recife_despesa_orc_2005
+    description: "Despesas orçamentárias — 2005 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2006
+    type: ckan
+    resource_id: "700fdec2-31ff-4e9c-8fd1-a7b3c56331c7"
+    target_table: br_recife_despesa_orc_2006
+    description: "Despesas orçamentárias — 2006 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2007
+    type: ckan
+    resource_id: "2cb6a68c-c930-46ad-a0a6-635d486950c2"
+    target_table: br_recife_despesa_orc_2007
+    description: "Despesas orçamentárias — 2007 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2008
+    type: ckan
+    resource_id: "ca3d1086-f36e-4cfc-9d5f-e9b79f1192ff"
+    target_table: br_recife_despesa_orc_2008
+    description: "Despesas orçamentárias — 2008 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2009
+    type: ckan
+    resource_id: "25416f0e-a0c0-4104-ba72-75d3390073fa"
+    target_table: br_recife_despesa_orc_2009
+    description: "Despesas orçamentárias — 2009 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2010
+    type: ckan
+    resource_id: "6808a3a2-7c0d-463e-8176-bc058cd43f95"
+    target_table: br_recife_despesa_orc_2010
+    description: "Despesas orçamentárias — 2010 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2011
+    type: ckan
+    resource_id: "8da2af22-dc61-43a8-8854-2480eeb3decb"
+    target_table: br_recife_despesa_orc_2011
+    description: "Despesas orçamentárias — 2011 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2012
+    type: ckan
+    resource_id: "9dca9a83-e033-4b4f-97d0-c194e8c2f4a5"
+    target_table: br_recife_despesa_orc_2012
+    description: "Despesas orçamentárias — 2012 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2013
+    type: ckan
+    resource_id: "4be4b148-c6d1-4b26-ac18-f66e6bce1429"
+    target_table: br_recife_despesa_orc_2013
+    description: "Despesas orçamentárias — 2013 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2014
+    type: ckan
+    resource_id: "69fa0c8a-27a5-4eb7-a9f3-5eef7c64c055"
+    target_table: br_recife_despesa_orc_2014
+    description: "Despesas orçamentárias — 2014 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2015
+    type: ckan
+    resource_id: "e88761a1-5ce0-4389-83be-67ca865c3832"
+    target_table: br_recife_despesa_orc_2015
+    description: "Despesas orçamentárias — 2015 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2016
+    type: ckan
+    resource_id: "9e562881-21d1-4ca2-a84c-1015b99a9569"
+    target_table: br_recife_despesa_orc_2016
+    description: "Despesas orçamentárias — 2016 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2017
+    type: ckan
+    resource_id: "bdc5103e-a34c-4530-8395-88362e4e18f5"
+    target_table: br_recife_despesa_orc_2017
+    description: "Despesas orçamentárias — 2017 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2018
+    type: ckan
+    resource_id: "a5b295c0-e2d5-4637-bc04-6e75352f72a3"
+    target_table: br_recife_despesa_orc_2018
+    description: "Despesas orçamentárias — 2018 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2019
+    type: ckan
+    resource_id: "120654a5-77ba-486b-a77f-6960de204ccd"
+    target_table: br_recife_despesa_orc_2019
+    description: "Despesas orçamentárias — 2019 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2020
+    type: ckan
+    resource_id: "993e972d-125a-4d38-a18b-3754cb30c660"
+    target_table: br_recife_despesa_orc_2020
+    description: "Despesas orçamentárias — 2020 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2021
+    type: ckan
+    resource_id: "74acf548-e343-44dd-a708-fbb0a5cdd909"
+    target_table: br_recife_despesa_orc_2021
+    description: "Despesas orçamentárias — 2021 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2022
+    type: ckan
+    resource_id: "3d7b31ed-7def-4b8e-9a9b-09f22342d741"
+    target_table: br_recife_despesa_orc_2022
+    description: "Despesas orçamentárias — 2022 (série histórica, função × elemento × credor)"
+  - id: orcamentaria_2023
+    type: ckan
+    resource_id: "ba29bffc-6478-4dd7-80a4-4c3ab6157f59"
+    target_table: br_recife_despesa_orc_2023
+    description: "Despesas orçamentárias — 2023 (série histórica, função × elemento × credor)"
+
   - id: contratos
     type: ckan
     resource_id: "a72e7175-8fcd-40bd-82ef-056a621a6165"

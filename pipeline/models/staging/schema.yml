@@ -20,7 +20,10 @@ models:
       - type_operation = 'Réel' (exclut 'Pour Ordre')
       - montant > 0
 
-      Années: 2019-2024
+      Années: 2019-2024 depuis l'open data de la Ville ; une année exécutée
+      qu'elle n'a pas encore publiée (2025) depuis la balance DGFiP croisée
+      nature × fonction, ramenée au même grain et contrôlée contre le compte
+      administratif imprimé (test balance_budget_vs_ca_imprime).
     columns:
       - name: annee
         description: "Année fiscale"
@@ -42,12 +45,24 @@ models:
         description: "Code chapitre M57"
         tests:
           - not_null
+      - name: chapitre_libelle
+        description: "Libellé du chapitre (open data de la Ville ; pour une année DGFiP, le dernier libellé publié)"
+        tests:
+          - not_null
       - name: nature_code
         description: "Code nature comptable (clé de jointure)"
         tests:
           - not_null
+      - name: nature_libelle
+        description: "Libellé de la nature (open data, sinon seed_paris_ca_libelles recopié du CA imprimé)"
+        tests:
+          - not_null
       - name: fonction_code
         description: "Code fonction (clé de jointure)"
+      - name: fonction_libelle
+        description: "Libellé de la sous-fonction (open data, sinon seed_paris_ca_libelles)"
+        tests:
+          - not_null
       - name: montant
         description: "Montant mandaté après régularisation (€)"
         tests:
@@ -57,6 +72,12 @@ models:
         tests:
           - unique
           - not_null
+      - name: source_budget
+        description: "D'où vient la ligne : open data de la Ville, ou balance DGFiP pour une année qu'elle n'a pas encore publiée"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['open_data_ville', 'balance_dgfip']
 
   # ===========================================================================
   # BUDGET VOTÉ (prévisionnel) - Entité séparée du CA
@@ -462,8 +483,20 @@ models:
   # Tous les seeds-mappings et seeds-cache LLM sont désormais wrappés ici.
   # ===========================================================================
 
+  - name: stg_paris_catalog
+    description: >
+      Snapshot typé du catalogue Opendatasoft (raw.paris_catalog) : une ligne
+      par dataset × champ, avec titre, URL de la page dataset, licence,
+      éditeur et `modified` (→ rows_updated_at). Source de vérité de la
+      provenance Paris.
+    columns:
+      - name: source_id
+        tests: [not_null]
+      - name: dataset_page_url
+        tests: [not_null]
+
   - name: stg_dette_garantie
-    description: "Annexe IV-B Paris (emprunts garantis) — wrapper de raw.dette_garantie_paris."
+    description: "Annexe IV-B Paris (emprunts garantis) — wrapper de raw.dette_garantie_paris. source_url est ajouté dans core_dette_garantie depuis le catalogue."
     columns:
       - name: annee
         tests: [not_null]
@@ -570,6 +603,25 @@ models:
       - name: nom_canonique
         tests: [not_null]
 
+  - name: stg_beneficiaire_identites
+    description: >
+      Graphie normalisée d'un bénéficiaire → identité canonique de l'organisation
+      (seed_beneficiaire_identites, produit par identites_beneficiaires.py).
+      Règle et preuve de chaque rapprochement : normalisation, troncature,
+      SIREN ou jugement. Jamais de personne physique.
+    columns:
+      - name: beneficiaire_normalise
+        tests: [not_null, unique]
+      - name: identite
+        tests: [not_null]
+      - name: regle
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['normalisation', 'troncature', 'siren', 'jugement', 'renommage']
+      - name: preuve
+        tests: [not_null]
+
   - name: stg_cache_thematique_beneficiaires
     description: "Cache LLM thématique par bénéficiaire normalisé."
     columns:
@@ -660,7 +712,7 @@ models:
           - unique
 
   - name: stg_apur_sru
-    description: "Inventaire SRU par arrondissement 2001-2019 (APUR, licence ODbL). Seed figé — dernière ventilation infra-communale publiée en open data."
+    description: "Inventaire SRU par arrondissement (APUR) : open data 2001-2019 (licence ODbL, comptages bruts) + note annuelle à partir de 2025 (nombre de logements et part publiée, sans résidences principales)."
     columns:
       - name: arrondissement
         description: "Numéro d'arrondissement (1-20)"
@@ -675,6 +727,40 @@ models:
         tests:
           - not_null
       - name: residences_principales
-        description: "Résidences principales au sens SRU (dénominateur DGFiP)"
+        description: "Résidences principales au sens SRU (dénominateur DGFiP) ; absentes des notes annuelles, qui publient la part"
         tests:
-          - not_null
+          - not_null:
+              config:
+                where: "taux_pct_publie IS NULL"
+      - name: taux_pct_publie
+        description: "Part publiée par l'APUR (note annuelle) quand les résidences principales ne le sont pas"
+        tests:
+          - not_null:
+              config:
+                where: "residences_principales IS NULL"
+
+  - name: stg_marseille_subventions
+    description: >
+      Subventions SCDL Ville de Marseille 2017–2022 (raw.marseille_subventions_ville_*
+      chargés en STRING) : montant normalisé (virgule ou point décimal → FLOAT),
+      colonnes renommées au schéma commun.
+
+  - name: stg_marseille_cache_thematique
+    description: >
+      Wrapper sans transformation de seed_marseille_cache_thematique :
+      thématique finale par beneficiaire_normalise, produite par
+      enrich_thematique_marseille.py.
+
+  - name: stg_marseille_place_subventions_rules
+    description: >
+      Wrapper de seed_marseille_place_subventions_rules : par lieu Marseille,
+      une regex « operator » (le bénéficiaire est le lieu, seuil
+      min_montant_total) et une regex « residents » (l'objet nomme le lieu,
+      exclude_regex écarte les écoles homonymes, max_rows plafonne).
+    columns:
+      - name: place_slug
+        tests: [not_null]
+      - name: relation
+        tests:
+          - accepted_values:
+              values: ['operator', 'residents']

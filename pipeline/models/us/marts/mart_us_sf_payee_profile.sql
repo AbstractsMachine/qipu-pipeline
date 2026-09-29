@@ -3,8 +3,8 @@
 --
 -- Sources: core_us_sf_vouchers (row-level payment lines),
 --          mart_us_sf_payees_search (the vendor universe),
---          stg_us_sf_subobject_class (purchase / obligation / ledger),
---          stg_us_sf_catalog (provenance).
+--          int_us_sf_sub_objects (purchase / obligation / ledger),
+--          core_us_sf_source_catalog (provenance).
 -- Grain:   one row per vendor (raw Controller display string).
 --
 -- WHY THIS EXISTS. The payee fiche had money and nothing else: a total, a
@@ -145,7 +145,7 @@ cat_cells AS (
         COUNT(DISTINCT l.voucher)          AS n_vouchers
     FROM lines l
     INNER JOIN subobj_labels sl USING (sub_object_code)
-    LEFT JOIN {{ ref('stg_us_sf_subobject_class') }} k
+    LEFT JOIN {{ ref('int_us_sf_sub_objects') }} k
         USING (sub_object_code)
     WHERE l.fiscal_year >= 2018
       AND l.sub_object_code IS NOT NULL
@@ -213,7 +213,7 @@ recent_cells AS (
         ON f.vendor = l.vendor AND f.recent_fy = l.fiscal_year
     INNER JOIN dept_labels dl USING (department_code)
     LEFT JOIN subobj_labels sl USING (sub_object_code)
-    LEFT JOIN {{ ref('stg_us_sf_subobject_class') }} k
+    LEFT JOIN {{ ref('int_us_sf_sub_objects') }} k
         USING (sub_object_code)
     WHERE l.department_code IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 6
@@ -263,7 +263,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_vouchers'
 )
 

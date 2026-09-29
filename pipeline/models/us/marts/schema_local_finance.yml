@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: mart_us_lf_towns
+    description: "One row per US town page (MA, IN, IA, FL, CA): identity, Census link, population, latest totals per document."
+    columns:
+      - name: slug
+        tests: [unique, not_null]
+      - name: state
+        tests:
+          - accepted_values:
+              values: ['MA', 'IN', 'IA', 'FL', 'CA']
+  - name: mart_us_lf_town_budget
+    description: "Town × fiscal year × document × shared category × state sub-category, counted lines, same fund scope for both documents."
+  - name: mart_us_lf_town_years
+    description: "Yearly totals per town and document, the year rail of a town page."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [state, government_key, fiscal_year, document]
+  - name: mart_us_lf_town_revenue
+    description: "Town × fiscal year × document × revenue category × the state's own line, counted lines only (no borrowing, no transfers between funds)."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [state, government_key, fiscal_year, document, category_code, subcategory]
+  - name: mart_us_lf_town_nature
+    description: "Town × fiscal year × document × type of spending (Indiana), the by-nature cut of the town page."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [state, government_key, fiscal_year, document, nature_code]
+  - name: mart_us_lf_town_capital
+    description: "What a town builds: capital spending, town × fiscal year × document × line, with the basis each state records it on."
+    columns:
+      - name: basis
+        tests:
+          - accepted_values:
+              values: ['capital_outlay', 'capital_projects', 'capital_projects_fund']
+  - name: mart_us_lf_town_debt
+    description: "What a town owes: town × fiscal year × issue, end-of-year principal and principal due within a year (Indiana)."
+  - name: mart_us_lf_town_tax_rate
+    description: "The property tax rate a town sets, town × year, in each state's own unit (MA, IA, FL per $1,000; IN per $100)."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [state, government_key, year]
+  - name: mart_us_lf_town_debt_total
+    description: "What a town owes, town × fiscal year: outstanding debt at year end (IN, CA, MA, IA)."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [state, government_key, fiscal_year]

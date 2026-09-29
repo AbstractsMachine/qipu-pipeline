@@ -2,8 +2,8 @@
 -- Mart: what San Francisco actually buys — spending by sub-object
 --
 -- Sources: core_us_sf_vouchers (row-level payment lines),
---          stg_us_sf_subobject_class (purchase / obligation / ledger),
---          stg_us_sf_catalog (provenance).
+--          int_us_sf_sub_objects (purchase / obligation / ledger),
+--          core_us_sf_source_catalog (provenance).
 -- Grain:   fiscal_year × sub_object_code.
 --
 -- Replaces a hand-curated six-line "what a payment buys" strip with the whole
@@ -154,7 +154,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_vouchers'
 )
 
@@ -189,7 +189,7 @@ SELECT
     p.rows_updated_at
 FROM cells c
 LEFT JOIN labels l    USING (sub_object_code)
-LEFT JOIN {{ ref('stg_us_sf_subobject_class') }} k USING (sub_object_code)
+LEFT JOIN {{ ref('int_us_sf_sub_objects') }} k USING (sub_object_code)
 LEFT JOIN exemplar e  USING (fiscal_year, sub_object_code)
 LEFT JOIN top_payees tp USING (fiscal_year, sub_object_code)
 CROSS JOIN provenance p

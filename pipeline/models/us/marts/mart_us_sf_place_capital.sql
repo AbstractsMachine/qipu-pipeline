@@ -38,7 +38,7 @@ WITH bonds AS (
         match_evidence,
         CAST(NULL AS STRING)                               AS contract_no,
         CAST(NULL AS STRING)                               AS status
-    FROM {{ ref('stg_us_sf_place_bonds') }}
+    FROM {{ ref('core_us_sf_place_bonds') }}
 ),
 
 contracts AS (
@@ -56,7 +56,7 @@ contracts AS (
         match_evidence,
         contract_no,
         CAST(NULL AS STRING)                               AS status
-    FROM {{ ref('stg_us_sf_place_contracts') }}
+    FROM {{ ref('core_us_sf_place_contracts') }}
 ),
 
 unioned AS (

@@ -52,6 +52,7 @@ Usage:
     python sync_socrata.py us --skip-catalog           # skip catalog snapshot
     python sync_socrata.py us --dry-run                # plan only
     python sync_socrata.py us --block datasf           # explicit protocol block
+    python sync_socrata.py us --block ca_sco           # California State Controller (ByTheNumbers)
 """
 
 from __future__ import annotations
@@ -125,8 +126,11 @@ def load_country_config(country_slug: str) -> dict:
         return yaml.safe_load(f)
 
 
-def socrata_sources(config: dict) -> list[dict]:
-    return [s for s in config.get("sources", []) if s.get("type") == "socrata"]
+def socrata_sources(config: dict, block: str = "datasf") -> list[dict]:
+    """The socrata sources of one protocol block — a source names its block
+    with `block:` (default `datasf`, so SF sources need no key)."""
+    return [s for s in config.get("sources", [])
+            if s.get("type") == "socrata" and s.get("block", "datasf") == block]
 
 
 def sanitize_field_name(name: str) -> str:
@@ -465,7 +469,7 @@ def main() -> int:
     csv_page_size = int(protocol.get("csv_page_size", CSV_PAGE_SIZE_DEFAULT))
     raw_dataset = config.get("bq_raw_dataset", RAW_DATASET_DEFAULT)
 
-    sources = socrata_sources(config)
+    sources = socrata_sources(config, args.block)
     if args.source:
         sources = [s for s in sources if s["id"] == args.source]
         if not sources:
@@ -515,7 +519,7 @@ def main() -> int:
         # datasets' provenance rows).
         log.section("Catalog metadata snapshot")
         try:
-            all_sources = socrata_sources(config)
+            all_sources = socrata_sources(config, args.block)
             for s in all_sources:
                 if s["id"] not in metas:
                     metas[s["id"]] = fetch_views_metadata(domain, s["dataset_id"], log)

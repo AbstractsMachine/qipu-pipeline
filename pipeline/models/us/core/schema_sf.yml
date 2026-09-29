@@ -78,3 +78,55 @@ models:
         tests: [not_null]
       - name: source_url
         tests: [not_null]
+
+  - name: core_us_sf_source_catalog
+    description: >
+      DataSF provenance dimension — one row per synced Socrata dataset
+      (source_id), collapsed from the dataset×column staging catalog.
+      Marts join it to stamp dataset_page_url / dataset_name / attribution /
+      rows_updated_at (the export contract's source_url and as_of). Carries
+      no amounts.
+    columns:
+      - name: source_id
+        tests: [not_null, unique]
+      - name: dataset_page_url
+        tests: [not_null]
+      - name: rows_updated_at
+        tests: [not_null]
+
+  - name: core_us_sf_places
+    description: >
+      SF places — the reviewed place ↔ facility crosswalk joined to the City
+      Facilities registry, one row per place_slug × facility_id: identity
+      evidence from the crosswalk, address / APN / size / owner / coordinates
+      read live from the registry, plus a GEOGRAPHY point. Every place mart
+      starts here.
+    columns:
+      - name: place_slug
+        tests: [not_null]
+      - name: facility_id
+        tests: [not_null]
+
+  - name: core_us_sf_place_contracts
+    description: >
+      Place ↔ prime contract links (one row per place_slug × contract_no) as
+      reviewed in seed_us_sf_place_contracts, with the contract's agreed and
+      lifetime-paid dollars. Feeds place capital rows and the payee chain.
+
+  - name: core_us_sf_place_bonds
+    description: >
+      Place ↔ GO-bond links (place_slug × source_kind × item_name) as
+      reviewed in seed_us_sf_place_bonds: exact bond dollars for bond_item
+      rows, program context for bond_project rows.
+
+  - name: core_us_sf_dpw_projects
+    description: >
+      DPW projects OBT — one row per project × mapped point with a GEOGRAPHY,
+      straight from stg_us_sf_dpw_projects. Used for the spatial "construction
+      near this place" join. Carries no money.
+
+  - name: core_us_sf_building_permits
+    description: >
+      Building permits OBT (~1.29M rows) from stg_us_sf_building_permits;
+      block_lot is the APN that joins to core_us_sf_places. Costs are the
+      applicant's declared value, not city spend.

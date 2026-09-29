@@ -83,6 +83,16 @@ def collect(logger: Logger) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
 def upload(df: pd.DataFrame, table: str, client: bigquery.Client, logger: Logger) -> None:
     table_ref = f"{PROJECT_ID}.{RAW_DATASET}.{table}"
+    # WRITE_TRUNCATE remplace la table. Un DataFrame vide n'a pas de colonnes :
+    # BigQuery écrase alors la table prod par une coquille à une colonne
+    # (`loaded_at`) et tout le staging casse (« Unrecognized name: session_id »).
+    # C'est arrivé le 2026-09-08 en CI, où le cache source n'existe pas.
+    # Zéro ligne n'est jamais une donnée à publier : on refuse.
+    if df.empty:
+        raise SystemExit(
+            f"✗ {table}: 0 ligne à charger — refus d'écraser la table prod. "
+            f"Source attendue : {DELIBS_DIR} (vide ou absente ?)"
+        )
     job_config = bigquery.LoadJobConfig(
         write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
         autodetect=True,
@@ -96,10 +106,25 @@ def upload(df: pd.DataFrame, table: str, client: bigquery.Client, logger: Logger
 def main() -> None:
     logger = Logger("sync_deliberations")
     logger.header("Sync Conseil de Paris deliberations → BigQuery")
+    # Le cache vient d'un scrape fait en session (scrape_deliberations.py) et vit
+    # sous pipeline/cache/, ignoré par git : en CI il n'existe pas. Ce n'est pas
+    # une erreur — c'est « rien de nouveau ». Les tables raw gardent leur contenu
+    # et la chaîne dbt continue dessus. On le dit, et on sort proprement.
+    if not DELIBS_DIR.is_dir() or not any(DELIBS_DIR.glob("session_*.json")):
+        logger.info(
+            f"Source absente ({DELIBS_DIR}) — skip, les tables raw deliberations_* "
+            f"gardent leur contenu précédent."
+        )
+        return
     sessions_df, delibs_df, articles_df = collect(logger)
     logger.info(
         f"Total: {len(sessions_df)} sessions · {len(delibs_df)} delibs · {len(articles_df)} articles"
     )
+    # Tout ou rien : les trois tables décrivent le même corpus. On vérifie les
+    # trois AVANT le premier upload pour ne jamais laisser prod à moitié écrasée.
+    for name, df in (("sessions", sessions_df), ("delibs", delibs_df), ("articles", articles_df)):
+        if df.empty:
+            raise SystemExit(f"✗ {name}: 0 ligne — refus de charger (source : {DELIBS_DIR}).")
     client = bigquery.Client(project=PROJECT_ID)
     upload(sessions_df, "deliberations_sessions_paris", client, logger)
     upload(delibs_df, "deliberations_delibs_paris", client, logger)

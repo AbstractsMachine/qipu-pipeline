@@ -22,6 +22,16 @@
 --
 -- NB : particuliers exclus de la résolution SIRET/thématique — la source les
 -- agrège déjà en une ligne « PERSONNES PHYSIQUES ANONYMISEES RGPD » au staging.
+--
+-- IDENTITÉ (2026-09-29) : une même organisation est publiée sous plusieurs
+-- graphies selon les exercices (nom coupé à 35 caractères, sigle, abréviation :
+-- « REGIE IMMOBILIERE DE LA VILLE DE PA », « RIVP », « REGIE IMMOBILIERE VILLE
+-- DE PARIS RIVP »). `identite` rattache chaque graphie à la graphie canonique
+-- de son organisation (stg_beneficiaire_identites, preuve par graphie), pour
+-- toutes les années ; une graphie non rapprochée est sa propre identité.
+-- `nom_identite` = le nom publié le plus récent de la graphie canonique, NULL
+-- quand la graphie n'est rapprochée d'aucune autre (le nom source reste alors
+-- celui de chaque ligne). Jamais de personne physique dans le seed.
 -- =============================================================================
 
 WITH distinct_benef AS (
@@ -40,6 +50,22 @@ mapping_entites AS (
 
 cache_thematique AS (
     SELECT * FROM {{ ref('stg_cache_thematique_beneficiaires') }}
+),
+
+identites AS (
+    SELECT beneficiaire_normalise, identite
+    FROM {{ ref('stg_beneficiaire_identites') }}
+),
+
+-- Le nom publié le plus récent de chaque graphie (à égalité d'exercice, la
+-- ligne au plus gros montant) : sert de nom d'affichage à l'identité.
+nom_recent AS (
+    SELECT
+        beneficiaire_normalise,
+        ARRAY_AGG(beneficiaire IGNORE NULLS ORDER BY annee DESC, montant DESC, cle_technique)[SAFE_OFFSET(0)] AS nom
+    FROM {{ ref('stg_subventions_all') }}
+    WHERE beneficiaire_normalise IS NOT NULL
+    GROUP BY beneficiaire_normalise
 ),
 
 -- ─── SIRET / secteurs au niveau ENTITÉ ────────────────────────────────────────
@@ -121,10 +147,17 @@ SELECT
     ct.ode_source           AS llm_source_thematique,
 
     -- Nom canonique (dédup CASP etc.), fallback = le nom normalisé lui-même.
-    COALESCE(be.nom_canonique, b.beneficiaire_normalise)        AS nom_canonique
+    COALESCE(be.nom_canonique, b.beneficiaire_normalise)        AS nom_canonique,
+
+    -- Identité de l'organisation, toutes années (voir en-tête).
+    COALESCE(i.identite, b.beneficiaire_normalise)              AS identite,
+    TO_HEX(MD5(COALESCE(i.identite, b.beneficiaire_normalise))) AS identite_id,
+    CASE WHEN i.identite IS NOT NULL THEN nr.nom END            AS nom_identite
 
 FROM distinct_benef b
 LEFT JOIN assoc_entity  a  USING (beneficiaire_normalise)
 LEFT JOIN best_pattern  bp USING (beneficiaire_normalise)
 LEFT JOIN cache_thematique ct USING (beneficiaire_normalise)
 LEFT JOIN best_entity   be USING (beneficiaire_normalise)
+LEFT JOIN identites     i  USING (beneficiaire_normalise)
+LEFT JOIN nom_recent    nr ON nr.beneficiaire_normalise = i.identite

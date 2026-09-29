@@ -1,0 +1,89 @@
+{
+ "what": "Vancouver's additions to San Francisco's taxonomy (pipeline/seeds/sf_bos_taxonomy.json), found where the calibration run of 2026-09-15 could not place a Vancouver record (58 of 300). Slugs added, none changed.",
+ "subtopics": {
+  "land-and-building": [
+   {
+    "slug": "strata-conversions",
+    "label": "Rental buildings turned into condos"
+   },
+   {
+    "slug": "secondary-suites",
+    "label": "Secondary and illegal suites"
+   },
+   {
+    "slug": "land-dedicated",
+    "label": "Land handed to the city for a street or lane"
+   },
+   {
+    "slug": "area-plans",
+    "label": "Plans for a whole area or the whole city"
+   },
+   {
+    "slug": "building-and-climate-rules",
+    "label": "Building code and climate rules"
+   },
+   {
+    "slug": "rental-protection",
+    "label": "Protecting rental housing (rate of change, demolitions)"
+   }
+  ],
+  "public-money": [
+   {
+    "slug": "development-levies",
+    "label": "Development levies and amenity contributions"
+   },
+   {
+    "slug": "grants",
+    "label": "Grants to organisations"
+   },
+   {
+    "slug": "fines-and-cost-recovery",
+    "label": "Fines and cost recovery"
+   },
+   {
+    "slug": "purchasing",
+    "label": "City purchases and bids"
+   }
+  ],
+  "city-services": [
+   {
+    "slug": "arts-and-culture",
+    "label": "Arts and culture"
+   },
+   {
+    "slug": "street-cleaning-and-snow",
+    "label": "Street cleaning, garbage and snow"
+   }
+  ],
+  "doing-business": [
+   {
+    "slug": "service-stations",
+    "label": "Service stations and car washes"
+   },
+   {
+    "slug": "cannabis",
+    "label": "Cannabis"
+   }
+  ],
+  "civic-life": [
+   {
+    "slug": "provincial-and-federal",
+    "label": "The Province and Ottawa"
+   },
+   {
+    "slug": "first-nations",
+    "label": "First Nations"
+   }
+  ]
+ },
+ "actions": [
+  {
+   "slug": "suspended-or-revoked",
+   "label": "suspended or revoked"
+  },
+  {
+   "slug": "referred",
+   "label": "sent on to a hearing or a committee"
+  }
+ ]
+}

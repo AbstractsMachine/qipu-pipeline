@@ -27,8 +27,39 @@ from utils.logger import Logger
 PROJECT_ID = "open-data-france-484717"
 RAW_DATASET = "raw"
 RAW_TABLE = "dette_garantie_paris"
-API_BASE = "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/dette-garantie"
-DEFAULT_YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _paris_portal  # noqa: E402
+API_BASE = _paris_portal.api("/catalog/datasets/dette-garantie")
+# Les exercices ne sont plus écrits à la main. La liste figée s'arrêtait à
+# 2019-2024 alors que la source publie de 2007 à 2025 pour la Ville de Paris :
+# douze exercices et environ 94 000 lignes n'étaient jamais ingérés, donc
+# jamais exportés, sans qu'aucun commentaire ne dise pourquoi (constaté
+# 2026-09-10). On demande au portail quels exercices il porte.
+FALLBACK_YEARS = [2019, 2020, 2021, 2022, 2023, 2024]
+
+
+def annees_publiees(logger) -> list[int]:
+    """Les exercices que le portail porte pour la Ville de Paris."""
+    import json as _json
+    import urllib.parse as _up
+    import urllib.request as _ur
+    url = (f"{API_BASE}/records?" + _up.urlencode({
+        "select": "annee_de_publication, count(*) as n",
+        "group_by": "annee_de_publication",
+        "where": 'collectivite="Ville de Paris"', "limit": "100"}))
+    try:
+        req = _ur.Request(url, headers={"User-Agent": "qipu/0.1 (qipu.org)"})
+        data = _json.loads(_ur.urlopen(req, timeout=60).read())
+        annees = sorted({int(str(r["annee_de_publication"])[:4])
+                         for r in data.get("results", []) if r.get("annee_de_publication")})
+        if annees:
+            return annees
+    except Exception as exc:  # noqa: BLE001
+        logger.info(f"exercices illisibles ({type(exc).__name__}), repli sur la liste figée : {exc}")
+    return FALLBACK_YEARS
+
+
+DEFAULT_YEARS = FALLBACK_YEARS
 
 
 def fetch_year(year: int, logger: Logger) -> pd.DataFrame:
@@ -60,12 +91,14 @@ def upload(df: pd.DataFrame, client: bigquery.Client, logger: Logger) -> None:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--years", default=",".join(str(y) for y in DEFAULT_YEARS))
+    parser.add_argument("--years", default=None,
+                        help="exercices séparés par des virgules ; par défaut, ceux que le portail publie")
     args = parser.parse_args()
-    years = [int(y) for y in args.years.split(",") if y.strip()]
-
     logger = Logger("sync_dette_garantie")
-    logger.header(f"Sync dette-garantie · {len(years)} années")
+    years = ([int(y) for y in args.years.split(",") if y.strip()]
+             if args.years else annees_publiees(logger))
+    logger.header(f"Sync dette-garantie · {len(years)} années "
+                  f"({years[0]}→{years[-1]})")
 
     frames = []
     for y in years:

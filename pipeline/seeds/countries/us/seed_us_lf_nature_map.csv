@@ -1,0 +1,10 @@
+source_system,source_value,nature_code,note
+in,PERSONAL SERVICES,salaries,Indiana budget expenditure category and AFR disbursement class
+in,SERVICES AND CHARGES,services,
+in,SUPPLIES,supplies,
+in,CAPITAL OUTLAYS,capital,
+in,DEBT SERVICE,debt,Budget label
+in,DEBT SERVICE - PRINCIPAL AND INTEREST,debt,AFR label
+in,OTHER DISBURSEMENTS,other,AFR only
+in,TOWNSHIP ASSISTANCE,other,
+in,TAXES AND INTERGOVERNMENTAL,other,

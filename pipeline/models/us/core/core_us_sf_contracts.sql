@@ -12,9 +12,19 @@
 WITH contracts AS (
     SELECT *
     FROM {{ ref('stg_us_sf_contracts') }}
+),
+
+-- Editorial grouping of purchasing authorities — seed, display only.
+authority_families AS (
+    SELECT purchasing_authority, authority_family
+    FROM {{ ref('stg_us_sf_purchasing_authority_families') }}
 )
 
 SELECT
-    *,
-    project_team_constituent = 'Prime Contractor'  AS is_prime_contractor_row
-FROM contracts
+    c.*,
+    c.project_team_constituent = 'Prime Contractor'  AS is_prime_contractor_row
+    ,
+    fam.authority_family               AS purchasing_authority_family
+FROM contracts c
+LEFT JOIN authority_families fam
+    ON fam.purchasing_authority = c.purchasing_authority

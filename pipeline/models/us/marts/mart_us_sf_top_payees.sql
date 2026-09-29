@@ -3,8 +3,8 @@
 --
 -- Sources: core_us_sf_vouchers (8.07M rows → FY × vendor rollup),
 --          core_us_sf_contracts (grant-contract join, FY2018+),
---          stg_us_sf_payee_buckets (manual bucket classification),
---          stg_us_sf_catalog (provenance).
+--          int_us_sf_payees (manual bucket classification),
+--          core_us_sf_source_catalog (provenance).
 -- Grain:  fiscal_year × vendor, top 100 payees per FY by vouchers_paid.
 --
 -- READ THIS before ranking (docs/us/API-RECON.md §A.3): the top of a naive
@@ -56,7 +56,7 @@ top_department AS (
             fiscal_year, vendor, department,
             ROW_NUMBER() OVER (
                 PARTITION BY fiscal_year, vendor
-                ORDER BY SUM(vouchers_paid) DESC
+                ORDER BY SUM(vouchers_paid) DESC, department
             ) AS rn
         FROM {{ ref('core_us_sf_vouchers') }}
         WHERE vendor IS NOT NULL
@@ -77,7 +77,7 @@ ranked AS (
     SELECT
         *,
         ROW_NUMBER() OVER (
-            PARTITION BY fiscal_year ORDER BY vouchers_paid_usd DESC
+            PARTITION BY fiscal_year ORDER BY vouchers_paid_usd DESC, vendor
         ) AS rank_in_fy
     FROM by_vendor
 ),
@@ -140,7 +140,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_vouchers'
 )
 
@@ -177,7 +177,7 @@ INNER JOIN fy_totals ft USING (fiscal_year)
 LEFT JOIN top_department td USING (fiscal_year, vendor)
 LEFT JOIN objects_top3 o3 USING (fiscal_year, vendor)
 LEFT JOIN grant_funded gf USING (fiscal_year, vendor)
-LEFT JOIN {{ ref('stg_us_sf_payee_buckets') }} pb
+LEFT JOIN {{ ref('int_us_sf_payees') }} pb
     ON pb.vendor = r.vendor
 CROSS JOIN provenance pr
 WHERE r.rank_in_fy <= 100

@@ -1,0 +1,33 @@
+nature_prefix,classe,section,default_sens,is_ordre,sankey_group_fr,sankey_group_en,category_fr,category_en,source
+60,6,Fonctionnement,Depense,false,Achats et charges externes,Purchases & external charges,Achats et variations de stocks,Purchases & stock variation,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+61,6,Fonctionnement,Depense,false,Achats et charges externes,Purchases & external charges,Services extérieurs,External services,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+62,6,Fonctionnement,Depense,false,Achats et charges externes,Purchases & external charges,Autres services extérieurs,Other external services,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+63,6,Fonctionnement,Depense,false,Impôts et taxes (charges),Taxes (expense),"Impôts, taxes et versements assimilés","Taxes and similar payments",Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+64,6,Fonctionnement,Depense,false,Charges de personnel,Staff costs,Charges de personnel,Personnel expenses,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+65,6,Fonctionnement,Depense,false,Charges de gestion courante,Current management expenses,Autres charges de gestion courante,Other current management expenses,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+66,6,Fonctionnement,Depense,false,Charges financières,Financial expenses,Charges financières,Financial expenses,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+67,6,Fonctionnement,Depense,false,Charges exceptionnelles,Exceptional expenses,Charges exceptionnelles,Exceptional expenses,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+68,6,Fonctionnement,Ordre,true,Opérations d'ordre,Book (non-cash) entries,Dotations aux amortissements et provisions,Depreciation & provision allowances,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+70,7,Fonctionnement,Recette,false,Produits des services,Service revenue,Produits des services et du domaine,Service and domain revenue,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+71,7,Fonctionnement,Ordre,true,Opérations d'ordre,Book (non-cash) entries,Production stockée,Stored production,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+72,7,Fonctionnement,Ordre,true,Opérations d'ordre,Book (non-cash) entries,Production immobilisée,Capitalised production,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+73,7,Fonctionnement,Recette,false,Impôts et taxes,Taxes,Impôts et taxes,Taxes,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+74,7,Fonctionnement,Recette,false,Dotations et subventions,Grants & subsidies,"Dotations, subventions et participations","Grants, subsidies and participations",Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+75,7,Fonctionnement,Recette,false,Autres produits de gestion,Other management revenue,Autres produits de gestion courante,Other current management revenue,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+76,7,Fonctionnement,Recette,false,Produits financiers,Financial revenue,Produits financiers,Financial revenue,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+77,7,Fonctionnement,Recette,false,Produits exceptionnels,Exceptional revenue,Produits exceptionnels,Exceptional revenue,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+78,7,Fonctionnement,Ordre,true,Opérations d'ordre,Book (non-cash) entries,Reprises sur amortissements et provisions,Depreciation & provision reversals,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+79,7,Fonctionnement,Recette,false,Transferts de charges,Cost transfers,Transferts de charges,Cost transfers,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+10,1,Investissement,Recette,false,Dotations et fonds propres,Endowments & own funds,"Dotations, fonds divers et réserves (dont FCTVA)","Endowments, funds and reserves (incl. FCTVA)",Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+13,1,Investissement,Recette,false,Subventions d'investissement,Investment grants,Subventions d'investissement reçues,Investment grants received,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+15,1,Investissement,Ordre,true,Opérations d'ordre,Book (non-cash) entries,Provisions pour risques et charges,Provisions for risks and charges,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+16,1,Investissement,Both,false,Emprunts et dettes,Borrowing & debt,Emprunts et dettes assimilées,Borrowing and similar debt,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+20,2,Investissement,Depense,false,Dépenses d'équipement,Capital expenditure,Immobilisations incorporelles,Intangible assets,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+21,2,Investissement,Depense,false,Dépenses d'équipement,Capital expenditure,Immobilisations corporelles,Tangible assets,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+22,2,Investissement,Depense,false,Dépenses d'équipement,Capital expenditure,Immobilisations reçues en affectation,Assets received under allocation,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+23,2,Investissement,Depense,false,Dépenses d'équipement,Capital expenditure,Immobilisations en cours,Assets under construction,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+24,2,Investissement,Depense,false,Opérations pour compte de tiers,Third-party operations,Immobilisations affectées ou mises à disposition,Assets allocated or made available,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+26,2,Investissement,Depense,false,Participations financières,Financial holdings,Participations et créances rattachées,Holdings and related receivables,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+27,2,Investissement,Depense,false,Autres immobilisations financières,Other financial assets,Autres immobilisations financières,Other financial assets,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+28,2,Investissement,Ordre,true,Opérations d'ordre,Book (non-cash) entries,Amortissements des immobilisations,Asset depreciation,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP
+29,2,Investissement,Ordre,true,Opérations d'ordre,Book (non-cash) entries,Provisions pour dépréciation des immobilisations,Asset impairment provisions,Plan comptable M14/M57 (comptabilité par nature) — DGCL/DGFiP

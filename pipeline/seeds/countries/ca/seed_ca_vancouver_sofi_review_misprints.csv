@@ -1,0 +1,4 @@
+report_year,table_name,fiscal_year_from,fiscal_year_to,evidence
+2023,capital_additions,2019,2022,"The 2023 five-year table prints 2022 = $585,399k, 2021 = $354,977k: the 2021 and 2020 figures one column to the right. The 2023 statement's own discussion says capital additions were $455.0 million in 2022, and the 2021 and 2022 statements say $585.4 million in 2021 and $455.0 million in 2022."
+2024,capital_additions,2020,2022,"Same shifted row as the 2023 report (2022 = $585,399k); the 2022 statement says $455.0 million in 2022."
+2025,capital_additions,2021,2022,"Same shifted row as the 2023 report (2022 = $585,399k, 2021 = $354,977k); the 2021 and 2022 statements say $585.4 million in 2021 and $455.0 million in 2022."

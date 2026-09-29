@@ -58,6 +58,11 @@ WITH bp_modern AS (
         CAST(NULL AS STRING) AS fonction_libelle_raw,
         SAFE_CAST(`Montant BP en euros` AS FLOAT64) AS montant_raw
     FROM {{ source('marseille_raw', 'marseille_budget_primitif_' ~ year) }}
+    -- Budget principal only: the file also carries the 5 budgets annexes
+    -- (Opéra et Odéon, Pompes Funèbres, Espaces Evénementiels, Pôle Média
+    -- Belle de Mai, Stade Vélodrome) whose nature lines collide on
+    -- cle_technique. Aligned with Paris (comptes administratifs *budgets principaux*).
+    WHERE `Budget` = 'VdM - Budget Principal'
     {% if not loop.last %}UNION ALL{% endif %}
     {% endfor %}
 ),
@@ -104,8 +109,10 @@ ca_modern AS (
             ELSE `BGT_SECTION`
         END AS section_raw,
         -- BGT_CODRD = 'recette' or 'depense'
+        -- BGT_CODRD = 'dépense' / 'recette' — UPPER('é') is 'É', so '%DEP%'
+        -- silently missed every expense line; compare accent-free.
         CASE
-            WHEN UPPER(`BGT_CODRD`) LIKE '%DEP%' THEN 'DEP'
+            WHEN REGEXP_CONTAINS(NORMALIZE(UPPER(`BGT_CODRD`), NFD), r'^D\p{M}?E\p{M}*P') THEN 'DEP'
             WHEN UPPER(`BGT_CODRD`) LIKE '%REC%' THEN 'REC'
             ELSE `BGT_CODRD`
         END AS sens_raw,
@@ -122,6 +129,8 @@ ca_modern AS (
         CAST(NULL AS STRING) AS fonction_libelle_raw,
         SAFE_CAST(`BGT_MTREAL` AS FLOAT64) AS montant_raw
     FROM {{ source('marseille_raw', 'marseille_compte_administratif_' ~ year) }}
+    -- Budget principal only (BGT_NOM lists the same 5 budgets annexes — see BP).
+    WHERE `BGT_NOM` = 'VdM - Budget Principal'
     {% if not loop.last %}UNION ALL{% endif %}
     {% endfor %}
 ),

@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: Licitações — one row per procurement PROCESSO (concluída or andamento).
 --
--- Source: stg_br_recife_licitacoes. economia = estimado − homologado (savings
+-- Source: core_br_recife_licitacoes. economia = estimado − homologado (savings
 -- vs the reference price) on concluídas. Feeds the contratos page's
 -- procurement context (modalidade mix, savings, in-progress pipeline).
 --
@@ -19,7 +19,7 @@ WITH provenance AS (
         ANY_VALUE(portal_name)       AS source_portal,
         ANY_VALUE(license_title)     AS source_license,
         MAX(rows_updated_at)         AS rows_updated_at
-    FROM {{ ref('stg_br_recife_catalog') }}
+    FROM {{ ref('core_br_recife_source_catalog') }}
     WHERE source_id LIKE 'licitacoes_%'
 )
 
@@ -47,5 +47,5 @@ SELECT
     p.source_portal,
     p.source_license,
     p.rows_updated_at                AS source_rows_updated_at
-FROM {{ ref('stg_br_recife_licitacoes') }} l
+FROM {{ ref('core_br_recife_licitacoes') }} l
 CROSS JOIN provenance p

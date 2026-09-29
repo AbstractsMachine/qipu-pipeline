@@ -27,3 +27,99 @@ models:
         tests: [not_null]
       - name: n_rows
         tests: [not_null]
+
+  # ---------------------------------------------------------------------------
+  # Display dimensions derived from the core OBTs (the editorial seeds are
+  # joined row-level in core_us_sf_*; these expose them at their own grain so
+  # marts join a small table after aggregating). ADR-0001 layering, rule E3.
+  # ---------------------------------------------------------------------------
+  - name: int_us_sf_payees
+    description: >
+      Payee dimension — one row per vendor string that has a manual bucket
+      (community / government / utility …) in seed_us_sf_payee_buckets, taken
+      from core_us_sf_vouchers. Display classification only; amounts never
+      pass through here.
+    columns:
+      - name: vendor
+        tests: [not_null, unique]
+      - name: bucket
+        tests: [not_null]
+
+  - name: int_us_sf_sub_objects
+    description: >
+      Sub-object spend-class dimension (purchase / obligation / ledger /
+      unclear) — one row per sub_object_code carrying a class, from
+      core_us_sf_vouchers.
+    columns:
+      - name: sub_object_code
+        tests: [not_null, unique]
+
+  - name: int_us_sf_departments
+    description: >
+      Department display-name dimension — one row per department_code with an
+      editorial display name, from core_us_sf_budget ∪ core_us_sf_actuals.
+    columns:
+      - name: department_code
+        tests: [not_null, unique]
+      - name: display_name
+        tests: [not_null]
+
+  - name: int_us_sf_characters
+    description: >
+      Character gloss dimension — one row per (side, character_code) with a
+      plain-English gloss and display category, from core_us_sf_budget.
+    columns:
+      - name: character_code
+        tests: [not_null]
+
+  - name: int_us_sf_purchasing_authorities
+    description: >
+      Purchasing-authority family dimension — one row per purchasing
+      authority string with an editorial family, from core_us_sf_contracts.
+    columns:
+      - name: purchasing_authority
+        tests: [not_null, unique]
+
+  - name: int_us_sf_job_reclass
+    description: >
+      Job-code reclassification dimension — one row per job code whose empty
+      portal family ('0000' / '__UNASSIGNED__') was manually assigned a
+      family, from core_us_sf_comp.
+    columns:
+      - name: job_code
+        tests: [not_null, unique]
+
+  - name: int_us_sf_job_families
+    description: >
+      Job-family display dimension — one row per effective family code
+      (after reclassification) with its canonical label and display family,
+      from core_us_sf_comp.
+    columns:
+      - name: job_family_code
+        tests: [not_null, unique]
+
+  - name: int_us_sf_budget_vs_actual_dept
+    description: >
+      Operating budget vs actuals per fiscal_year × side × department, FY2019+
+      (Operating funds only, transfers and related-government-unit rows
+      excluded, FULL OUTER join of core_us_sf_budget and core_us_sf_actuals),
+      with the editorial department display name and the structural-outlier
+      flag from seed_us_sf_bva_outliers. mart_us_sf_budget_vs_actual_dept
+      adds provenance and execution status.
+    columns:
+      - name: fiscal_year
+        tests: [not_null]
+      - name: department_code
+        tests: [not_null]
+
+  - name: int_us_sf_payee_materiality
+    description: >
+      Curated "what a payment buys" lines — the seed picks which vendor ×
+      department × sub_object × fiscal_year lines to feature and their label;
+      amount_usd and n_voucher_lines are summed from core_us_sf_vouchers.
+      One row per slug.
+    columns:
+      - name: slug
+        tests: [not_null, unique]
+      - name: amount_usd
+        tests: [not_null]

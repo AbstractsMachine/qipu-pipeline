@@ -4,7 +4,10 @@
 # Read by:
 #   - `pipeline/scripts/sync/sync_fiscaldata.py us`   (type: fiscaldata_api)
 #   - `pipeline/scripts/sync/sync_census_popest.py us` (type: census_popest_csv)
-#   - `pipeline/scripts/sync/sync_socrata.py us`      (type: socrata — DataSF)
+#   - `pipeline/scripts/sync/sync_socrata.py us`      (type: socrata — DataSF;
+#       `--block ca_sco` for the California State Controller's sources)
+#   - `pipeline/scripts/sync/sync_us_local_finance.py us` (types: census_iuf,
+#       iowa_datahub, indiana_gateway, ma_dls_logi, fl_edr_xlsx)
 #
 # Each source declares how to ingest one dataset into BigQuery `raw.us_*`
 # (city-scale tables are `raw.us_sf_*`). Raw tables keep every value AS A
@@ -62,6 +65,19 @@ datasf:
   page_size: 50000        # paged-json mode ($limit per request)
   csv_page_size: 500000   # bulk-csv mode (rows per CSV page; the one-shot
                           # rows.csv export drops mid-stream on long pulls)
+
+# California State Controller — "By the Numbers", the Cities Annual Report
+# (every city files with the SCO). Same SODA mechanics as DataSF; sources
+# name this block with `block: ca_sco`. Tabular datasets, not the xlsx blob
+# of the same report (verified 2026-09-22).
+ca_sco:
+  protocol: socrata
+  domain: "bythenumbers.sco.ca.gov"
+  portal_name: "California State Controller's Office — By the Numbers"
+  dataset_page_base: "https://bythenumbers.sco.ca.gov/d"
+  catalog_table: us_ca_sco_catalog
+  page_size: 50000
+  csv_page_size: 500000
 
 sources:
   # ---------------------------------------------------------------------------
@@ -331,3 +347,226 @@ sources:
     mode: paged-json
     order_by: ":id"
     description: "SF Building Permits — block+lot (APN), estimated_cost/revised_cost, description, status, issued_date, location"
+
+  # ---------------------------------------------------------------------------
+  # Local government finance — Census national base + four pilot states
+  # (sync_us_local_finance.py). Sources verified 2026-09-18/22; see the memory
+  # note project_us_municipal_finance_sources for coverage, freshness and the
+  # measured cross-source reconciliation.
+  # ---------------------------------------------------------------------------
+
+  # Census of Governments / Annual Survey of Local Government Finances. Every
+  # US local government in census years (2017, 2022), a size-stratified sample
+  # (~25k units, every large city) in between. 247 item codes; E* = current
+  # operations BY FUNCTION. Amounts in thousands. Published ~2 years late,
+  # each March. 2022 is inflated by one-time federal ARPA money.
+  - id: census_iuf
+    type: census_iuf
+    url_pattern: "https://www2.census.gov/programs-surveys/gov-finances/tables/{year}/{year}_Individual_Unit_File{s}.zip"
+    years: {from: 2017, to: current}
+    target_table: us_census_iuf_finance
+    units_table: us_census_iuf_units
+    source: "U.S. Census Bureau, Census of Governments / Annual Survey of State and Local Government Finances, Individual Unit File"
+
+  # Iowa — budget AND actual per city per function, same 10 functions for both
+  # (FY2007+ ; actuals lag ~2 fiscal years). Department of Management.
+  # Certified budget LINE ITEMS (line × program × fund), FY2009 → the year
+  # just started: carries FY2026 and FY2027 where 925 stops at FY2025. Its
+  # program totals equal 925's budget for the same year (FY2025: $11.6B,
+  # every program within $0.03B — checked 2026-09-22). Five csv parts.
+  # City property tax rates, one workbook per fiscal year (FY2000 → the year
+  # just certified) in the DOM's public Drive folder "City Property Tax Rate
+  # Files" (linked from dom.iowa.gov/local-government/city-resources).
+  - id: ia_city_tax_rates
+    type: iowa_drive_rates
+    folder_id: "1rDAQSViry0JyL-cuoSVIq9GVRUH-Ozs8"
+    target_table: us_ia_dom_city_tax_rates
+    source: "Iowa Department of Management, City Property Tax Rate Files"
+  # Outstanding debt at June 30 of every public body, with population and
+  # per capita (Iowa Treasurer's debt reporting site), FY2018 →.
+  - id: ia_debt_obligations
+    type: iowa_debt_html
+    url_pattern: "https://www.debtreportingiowa.gov/index.cfm?fuseaction=c.outstandingObligations&fy={fy}"
+    years: {from: 2018, to: current}
+    target_table: us_ia_treasurer_debt
+    source: "Iowa Treasurer of State, Debt Reporting, Outstanding Obligations"
+  - id: ia_city_budget_line_items
+    type: iowa_datahub
+    dataset_id: 926
+    target_table: us_ia_city_budget_line_items
+    source: "Iowa Department of Management, City Budget Expenditures by Fund and Fiscal Year (data.iowa.gov dataset 926)"
+  - id: ia_city_expenditures
+    type: iowa_datahub
+    dataset_id: 925
+    target_table: us_ia_city_budget_actual_expenditures
+    source: "Iowa Department of Management, City Budget and Actual Expenditures (data.iowa.gov dataset 925)"
+  - id: ia_city_revenues
+    type: iowa_datahub
+    dataset_id: 928
+    target_table: us_ia_city_budget_actual_revenues
+    source: "Iowa Department of Management, City Budget and Actual Revenue (data.iowa.gov dataset 928)"
+
+  # Indiana — voted budget line items (Form 1: fund × department × expenditure
+  # category × item, published and approved amounts) and actual disbursements
+  # (AFR, same department list and expenditure classes). Current year included.
+  - id: in_budget_line_items
+    type: indiana_gateway
+    kind: "Budget Data"
+    subkind: "Line-Item Budget Estimate (Form 1)"
+    unit_types: ["City/Town"]
+    years: {from: 2019, to: next}
+    target_table: us_in_budget_line_items
+    source: "Indiana Department of Local Government Finance, Gateway, Line-Item Budget Estimate (Form 1)"
+  # Debt, one row per issue (bond, loan, note) with its end-of-year principal
+  # balance, the fund that owes it and its class (GO, revenue, notes).
+  # 2025: 2,503 issues in 443 cities/towns, $11.17B outstanding (checked
+  # 2026-09-23). Indianapolis files under "Special" units: not here.
+  - id: in_afr_debt
+    type: indiana_gateway
+    kind: "Annual Financial Reports"
+    subkind: "Debt"
+    unit_types: ["City/Town"]
+    years: {from: 2016, to: current}
+    target_table: us_in_afr_debt
+    source: "Indiana State Board of Accounts, Gateway Annual Financial Report, Debt"
+  # Certified budget, levy, net assessed value and tax RATE (per $100 of
+  # assessed value) per unit × fund, every unit type; a city's or town's own
+  # rate is the sum over its funds (unit type 3). 2023's file is "_v2".
+  - id: in_certified_rates
+    type: xlsx_by_year
+    files:
+      2022: "https://www.in.gov/dlgf/files/2022-reports/2022_Certifed_Budget_Levy_CNAV_Rate_by_Fund.xlsx"
+      2023: "https://www.in.gov/dlgf/files/2023-reports/2023_Certifed_Budget_Levy_CNAV_Rate_by_Fund_v2.xlsx"
+      2024: "https://www.in.gov/dlgf/files/2024-reports/2024_Certifed_Budget_Levy_CNAV_Rate_by_Fund.xlsx"
+      2025: "https://www.in.gov/dlgf/files/2025-reports/2025_Certifed_Budget_Levy_CNAV_Rate_by_Fund.xlsx"
+      2026: "https://www.in.gov/dlgf/files/2026-reports/2026_Certifed_Budget_Levy_CNAV_Rate_by_Fund.xlsx"
+    target_table: us_in_dlgf_certified_rates
+    source: "Indiana Department of Local Government Finance, Certified Budget, Levy, CNAV and Rate by Fund"
+  - id: in_afr_disbursements
+    type: indiana_gateway
+    kind: "Annual Financial Reports"
+    subkind: "Disbursements by Fund and Department"
+    unit_types: ["City/Town"]
+    years: {from: 2016, to: current}
+    target_table: us_in_afr_disbursements
+    source: "Indiana State Board of Accounts, Gateway Annual Financial Report, Disbursements by Fund and Department"
+
+  # Massachusetts — Schedule A general fund by function (actuals, 351 towns,
+  # 2002+) and the tax-rate-recap operating budget (voted TOTAL, current FY).
+  # The recap files appropriations by funding source, not by function.
+  - id: ma_general_fund_expenditures
+    type: ma_dls_logi
+    report: ScheduleA.GeneralFund
+    table_id: xtGenFund
+    params: {islAmountType: Expenditures}
+    param_guid: "2b1e9c56551342598b9ed3ad026042b8"
+    year_param: islYear
+    years: {from: 2002, to: current}
+    target_table: us_ma_dls_general_fund_expenditures
+    source: "Massachusetts DOR Division of Local Services, Schedule A General Fund Expenditures"
+  - id: ma_general_fund_revenues
+    type: ma_dls_logi
+    report: ScheduleA.GeneralFund
+    table_id: xtGenFund
+    params: {islAmountType: Revenues}
+    param_guid: "2b1e9c56551342598b9ed3ad026042b8"
+    year_param: islYear
+    years: {from: 2002, to: current}
+    target_table: us_ma_dls_general_fund_revenues
+    source: "Massachusetts DOR Division of Local Services, Schedule A General Fund Revenues"
+  - id: ma_operating_budget
+    type: ma_dls_logi
+    report: 351BudgetperCapita
+    table_id: DataTable1
+    target_table: us_ma_dls_operating_budget
+    source: "Massachusetts DOR Division of Local Services, Tax Rate Recapitulation, Total Budget per Capita"
+
+  # Tax rates by class ($ per $1,000 of assessed value: residential, open
+  # space, commercial, industrial, personal property), FY2003 → the year
+  # being certified; the year parameter binds without its GUID twin.
+  - id: ma_tax_rates
+    type: ma_dls_logi
+    report: PropertyTaxInformation.taxratesbyclass.taxratesbyclass
+    table_id: tbl_taxratesbyclass
+    year_param: iclYear
+    years: {from: 2003, to: next}
+    target_table: us_ma_dls_tax_rates
+    source: "Massachusetts DOR Division of Local Services, Tax Rates by Class"
+  # Long-term debt: total outstanding (Schedule A Part 10), per capita, and
+  # general-fund debt service (Part 2) against the total budget, FY2005 →.
+  - id: ma_long_term_debt
+    type: ma_dls_logi
+    report: Dashboard.Cat_6_Reports.LongTermDebt351
+    table_id: tblLongTermDebt
+    year_param: iclYear
+    years: {from: 2005, to: current}
+    target_table: us_ma_dls_long_term_debt
+    source: "Massachusetts DOR Division of Local Services, Long Term Debt (Schedule A Parts 2 and 10)"
+
+  # Florida DOR Data Book, Municipal Report: taxable value, CITY MILLAGE
+  # RATE ($ per $1,000 of taxable value) and taxes levied, one sheet per
+  # county, the two latest years in each edition (2024 and 2025 here); rows
+  # "Pct Change" are the file's own ratios, dropped in staging.
+  - id: fl_municipal_millage
+    type: xlsx_by_year
+    all_sheets: true
+    skip_sheets: ["Report Index"]
+    files:
+      2025: "https://floridarevenue.com/property/Documents/municipal_report.xlsx"
+    target_table: us_fl_dor_municipal_millage
+    source: "Florida Department of Revenue, Property Tax Data Book, Municipal Report"
+
+  # Florida — actual expenditures/revenues per municipality by Uniform
+  # Accounting System account code × fund type, one workbook per municipality,
+  # one sheet per fiscal year (~5 recent years). No voted budget at state level.
+  - id: fl_municipal_expenditures
+    type: fl_edr_xlsx
+    index_url: "https://edr.state.fl.us/Content/local-government/data/revenues-expenditures/munifiscal.cfm"
+    file_suffix: expenditures
+    target_table: us_fl_edr_municipal_expenditures
+    source: "Florida Office of Economic and Demographic Research, from DFS Annual Financial Reports (municipal expenditures)"
+  - id: fl_municipal_revenues
+    type: fl_edr_xlsx
+    index_url: "https://edr.state.fl.us/Content/local-government/data/revenues-expenditures/munifiscal.cfm"
+    file_suffix: revenues
+    target_table: us_fl_edr_municipal_revenues
+    source: "Florida Office of Economic and Demographic Research, from DFS Annual Financial Reports (municipal revenues)"
+
+  # California — the Cities Annual Report each city files with the State
+  # Controller: long format, one row per city × fiscal year × form line ×
+  # fund category (governmental functions, each enterprise fund, internal
+  # service). FY2003-FY2024 (2024 = fiscal year 2023-24), ~114k rows a year
+  # since 2017, estimated population per row. Actuals only — California
+  # collects no voted budgets. No subtotal rows (checked, Fresno 2024).
+  # Long-term debt per issue from the SCO "Cities Raw Data" workbook (the
+  # By the Numbers file blob, FY2022-23 and FY2023-24): bonds and COPs
+  # (sheet 31) and other long-term debt — loans, notes (sheet 32), with the
+  # principal outstanding at the end of the fiscal year.
+  - id: ca_city_lt_debt
+    type: xlsx_by_year
+    sheet_name: "31 CIX_LT_DEBT"
+    files:
+      2024: "https://bythenumbers.sco.ca.gov/api/views/wjvf-fpdc/files/f3eaabf9-50ed-4347-98ee-f01abfa7ae64?download=true"
+    target_table: us_ca_sco_city_lt_debt
+    source: "California State Controller, Cities Raw Data, Long-Term Debt (bonds and COPs)"
+  - id: ca_city_other_lt_debt
+    type: xlsx_by_year
+    sheet_name: "32 CIX_OTHER_LT_DEBT"
+    files:
+      2024: "https://bythenumbers.sco.ca.gov/api/views/wjvf-fpdc/files/f3eaabf9-50ed-4347-98ee-f01abfa7ae64?download=true"
+    target_table: us_ca_sco_city_other_lt_debt
+    source: "California State Controller, Cities Raw Data, Other Long-Term Debt (loans and notes)"
+  - id: ca_city_expenditures
+    type: socrata
+    block: ca_sco
+    target_table: us_ca_sco_city_expenditures
+    dataset_id: "ju3w-4gxp"
+    mode: bulk-csv
+    description: "California SCO Cities Annual Report — expenditures, FY2003-FY2024, ~1.4M rows"
+  - id: ca_city_revenues
+    type: socrata
+    block: ca_sco
+    target_table: us_ca_sco_city_revenues
+    dataset_id: "rrtv-rsj9"
+    mode: bulk-csv
+    description: "California SCO Cities Annual Report — revenues"

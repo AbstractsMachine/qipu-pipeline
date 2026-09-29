@@ -4,7 +4,7 @@
 -- Grain: one row per (place_slug, permit_number).
 --
 -- The structured, ~100%-precision money-at-location join: the place's
--- facility parcels (stg_us_sf_place_facilities.block_lot) → all building
+-- facility parcels (core_us_sf_places.block_lot) → all building
 -- permits on those APNs. "Construction on this parcel" — declared value,
 -- description, status, date. Rescues even places bonds/contracts miss (Coit
 -- Tower rehab; the Chinatown Library $19M renovation).
@@ -18,7 +18,7 @@
 
 WITH place_apns AS (
     SELECT DISTINCT place_slug, block_lot
-    FROM {{ ref('stg_us_sf_place_facilities') }}
+    FROM {{ ref('core_us_sf_places') }}
     WHERE block_lot IS NOT NULL AND block_lot != ''
 ),
 
@@ -27,7 +27,7 @@ permits AS (
         permit_number, block_lot, description, permit_type,
         estimated_cost_usd, revised_cost_usd, status,
         issued_date, filed_date, completed_date
-    FROM {{ ref('stg_us_sf_building_permits') }}
+    FROM {{ ref('core_us_sf_building_permits') }}
 ),
 
 joined AS (

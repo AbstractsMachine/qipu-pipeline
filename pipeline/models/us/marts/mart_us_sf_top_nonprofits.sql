@@ -2,7 +2,7 @@
 -- Mart: SF top nonprofit payees per fiscal year — FY2018+ ONLY
 --
 -- Sources: core_us_sf_vouchers (is_non_profit flag), core_us_sf_contracts
---          (grant join), stg_us_sf_payee_buckets, stg_us_sf_catalog.
+--          (grant join), int_us_sf_payees, core_us_sf_source_catalog.
 -- Grain:  fiscal_year × vendor, top 30 nonprofit-flagged payees per FY.
 --
 -- FLOOR (measured, docs/us/block-studies/2-payees.md §1.3):
@@ -60,7 +60,7 @@ top_department AS (
             fiscal_year, vendor, department,
             ROW_NUMBER() OVER (
                 PARTITION BY fiscal_year, vendor
-                ORDER BY SUM(vouchers_paid) DESC
+                ORDER BY SUM(vouchers_paid) DESC, department
             ) AS rn
         FROM {{ ref('core_us_sf_vouchers') }}
         WHERE fiscal_year >= 2018 AND is_non_profit AND vendor IS NOT NULL
@@ -80,10 +80,10 @@ ranked AS (
         (pb.bucket IS NULL OR pb.bucket = 'nonprofit')
             AND NOT COALESCE(pb.is_aggregation_line, FALSE) AS in_community_ranking,
         ROW_NUMBER() OVER (
-            PARTITION BY bv.fiscal_year ORDER BY bv.vouchers_paid_usd DESC
+            PARTITION BY bv.fiscal_year ORDER BY bv.vouchers_paid_usd DESC, bv.vendor
         ) AS rank_in_fy
     FROM by_vendor bv
-    LEFT JOIN {{ ref('stg_us_sf_payee_buckets') }} pb
+    LEFT JOIN {{ ref('int_us_sf_payees') }} pb
         ON pb.vendor = bv.vendor
 ),
 
@@ -92,7 +92,7 @@ community_ranked AS (
         fiscal_year,
         vendor,
         ROW_NUMBER() OVER (
-            PARTITION BY fiscal_year ORDER BY vouchers_paid_usd DESC
+            PARTITION BY fiscal_year ORDER BY vouchers_paid_usd DESC, vendor
         ) AS community_rank
     FROM ranked
     WHERE in_community_ranking
@@ -105,7 +105,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_vouchers'
 )
 

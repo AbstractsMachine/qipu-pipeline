@@ -1,0 +1,7 @@
+nature_code,sort_order,label_en,label_fr,description_en
+salaries,1,Salaries and benefits,Salaires et charges,"Pay, health insurance and pension contributions of the town's staff"
+services,2,Services and contracts,Services et prestations,"Contracted services, utilities, insurance, rent, professional fees"
+supplies,3,Supplies,Fournitures,"Fuel, materials, equipment under the capital threshold"
+capital,4,Construction and equipment,Travaux et équipement,"Buildings, roads, vehicles and other capital outlays"
+debt,5,Debt payments,Remboursement de la dette,"Principal and interest on the town's borrowing"
+other,6,Other payments,Autres paiements,"Payments the state files under no other class (grants, refunds, transfers out)"

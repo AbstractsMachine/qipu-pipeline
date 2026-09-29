@@ -32,6 +32,10 @@ bq_raw_dataset: raw
 ods:
   protocol: ods
   domain: opendata.paris.fr
+  # The same Opendatasoft portal at the platform's own address: read there
+  # when the City's name does not resolve (it went NXDOMAIN on 2026-09-23).
+  # Citations keep `domain`. See sync_ods_dataset.resolve_fetch_portal.
+  domain_fallback: parisdata.opendatasoft.com
   api_version: v2.1
 
 sources:
@@ -63,6 +67,22 @@ sources:
     dataset_id: subventions-versees-annexe-compte-administratif-a-partir-de-2018
     target_table: subventions_versees_annexe_compte_administratif_a_partir_de_2018
     description: "Annexe CA - Toutes subventions versées"
+    map_to: subvention
+
+  # ---------------------------------------------------------------------------
+  # SUBVENTIONS 2013-2017 — la première moitié de la même annexe CA. La Ville a
+  # coupé la série au changement de plan comptable et republié la suite sous un
+  # autre identifiant ; on ne lisait que la seconde, donc cinq exercices et
+  # 6,2 Md€ n'existaient nulle part chez nous (constaté 2026-09-10).
+  # Différence de forme à connaître : ici les particuliers SONT présents, sous
+  # pseudonyme (« Nom 323 »), avec nature_juridique = « Personnes physiques ».
+  # Le staging les agrège en une ligne par exercice, comme la branche PDF.
+  # ---------------------------------------------------------------------------
+  - id: subventions_2013_2017
+    type: ods_dataset
+    dataset_id: subventions-versees
+    target_table: subventions_versees_2013_2017
+    description: "Annexe CA - Subventions versées 2013-2017 (M14-M52)"
     map_to: subvention
 
   - id: associations
@@ -103,3 +123,29 @@ sources:
     target_table: liste_des_marches_de_la_collectivite_parisienne
     description: "Marchés publics (enveloppes pluriannuelles - non sommables)"
     map_to: marche
+
+  # ---------------------------------------------------------------------------
+  # BILAN COMPTABLE — l'état patrimonial de la Ville (actif / passif), détaillé.
+  # Jusqu'au 2026-09-23 : un CSV téléchargé à la main et chargé par
+  # upload_bilan_comptable.py (supprimé). Même jeu, mêmes lignes (vérifié
+  # année par année, 2016-2024) ; l'année arrive en texte (« 2024 »),
+  # stg_bilan_comptable la convertit.
+  # ---------------------------------------------------------------------------
+  - id: bilan_comptable
+    type: ods_dataset
+    dataset_id: bilan-comptable
+    target_table: bilan_comptable
+    description: "Bilan comptable de la Ville de Paris, détaillé (actif / passif, brut, amortissements, net)"
+
+  # ---------------------------------------------------------------------------
+  # DETTE GARANTIE — annexe IV-B (emprunts garantis). Data loaded by the
+  # dedicated sync_dette_garantie.py (per-year refine + collectivite filter);
+  # listed here so the catalog snapshot carries its provenance (page URL,
+  # license, `modified`) for core_dette_garantie.
+  # ---------------------------------------------------------------------------
+  - id: dette_garantie
+    type: ods_dataset
+    catalog_only: true
+    dataset_id: dette-garantie
+    target_table: dette_garantie_paris
+    description: "Dette garantie par la Ville de Paris (annexe IV-B du compte administratif)"

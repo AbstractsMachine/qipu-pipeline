@@ -1,0 +1,8 @@
+place_slug,relation,match_regex,exclude_regex,min_montant_total,max_rows,note
+mucem,operator,(?i)^MUSEE DES CIVILISATIONS.*MUCEM$|(?i)\bMUCEM\b,,50000,,Le MuCEM est lui-même bénéficiaire (opérateur du lieu).
+mucem,residents,(?i)\bMUCEM\b,(?i)\becole\b|\bmaternelle\b|\b[ée]l[ée]mentaire\b,,8,Subventions dont l'objet nomme le MuCEM.
+friche-belle-de-mai,operator,(?i)^FRICHE LA BELLE DE MAI$,,50000,,La Friche est elle-même bénéficiaire.
+friche-belle-de-mai,residents,"(?i)friche.{0,12}belle de mai|belle de mai.{0,12}friche",(?i)\becole\b|\bmaternelle\b|\b[ée]l[ée]mentaire\b,,8,Objet nommant la Friche (hors écoles homonymes).
+la-criee,operator,(?i)^THEATRE NATIONAL.*CRIEE$|^THEATRE NATIONAL LA CRIEE$,,50000,,Le Théâtre national de Marseille - La Criée est lui-même bénéficiaire.
+la-criee,residents,(?i)\bla cri[ée]e\b,(?i)\becole\b|\bmaternelle\b|\b[ée]l[ée]mentaire\b,,8,Objet nommant La Criée.
+bibliotheque-alcazar,residents,"(?i)(patio|foyer|auditorium|salle|conf[ée]rence).{0,20}alcazar|alcazar.{0,20}(patio|foyer|auditorium|salle)",(?i)\becole\b|\bmaternelle\b|\b[ée]l[ée]mentaire\b,,8,Seul cas honnête : des assos ont reçu le prêt du patio / auditorium / salle de l'Alcazar (l'objet le dit).

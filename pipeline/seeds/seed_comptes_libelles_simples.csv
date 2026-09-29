@@ -1,0 +1,232 @@
+compte,libelle_fr,libelle_en,source
+60611,Eau,Water,Plan comptable M57 — DGCL/DGFiP
+60612,Électricité et gaz,Electricity and gas,Plan comptable M57 — DGCL/DGFiP
+60613,Chauffage,Heating,Plan comptable M57 — DGCL/DGFiP
+60621,Carburants,Fuel,Plan comptable M57 — DGCL/DGFiP
+60622,Fournitures pour véhicules,Vehicle supplies,Plan comptable M57 — DGCL/DGFiP
+60623,Alimentation (cantines et crèches),Food (canteens and nurseries),Plan comptable M57 — DGCL/DGFiP
+60628,Autres fournitures non stockées,Other consumables,Plan comptable M57 — DGCL/DGFiP
+60631,Fournitures d'entretien,Cleaning supplies,Plan comptable M57 — DGCL/DGFiP
+60632,Petit équipement,Small equipment,Plan comptable M57 — DGCL/DGFiP
+60633,Fournitures de voirie,Road maintenance supplies,Plan comptable M57 — DGCL/DGFiP
+60636,Vêtements de travail,Work clothing,Plan comptable M57 — DGCL/DGFiP
+6064,Fournitures administratives,Office supplies,Plan comptable M57 — DGCL/DGFiP
+6065,Livres et disques des bibliothèques,Library books and media,Plan comptable M57 — DGCL/DGFiP
+6067,Fournitures scolaires,School supplies,Plan comptable M57 — DGCL/DGFiP
+6068,Autres fournitures,Other supplies,Plan comptable M57 — DGCL/DGFiP
+6042,Prestations de services achetées,Purchased services,Plan comptable M57 — DGCL/DGFiP
+611,Contrats de prestations de services,Service contracts,Plan comptable M57 — DGCL/DGFiP
+6132,Locations immobilières,Property rentals,Plan comptable M57 — DGCL/DGFiP
+6135,Locations mobilières,Equipment rentals,Plan comptable M57 — DGCL/DGFiP
+61358,Autres locations,Other rentals,Plan comptable M57 — DGCL/DGFiP
+614,Charges locatives et de copropriété,Rental and co-ownership charges,Plan comptable M57 — DGCL/DGFiP
+61521,Entretien des terrains,Grounds maintenance,Plan comptable M57 — DGCL/DGFiP
+615221,Entretien des bâtiments publics,Public building maintenance,Plan comptable M57 — DGCL/DGFiP
+615228,Entretien des autres bâtiments,Other building maintenance,Plan comptable M57 — DGCL/DGFiP
+615231,Entretien des voiries,Road maintenance,Plan comptable M57 — DGCL/DGFiP
+615232,Entretien des réseaux,Network maintenance,Plan comptable M57 — DGCL/DGFiP
+61551,Entretien du matériel roulant,Vehicle maintenance,Plan comptable M57 — DGCL/DGFiP
+61558,Entretien des autres matériels,Other equipment maintenance,Plan comptable M57 — DGCL/DGFiP
+6156,Maintenance,Maintenance contracts,Plan comptable M57 — DGCL/DGFiP
+6161,Assurance multirisques,Insurance,Plan comptable M57 — DGCL/DGFiP
+6168,Autres assurances,Other insurance,Plan comptable M57 — DGCL/DGFiP
+617,Études et recherches,Studies and research,Plan comptable M57 — DGCL/DGFiP
+6182,Documentation,Documentation,Plan comptable M57 — DGCL/DGFiP
+6184,Formation du personnel,Staff training,Plan comptable M57 — DGCL/DGFiP
+6188,Autres frais divers,Other miscellaneous costs,Plan comptable M57 — DGCL/DGFiP
+6216,Personnel affecté par une autre collectivité,Staff seconded from another authority,Plan comptable M57 — DGCL/DGFiP
+6218,Autre personnel extérieur,Other external staff,Plan comptable M57 — DGCL/DGFiP
+6225,Indemnités au comptable et aux régisseurs,Accountant and cashier fees,Plan comptable M57 — DGCL/DGFiP
+6226,Honoraires,Professional fees,Plan comptable M57 — DGCL/DGFiP
+6227,Frais d'actes et de contentieux,Legal and litigation costs,Plan comptable M57 — DGCL/DGFiP
+6228,Rémunérations d'intermédiaires diverses,Other intermediary fees,Plan comptable M57 — DGCL/DGFiP
+6231,Annonces et insertions,Announcements and advertising,Plan comptable M57 — DGCL/DGFiP
+6232,Fêtes et cérémonies,Festivities and ceremonies,Plan comptable M57 — DGCL/DGFiP
+6236,Catalogues et imprimés,Catalogues and printed matter,Plan comptable M57 — DGCL/DGFiP
+6237,Publications,Publications,Plan comptable M57 — DGCL/DGFiP
+6238,Autres frais de communication,Other communication costs,Plan comptable M57 — DGCL/DGFiP
+6247,Transports collectifs,Group transport,Plan comptable M57 — DGCL/DGFiP
+6251,Voyages et déplacements,Travel,Plan comptable M57 — DGCL/DGFiP
+6257,Réceptions,Receptions,Plan comptable M57 — DGCL/DGFiP
+6261,Frais d'affranchissement,Postage,Plan comptable M57 — DGCL/DGFiP
+6262,Frais de télécommunications,Telecommunications,Plan comptable M57 — DGCL/DGFiP
+627,Services bancaires,Banking services,Plan comptable M57 — DGCL/DGFiP
+6281,Concours divers (cotisations),Subscriptions and memberships,Plan comptable M57 — DGCL/DGFiP
+6283,Frais de nettoyage des locaux,Premises cleaning,Plan comptable M57 — DGCL/DGFiP
+6288,Autres services extérieurs,Other external services,Plan comptable M57 — DGCL/DGFiP
+6331,Versement transport,Transport levy,Plan comptable M57 — DGCL/DGFiP
+6336,Cotisations au centre de gestion et au CNFPT,Civil-service management bodies,Plan comptable M57 — DGCL/DGFiP
+63512,Taxes foncières payées,Property taxes paid,Plan comptable M57 — DGCL/DGFiP
+6411,Rémunération des titulaires,Permanent staff pay,Plan comptable M57 — DGCL/DGFiP
+64111,Rémunération principale des titulaires,Permanent staff base pay,Plan comptable M57 — DGCL/DGFiP
+64112,Indemnités de résidence et supplément familial,Residence and family allowances,Plan comptable M57 — DGCL/DGFiP
+64118,Autres indemnités des titulaires,Other permanent staff allowances,Plan comptable M57 — DGCL/DGFiP
+6413,Rémunération des contractuels,Contract staff pay,Plan comptable M57 — DGCL/DGFiP
+64131,Rémunération principale des contractuels,Contract staff base pay,Plan comptable M57 — DGCL/DGFiP
+64138,Autres indemnités des contractuels,Other contract staff allowances,Plan comptable M57 — DGCL/DGFiP
+64168,Autres emplois aidés,Other subsidised jobs,Plan comptable M57 — DGCL/DGFiP
+6417,Apprentis,Apprentices,Plan comptable M57 — DGCL/DGFiP
+6419,Remboursements sur rémunérations,Pay reimbursements received,Plan comptable M57 — DGCL/DGFiP
+6450,Charges sociales,Social contributions,Plan comptable M57 — DGCL/DGFiP
+6451,Cotisations Urssaf,Social security contributions,Plan comptable M57 — DGCL/DGFiP
+6453,Cotisations aux caisses de retraite,Pension contributions,Plan comptable M57 — DGCL/DGFiP
+6454,Cotisations chômage,Unemployment contributions,Plan comptable M57 — DGCL/DGFiP
+6455,Cotisations d'assurance du personnel,Staff insurance contributions,Plan comptable M57 — DGCL/DGFiP
+6456,Versement au fonds pour l'emploi des handicapés,Disability employment fund,Plan comptable M57 — DGCL/DGFiP
+6457,Cotisations sociales liées à l'apprentissage,Apprenticeship contributions,Plan comptable M57 — DGCL/DGFiP
+6475,Médecine du travail et pharmacie,Occupational health,Plan comptable M57 — DGCL/DGFiP
+6478,Autres charges sociales,Other social costs,Plan comptable M57 — DGCL/DGFiP
+6488,Autres charges de personnel,Other staff costs,Plan comptable M57 — DGCL/DGFiP
+65311,Indemnités des élus,Elected officials' allowances,Plan comptable M57 — DGCL/DGFiP
+65312,Frais de mission des élus,Elected officials' travel,Plan comptable M57 — DGCL/DGFiP
+6532,Frais de mission des élus,Elected officials' travel,Plan comptable M57 — DGCL/DGFiP
+6533,Cotisations de retraite des élus,Elected officials' pensions,Plan comptable M57 — DGCL/DGFiP
+6534,Cotisations sociales des élus,Elected officials' social contributions,Plan comptable M57 — DGCL/DGFiP
+6535,Formation des élus,Elected officials' training,Plan comptable M57 — DGCL/DGFiP
+6541,Créances admises en non-valeur,Written-off receivables,Plan comptable M57 — DGCL/DGFiP
+6553,Contribution au service d'incendie et de secours,Fire and rescue service contribution,Plan comptable M57 — DGCL/DGFiP
+65541,Contributions aux organismes de regroupement,Contributions to inter-municipal bodies,Plan comptable M57 — DGCL/DGFiP
+65548,Autres contributions,Other contributions,Plan comptable M57 — DGCL/DGFiP
+65561,Contribution aux organismes de regroupement (aide sociale),Contribution to social aid bodies,Plan comptable M57 — DGCL/DGFiP
+65568,Autres contributions obligatoires,Other compulsory contributions,Plan comptable M57 — DGCL/DGFiP
+6558,Autres contributions obligatoires,Other compulsory contributions,Plan comptable M57 — DGCL/DGFiP
+657358,Subventions aux autres groupements,Grants to other public bodies,Plan comptable M57 — DGCL/DGFiP
+657362,Subvention au CCAS,Grant to the municipal social action centre,Plan comptable M57 — DGCL/DGFiP
+657363,Subvention à la caisse des écoles,Grant to the schools fund,Plan comptable M57 — DGCL/DGFiP
+657364,Subventions aux établissements publics locaux,Grants to local public bodies,Plan comptable M57 — DGCL/DGFiP
+65737,Subventions aux autres établissements publics,Grants to other public bodies,Plan comptable M57 — DGCL/DGFiP
+6574,Subventions aux associations et personnes privées,Grants to associations and private bodies,Plan comptable M57 — DGCL/DGFiP
+65748,Subventions aux associations et personnes privées,Grants to associations and private bodies,Plan comptable M57 — DGCL/DGFiP
+6581,Redevances pour concessions et brevets,Licences and royalties,Plan comptable M57 — DGCL/DGFiP
+65888,Autres charges de gestion courante,Other operating costs,Plan comptable M57 — DGCL/DGFiP
+66111,Intérêts des emprunts,Loan interest,Plan comptable M57 — DGCL/DGFiP
+66112,Intérêts courus non échus,Accrued interest,Plan comptable M57 — DGCL/DGFiP
+6615,Intérêts des lignes de trésorerie,Cash-line interest,Plan comptable M57 — DGCL/DGFiP
+673,Titres annulés sur exercices antérieurs,Cancelled prior-year receipts,Plan comptable M57 — DGCL/DGFiP
+675,Valeur comptable des biens cédés,Book value of assets sold,Plan comptable M57 — DGCL/DGFiP
+6751,Valeur comptable des biens cédés,Book value of assets sold,Plan comptable M57 — DGCL/DGFiP
+6761,Différence sur réalisation d'actif,Gains on asset disposals transferred,Plan comptable M57 — DGCL/DGFiP
+6811,Dotations aux amortissements,Depreciation,Plan comptable M57 — DGCL/DGFiP
+681,Dotations aux amortissements et provisions,Depreciation and provisions,Plan comptable M57 — DGCL/DGFiP
+7062,Redevances des services culturels,Cultural service fees,Plan comptable M57 — DGCL/DGFiP
+70632,Redevances des services de loisirs,Leisure service fees,Plan comptable M57 — DGCL/DGFiP
+7066,Redevances des services sociaux,Social service fees,Plan comptable M57 — DGCL/DGFiP
+7067,Redevances des services périscolaires (cantine et garderie),School canteen and childcare fees,Plan comptable M57 — DGCL/DGFiP
+70323,Redevance d'occupation du domaine public,Public-domain occupancy fees,Plan comptable M57 — DGCL/DGFiP
+70383,Redevance de stationnement,Parking fees,Plan comptable M57 — DGCL/DGFiP
+70846,Remboursements de frais par le groupement,Cost reimbursements from the inter-municipal body,Plan comptable M57 — DGCL/DGFiP
+70876,Remboursements de frais par le groupement,Cost reimbursements from the inter-municipal body,Plan comptable M57 — DGCL/DGFiP
+70878,Remboursements de frais par d'autres redevables,Cost reimbursements from others,Plan comptable M57 — DGCL/DGFiP
+7311,Taxes foncières et d'habitation,Property and residence taxes,Plan comptable M57 — DGCL/DGFiP
+73111,Taxes foncières et d'habitation,Property and residence taxes,Plan comptable M57 — DGCL/DGFiP
+73123,Compensation de la taxe d'habitation,Residence-tax compensation,Plan comptable M57 — DGCL/DGFiP
+73132,Fraction de TVA,Share of VAT,Plan comptable M57 — DGCL/DGFiP
+73141,Taxe d'enlèvement des ordures ménagères,Household waste tax,Plan comptable M57 — DGCL/DGFiP
+73211,Attribution de compensation de l'intercommunalité,Compensation from the inter-municipal body,Plan comptable M57 — DGCL/DGFiP
+73212,Dotation de solidarité communautaire,Community solidarity grant,Plan comptable M57 — DGCL/DGFiP
+73221,Fonds national de péréquation (FPIC),National equalisation fund,Plan comptable M57 — DGCL/DGFiP
+73223,Fonds de péréquation des ressources intercommunales,Inter-municipal equalisation fund,Plan comptable M57 — DGCL/DGFiP
+732221,Fonds de péréquation,Equalisation fund,Plan comptable M57 — DGCL/DGFiP
+73331,Taxe sur la publicité extérieure,Outdoor advertising tax,Plan comptable M57 — DGCL/DGFiP
+7336,Droits de place,Market stall fees,Plan comptable M57 — DGCL/DGFiP
+73431,Taxe sur les paris hippiques,Horse-race betting tax,Plan comptable M57 — DGCL/DGFiP
+7381,Droits de mutation (ventes immobilières),Property transfer duties,Plan comptable M57 — DGCL/DGFiP
+739211,Reversement à l'intercommunalité (attribution de compensation),Compensation paid to the inter-municipal body,Plan comptable M57 — DGCL/DGFiP
+739221,Reversement au fonds de péréquation (FPIC),Payment to the national equalisation fund,Plan comptable M57 — DGCL/DGFiP
+7392221,Reversement au fonds de péréquation,Payment to the equalisation fund,Plan comptable M57 — DGCL/DGFiP
+74111,Dotation forfaitaire de l'État (DGF),Basic State grant (DGF),Plan comptable M57 — DGCL/DGFiP
+741121,Dotation de solidarité rurale,Rural solidarity grant,Plan comptable M57 — DGCL/DGFiP
+741123,Dotation de solidarité urbaine,Urban solidarity grant,Plan comptable M57 — DGCL/DGFiP
+741125,Dotation nationale de péréquation,National equalisation grant,Plan comptable M57 — DGCL/DGFiP
+741127,Dotation nationale de péréquation,National equalisation grant,Plan comptable M57 — DGCL/DGFiP
+74718,Autres participations de l'État,Other State contributions,Plan comptable M57 — DGCL/DGFiP
+7472,Participations de la région,Regional contributions,Plan comptable M57 — DGCL/DGFiP
+7473,Participations du département,Departmental contributions,Plan comptable M57 — DGCL/DGFiP
+7478222,Participations de la caisse d'allocations familiales,Family benefits fund contributions,Plan comptable M57 — DGCL/DGFiP
+747888,Autres participations,Other contributions received,Plan comptable M57 — DGCL/DGFiP
+748312,Dotation pour les titres sécurisés,Secure-documents grant,Plan comptable M57 — DGCL/DGFiP
+74833,Compensation d'exonérations de taxe foncière,Property-tax exemption compensation,Plan comptable M57 — DGCL/DGFiP
+74834,Compensation d'exonérations de taxe foncière,Property-tax exemption compensation,Plan comptable M57 — DGCL/DGFiP
+74835,Compensation d'exonérations de taxe d'habitation,Residence-tax exemption compensation,Plan comptable M57 — DGCL/DGFiP
+74836,Compensations pour perte de fiscalité,Compensation for lost tax revenue,Plan comptable M57 — DGCL/DGFiP
+74888,Autres dotations et participations,Other grants received,Plan comptable M57 — DGCL/DGFiP
+752,Loyers perçus,Rents received,Plan comptable M57 — DGCL/DGFiP
+7551,Excédent des budgets annexes,Surplus from annex budgets,Plan comptable M57 — DGCL/DGFiP
+7588,Autres produits de gestion,Other operating income,Plan comptable M57 — DGCL/DGFiP
+75888,Autres produits de gestion,Other operating income,Plan comptable M57 — DGCL/DGFiP
+7711,Dédits et pénalités perçus,Penalties received,Plan comptable M57 — DGCL/DGFiP
+7718,Autres produits exceptionnels,Other exceptional income,Plan comptable M57 — DGCL/DGFiP
+775,Produits des cessions d'immobilisations,Proceeds from asset sales,Plan comptable M57 — DGCL/DGFiP
+7751,Produits des cessions d'immobilisations,Proceeds from asset sales,Plan comptable M57 — DGCL/DGFiP
+7761,Différence sur réalisation d'actif,Gains on asset disposals,Plan comptable M57 — DGCL/DGFiP
+7788,Autres produits exceptionnels,Other exceptional income,Plan comptable M57 — DGCL/DGFiP
+1068,Excédents de fonctionnement capitalisés,Capitalised operating surpluses,Plan comptable M57 — DGCL/DGFiP
+10222,FCTVA (remboursement de TVA sur investissements),VAT refund on investments,Plan comptable M57 — DGCL/DGFiP
+10226,Taxe d'aménagement,Development tax,Plan comptable M57 — DGCL/DGFiP
+1321,Subventions d'investissement de l'État,State investment grants,Plan comptable M57 — DGCL/DGFiP
+1322,Subventions d'investissement de la région,Regional investment grants,Plan comptable M57 — DGCL/DGFiP
+1323,Subventions d'investissement du département,Departmental investment grants,Plan comptable M57 — DGCL/DGFiP
+13251,Subventions d'investissement de l'intercommunalité,Inter-municipal investment grants,Plan comptable M57 — DGCL/DGFiP
+1328,Autres subventions d'investissement,Other investment grants,Plan comptable M57 — DGCL/DGFiP
+1341,Dotation d'équipement des territoires ruraux (DETR),Rural areas equipment grant,Plan comptable M57 — DGCL/DGFiP
+1345,Dotation de soutien à l'investissement local (DSIL),Local investment support grant,Plan comptable M57 — DGCL/DGFiP
+13461,Dotation d'équipement des territoires ruraux (DETR),Rural areas equipment grant,Plan comptable M57 — DGCL/DGFiP
+13462,Dotation de soutien à l'investissement local (DSIL),Local investment support grant,Plan comptable M57 — DGCL/DGFiP
+1641,Emprunts bancaires,Bank loans,Plan comptable M57 — DGCL/DGFiP
+16441,Emprunts assortis d'une option de tirage,Loans with drawdown option,Plan comptable M57 — DGCL/DGFiP
+16449,Emprunts assortis d'une option de tirage,Loans with drawdown option,Plan comptable M57 — DGCL/DGFiP
+1645,Remboursements temporaires sur emprunts,Temporary loan repayments,Plan comptable M57 — DGCL/DGFiP
+16451,Remboursements temporaires sur emprunts,Temporary loan repayments,Plan comptable M57 — DGCL/DGFiP
+166,Refinancement de dette,Debt refinancing,Plan comptable M57 — DGCL/DGFiP
+1675,Dettes de crédit-bail,Leasing debts,Plan comptable M57 — DGCL/DGFiP
+192,Plus ou moins-values sur cessions,Gains or losses on disposals,Plan comptable M57 — DGCL/DGFiP
+2031,Frais d'études,Study costs,Plan comptable M57 — DGCL/DGFiP
+2033,Frais d'insertion,Publication costs,Plan comptable M57 — DGCL/DGFiP
+2041,Subventions d'équipement versées à des organismes publics,Equipment grants paid to public bodies,Plan comptable M57 — DGCL/DGFiP
+20422,Subventions d'équipement versées à des personnes privées,Equipment grants paid to private bodies,Plan comptable M57 — DGCL/DGFiP
+2046,Attributions de compensation d'investissement,Investment compensation paid,Plan comptable M57 — DGCL/DGFiP
+2051,Logiciels,Software,Plan comptable M57 — DGCL/DGFiP
+2111,Terrains nus,Bare land,Plan comptable M57 — DGCL/DGFiP
+2112,Terrains de voirie,Road land,Plan comptable M57 — DGCL/DGFiP
+2113,Terrains aménagés,Developed land,Plan comptable M57 — DGCL/DGFiP
+2115,Terrains bâtis,Built land,Plan comptable M57 — DGCL/DGFiP
+2116,Cimetières,Cemeteries,Plan comptable M57 — DGCL/DGFiP
+2118,Autres terrains,Other land,Plan comptable M57 — DGCL/DGFiP
+2121,Plantations d'arbres et d'arbustes,Trees and shrubs,Plan comptable M57 — DGCL/DGFiP
+2128,Autres aménagements de terrains,Other land development,Plan comptable M57 — DGCL/DGFiP
+2131,Bâtiments publics,Public buildings,Plan comptable M57 — DGCL/DGFiP
+21311,Hôtel de ville,Town hall,Plan comptable M57 — DGCL/DGFiP
+21312,Bâtiments scolaires,School buildings,Plan comptable M57 — DGCL/DGFiP
+21313,Crèches et garderies,Nurseries and childcare buildings,Plan comptable M57 — DGCL/DGFiP
+21314,Bâtiments culturels et sportifs,Cultural and sports buildings,Plan comptable M57 — DGCL/DGFiP
+21316,Équipements du cimetière,Cemetery facilities,Plan comptable M57 — DGCL/DGFiP
+21318,Autres bâtiments publics,Other public buildings,Plan comptable M57 — DGCL/DGFiP
+2132,Immeubles de rapport,Rental property,Plan comptable M57 — DGCL/DGFiP
+21321,Immeubles de rapport,Rental property,Plan comptable M57 — DGCL/DGFiP
+21328,Autres immeubles de rapport,Other rental property,Plan comptable M57 — DGCL/DGFiP
+2135,Installations générales et agencements des bâtiments,Building fittings,Plan comptable M57 — DGCL/DGFiP
+21351,Installations générales des bâtiments publics,Public building fittings,Plan comptable M57 — DGCL/DGFiP
+2138,Autres constructions,Other buildings,Plan comptable M57 — DGCL/DGFiP
+2151,Réseaux de voirie,Road network,Plan comptable M57 — DGCL/DGFiP
+2152,Installations de voirie,Road installations,Plan comptable M57 — DGCL/DGFiP
+21534,Réseaux d'électrification,Electricity networks,Plan comptable M57 — DGCL/DGFiP
+21538,Autres réseaux,Other networks,Plan comptable M57 — DGCL/DGFiP
+21568,Matériel d'incendie et de secours,Fire and rescue equipment,Plan comptable M57 — DGCL/DGFiP
+21571,Matériel roulant de voirie,Road vehicles,Plan comptable M57 — DGCL/DGFiP
+21578,Autre matériel de voirie,Other road equipment,Plan comptable M57 — DGCL/DGFiP
+2158,Autres installations techniques,Other technical installations,Plan comptable M57 — DGCL/DGFiP
+2161,Œuvres et objets d'art,Works of art,Plan comptable M57 — DGCL/DGFiP
+2182,Matériel de transport,Vehicles,Plan comptable M57 — DGCL/DGFiP
+21828,Autre matériel de transport,Other vehicles,Plan comptable M57 — DGCL/DGFiP
+2183,Matériel informatique,IT equipment,Plan comptable M57 — DGCL/DGFiP
+21838,Autre matériel informatique,Other IT equipment,Plan comptable M57 — DGCL/DGFiP
+2184,Mobilier,Furniture,Plan comptable M57 — DGCL/DGFiP
+21848,Autre mobilier,Other furniture,Plan comptable M57 — DGCL/DGFiP
+2188,Autres matériels et équipements,Other equipment,Plan comptable M57 — DGCL/DGFiP
+2312,Terrains en cours d'aménagement,Land development in progress,Plan comptable M57 — DGCL/DGFiP
+2313,Bâtiments en cours de construction,Buildings under construction,Plan comptable M57 — DGCL/DGFiP
+2315,Voirie et réseaux en cours de travaux,Roads and networks under construction,Plan comptable M57 — DGCL/DGFiP
+2318,Autres immobilisations en cours,Other work in progress,Plan comptable M57 — DGCL/DGFiP
+238,Avances versées sur commandes d'immobilisations,Advances on capital orders,Plan comptable M57 — DGCL/DGFiP
+2764,Créances sur des particuliers,Receivables from individuals,Plan comptable M57 — DGCL/DGFiP
+27638,Créances sur d'autres établissements publics,Receivables from other public bodies,Plan comptable M57 — DGCL/DGFiP

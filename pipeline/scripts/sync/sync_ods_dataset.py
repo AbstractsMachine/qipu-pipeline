@@ -34,8 +34,17 @@ the YAML are declarative provenance for the (future) country-profile layer and
 are NOT applied here — like every other generic ingester, this one loads raw
 faithfully and lets staging do the mapping.
 
+Catalog snapshot: every run also refreshes `raw.<city>_catalog` — one row
+per (dataset, field) from `/catalog/datasets/{id}` (title, page URL,
+license, publisher, `modified`). It is the provenance source of truth read
+by stg_<city>_catalog → core_<city>_source_catalog, so no model hardcodes a
+dataset URL. A source may declare `catalog_only: true` when its rows are
+loaded by a dedicated script (dette-garantie's per-year refine): it gets a
+catalog row but no data load here.
+
 Usage:
-    python sync_ods_dataset.py --city paris                       # all ods sources
+    python sync_ods_dataset.py --city paris                       # all ods sources + catalog
+    python sync_ods_dataset.py --city paris --catalog-only        # metadata snapshot only
     python sync_ods_dataset.py --city paris --source budget_principal
     python sync_ods_dataset.py --city paris --dry-run             # plan only
     python sync_ods_dataset.py --city paris --raw-dataset raw_parity  # shadow load
@@ -47,6 +56,7 @@ import argparse
 import json
 import os
 import re
+import socket
 import sys
 import unicodedata
 from datetime import datetime, timezone
@@ -77,7 +87,22 @@ def load_city_config(city_slug: str) -> dict:
 
 
 def ods_sources(config: dict) -> list[dict]:
+    """ods_dataset sources whose DATA this adapter loads. `catalog_only: true`
+    entries are excluded here (their rows come from another loader, e.g.
+    sync_dette_garantie.py's per-year refine) but still get a catalog row."""
+    return [
+        s for s in config.get("sources", [])
+        if s.get("type") == "ods_dataset" and not s.get("catalog_only")
+    ]
+
+
+def catalog_sources(config: dict) -> list[dict]:
+    """Every ods_dataset source, catalog_only ones included."""
     return [s for s in config.get("sources", []) if s.get("type") == "ods_dataset"]
+
+
+def catalog_table_name(config: dict) -> str:
+    return config.get("ods", {}).get("catalog_table") or f"{config['city_slug']}_catalog"
 
 
 def clean_column_name(name: str) -> str:
@@ -114,10 +139,60 @@ def resolve_portal(config: dict, source: dict) -> tuple[str, str]:
     return domain, api_version
 
 
-def download_dataset(domain: str, api_version: str, dataset_id: str, log: Logger) -> pd.DataFrame:
-    """Full dataset via the ODS export endpoint (no pagination cap)."""
+_RESOLVES: dict[str, bool] = {}
+
+
+def _resolves(host: str) -> bool:
+    if host not in _RESOLVES:
+        try:
+            socket.getaddrinfo(host, 443)
+            _RESOLVES[host] = True
+        except socket.gaierror:
+            _RESOLVES[host] = False
+    return _RESOLVES[host]
+
+
+def resolve_fetch_portal(config: dict, source: dict) -> tuple[str, str]:
+    """resolve_portal, for the HTTP calls. When the portal's name does not
+    resolve and the config names the platform's own address (`ods.domain_fallback`,
+    or `portal_fallback` next to a source's own `portal`), that address. The
+    catalog keeps the configured name: the links readers see do not follow an
+    outage. (2026-09-23: opendata.paris.fr NXDOMAIN everywhere, the same
+    portal answering at parisdata.opendatasoft.com.)"""
+    domain, api_version = resolve_portal(config, source)
+    block = config.get("ods", {}) or {}
+    fallback = source.get("portal_fallback") if source.get("portal") else block.get("domain_fallback")
+    if fallback and not _resolves(domain):
+        if domain not in _WARNED:
+            print(f"  ! {domain} ne résout pas : le portail est lu à {fallback}")
+            _WARNED.add(domain)
+        return fallback, api_version
+    return domain, api_version
+
+
+_WARNED: set[str] = set()
+
+
+def download_dataset(
+    domain: str, api_version: str, dataset_id: str, log: Logger,
+    where: str | None = None, select: str | None = None,
+) -> pd.DataFrame:
+    """Full dataset via the ODS export endpoint (no pagination cap).
+
+    `where` / `select` are ODSQL clauses the export endpoint honours (verified
+    live on opendata.vancouver.ca 2026-09-12: a `where` cut 1.55 M rows to
+    the requested slice and `select` returned only the named columns). They
+    are PROTOCOL features, declared per source in the city YAML, so a large
+    dataset can be pulled by year or trimmed of columns it does not need —
+    the raw table still holds exactly what the portal returned for that
+    clause. Absent both, behaviour is unchanged: the whole dataset."""
     url = f"https://{domain}/api/explore/{api_version}/catalog/datasets/{dataset_id}/exports/json"
-    resp = requests.get(url, params={"limit": -1}, timeout=REQUEST_TIMEOUT_S, stream=True)
+    params: dict = {"limit": -1}
+    if where:
+        params["where"] = where
+    if select:
+        params["select"] = select
+    resp = requests.get(url, params=params, timeout=REQUEST_TIMEOUT_S, stream=True)
     resp.raise_for_status()
     data = resp.json()
     if not data:
@@ -173,6 +248,90 @@ def load_dataframe_to_bigquery(
     return n_rows
 
 
+# ---------------------------------------------------------------------------
+# catalog snapshot (provenance source of truth — mirrors sync_socrata.py)
+# ---------------------------------------------------------------------------
+
+def fetch_dataset_metadata(domain: str, api_version: str, dataset_id: str) -> dict:
+    """`/catalog/datasets/{id}` — title, license, publisher, `modified`
+    (portal refresh timestamp), records_count and the field list."""
+    url = f"https://{domain}/api/explore/{api_version}/catalog/datasets/{dataset_id}"
+    resp = requests.get(url, timeout=REQUEST_TIMEOUT_S)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def build_catalog_rows(config: dict, sources: list[dict], metas: dict[str, dict]) -> list[dict]:
+    """One row per (dataset, field): dataset-level provenance (title, page
+    URL, license, publisher, `modified` → rows_updated_at) + per-field
+    metadata. All values are strings (typed in stg_<city>_catalog)."""
+    out: list[dict] = []
+    for source in sources:
+        domain, _ = resolve_portal(config, source)
+        meta = metas[source["id"]]
+        default = (meta.get("metas") or {}).get("default") or {}
+        dataset_id = meta.get("dataset_id") or source["dataset_id"]
+        base = {
+            "source_id": source["id"],
+            "dataset_id": dataset_id,
+            "dataset_title": default.get("title"),
+            "dataset_page_url": f"https://{domain}/explore/dataset/{dataset_id}/",
+            "domain": domain,
+            "portal_name": config.get("ods", {}).get("portal_name"),
+            "publisher": default.get("publisher"),
+            "license_title": default.get("license"),
+            "license_url": default.get("license_url"),
+            "theme": "; ".join(default.get("theme") or []) or None,
+            "rows_updated_at": default.get("modified"),
+            "data_processed_at": default.get("data_processed"),
+            "records_count": (
+                str(default["records_count"]) if default.get("records_count") is not None else None
+            ),
+        }
+        fields = meta.get("fields") or [{}]
+        for position, field in enumerate(fields):
+            out.append({
+                **base,
+                "column_field_name": field.get("name"),
+                "column_display_name": field.get("label"),
+                "column_data_type": field.get("type"),
+                "column_description": field.get("description"),
+                "column_position": str(position),
+            })
+    return out
+
+
+def load_catalog(client: bigquery.Client, rows: list[dict], raw_dataset: str,
+                 table_id: str, synced_at: datetime, log: Logger) -> None:
+    if not rows:
+        raise ValueError("no catalog rows to load")
+    field_names = [k for k in rows[0].keys()]
+    schema = [bigquery.SchemaField(n, "STRING") for n in field_names]
+    schema.append(bigquery.SchemaField("_synced_at", "TIMESTAMP"))
+    stamp = synced_at.isoformat()
+    for r in rows:
+        r["_synced_at"] = stamp
+    table_ref = f"{PROJECT_ID}.{raw_dataset}.{table_id}"
+    job_config = bigquery.LoadJobConfig(
+        schema=schema, write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
+    )
+    client.load_table_from_json(rows, table_ref, job_config=job_config).result()
+    log.success(f"loaded {len(rows):,} catalog rows", extra=table_ref)
+
+
+def sync_catalog(client: bigquery.Client, config: dict, raw_dataset: str, log: Logger) -> int:
+    sources = catalog_sources(config)
+    log.section(f"Catalog snapshot ({len(sources)} dataset(s))")
+    metas = {}
+    for source in sources:
+        domain, api_version = resolve_fetch_portal(config, source)
+        metas[source["id"]] = fetch_dataset_metadata(domain, api_version, source["dataset_id"])
+        log.info("metadata", extra=f"{source['id']} · modified={metas[source['id']].get('metas', {}).get('default', {}).get('modified')}")
+    rows = build_catalog_rows(config, sources, metas)
+    load_catalog(client, rows, raw_dataset, catalog_table_name(config), datetime.now(timezone.utc), log)
+    return len(rows)
+
+
 def get_bigquery_client() -> bigquery.Client:
     """Same credential resolution as the other generic ingesters."""
     creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -192,13 +351,18 @@ def sync_source(client: bigquery.Client, config: dict, source: dict, raw_dataset
     source_id = source["id"]
     dataset_id = source["dataset_id"]
     table_id = source.get("target_table") or dataset_id_to_table_name(dataset_id)
-    domain, api_version = resolve_portal(config, source)
+    domain, api_version = resolve_fetch_portal(config, source)
 
     log.section(f"Source: {source_id} ({dataset_id})")
     log.info("description", extra=source.get("description", ""))
     log.info("portal", extra=f"{domain} ({api_version}) → {raw_dataset}.{table_id}")
 
-    df = download_dataset(domain, api_version, dataset_id, log)
+    if source.get("where") or source.get("select"):
+        log.info("export clause", extra=f"where={source.get('where')!r} select={source.get('select')!r}")
+    df = download_dataset(
+        domain, api_version, dataset_id, log,
+        where=source.get("where"), select=source.get("select"),
+    )
     log.info("downloaded", extra=f"{len(df):,} rows, {len(df.columns)} columns")
     df = prepare_dataframe(df, source.get("drop_columns", []), datetime.now(timezone.utc), log)
     rows = load_dataframe_to_bigquery(client, df, raw_dataset, table_id, log)
@@ -214,6 +378,10 @@ def main() -> int:
     parser.add_argument("--raw-dataset", dest="raw_dataset",
                         help="Override the destination BQ dataset (e.g. raw_parity for a shadow load)")
     parser.add_argument("--dry-run", action="store_true", help="Plan only, don't fetch or load")
+    parser.add_argument("--skip-catalog", action="store_true",
+                        help="Don't refresh raw.<city>_catalog (portal metadata snapshot)")
+    parser.add_argument("--catalog-only", action="store_true",
+                        help="Only refresh raw.<city>_catalog, load no dataset")
     args = parser.parse_args()
 
     log = Logger("sync_ods")
@@ -223,20 +391,28 @@ def main() -> int:
     raw_dataset = args.raw_dataset or config.get("bq_raw_dataset", RAW_DATASET_DEFAULT)
 
     sources = ods_sources(config)
-    if args.source:
+    if args.catalog_only:
+        sources = []
+    elif args.source:
         sources = [s for s in sources if s["id"] == args.source]
         if not sources:
-            log.error(f"source '{args.source}' not found in {args.city}.yaml")
-            return 2
+            catalog_only = [s for s in catalog_sources(config) if s["id"] == args.source]
+            if catalog_only:
+                log.info("catalog-only source", extra=f"{args.source}: data loaded elsewhere, refreshing catalog only")
+            else:
+                log.error(f"source '{args.source}' not found in {args.city}.yaml")
+                return 2
 
     log.info("sources to sync", extra=f"{len(sources)} source(s) → dataset '{raw_dataset}'")
 
     if args.dry_run:
         log.section("Dry run — would sync:")
         for s in sources:
-            domain, api_version = resolve_portal(config, s)
+            domain, api_version = resolve_fetch_portal(config, s)
             table_id = s.get("target_table") or dataset_id_to_table_name(s["dataset_id"])
             log.info("would load", extra=f"{domain}/{s['dataset_id']} → {raw_dataset}.{table_id}")
+        if not args.skip_catalog:
+            log.info("would snapshot catalog", extra=f"{len(catalog_sources(config))} dataset(s) → {raw_dataset}.{catalog_table_name(config)}")
         return 0
 
     log.section("BigQuery client")
@@ -250,6 +426,13 @@ def main() -> int:
             summaries.append(sync_source(client, config, source, raw_dataset, log))
         except Exception as e:
             log.error(f"sync failed: {source['id']}", extra=str(e))
+            failures += 1
+
+    if not args.skip_catalog:
+        try:
+            sync_catalog(client, config, raw_dataset, log)
+        except Exception as e:
+            log.error("catalog snapshot failed", extra=str(e))
             failures += 1
 
     log.section("Summary")

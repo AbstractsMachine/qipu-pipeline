@@ -287,6 +287,22 @@ models:
   # NOUVEAUX CORE (Phases 1-18)
   # ===========================================================================
 
+  - name: core_paris_source_catalog
+    meta:
+      domain: "provenance"
+      criticality: "low"
+      freshness_slo: "per sync"
+    description: >
+      Dimension de provenance Paris — une ligne par dataset ODS synchronisé
+      (source_id), réduite depuis stg_paris_catalog. Les modèles core/mart la
+      joignent pour source_url / rows_updated_at au lieu d'écrire une URL en
+      dur. Aucun montant.
+    columns:
+      - name: source_id
+        tests: [not_null, unique]
+      - name: dataset_page_url
+        tests: [not_null]
+
   - name: core_dette_garantie
     meta:
       domain: "bilan"
@@ -443,3 +459,36 @@ models:
         description: "SIRET résolu (plus gros dossier associations), NULL si inconnu."
       - name: siren
         description: "9 premiers chiffres du SIRET, NULL si inconnu."
+
+  - name: core_logement_sru_arr
+    description: >
+      Taux SRU par arrondissement × année : logements sociaux /
+      résidences principales (× 100, arrondi à 0,1) calculé ici depuis les
+      comptages bruts de stg_apur_sru quand ils existent (2001-2019), taux
+      publié par l'APUR sinon (2025, sans résidences principales) ; source,
+      source_url et licence conservés sur chaque ligne.
+    columns:
+      - name: arrondissement
+        tests: [not_null]
+      - name: annee
+        tests: [not_null]
+
+  - name: core_marseille_subventions
+    description: >
+      OBT Marseille, une ligne par subvention : lignes SCDL normalisées
+      (stg_marseille_subventions) jointes au cache thématique in-session
+      (stg_marseille_cache_thematique) sur beneficiaire_normalise ; colonnes
+      siret / direction / secteurs exposées à NULL pour aligner le schéma sur
+      core_subventions (Paris).
+
+  - name: core_marseille_place_subventions
+    description: >
+      Subventions Marseille rattachées à un lieu, ligne à ligne : chaque
+      subvention de core_marseille_subventions dont le bénéficiaire (relation
+      operator) ou l'objet (relation residents, hors exclusions) matche la
+      regex du lieu. L'objet est conservé comme preuve. Aucun seuil ici.
+    columns:
+      - name: place_slug
+        tests: [not_null]
+      - name: montant
+        tests: [not_null]

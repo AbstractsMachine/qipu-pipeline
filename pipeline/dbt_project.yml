@@ -34,11 +34,102 @@ clean-targets:
 # =============================================================================
 seeds:
   paris_public_open_data:
+    # Nomenclature comptable par nature (M14/M57) et libellés simples des comptes,
+    # pour le budget national des communes. "60"/"10" restent des chaînes.
+    seed_comptes_libelles_simples:
+      +column_types:
+        compte: string
+    # Code officiel géographique (Insee, 2025) : l'article des départements et des régions
+    # (TNCC : 3 = « de la », 2 = « du »…), pour écrire « de la Haute-Garonne » (26/09).
+    seed_cog_articles:
+      +column_types:
+        niveau: string
+        code: string
+        tncc: string
+        libelle: string
+    # Nomenclature d'activités française NAF rév. 2 (Insee, niveau 5, 732 sous-classes) :
+    # le libellé de l'activité principale d'une entreprise (« Production d'électricité »).
+    seed_naf_rev2:
+      +column_types:
+        code: string
+        libelle: string
+    seed_nomenclature_comptes:
+      +column_types:
+        nature_prefix: string
+        classe: string
+        is_ordre: boolean
     +schema: seeds
     
     # -------------------------------------------------------------------------
     # Mapping thématiques (chapitre/fonction → thématique dashboard)
     # -------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # Subventions 2015 : noms masqués par l'open data, retrouvés dans l'annexe
+    # B1.7 du compte administratif (montant au centime + code postal).
+    # -------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # Subventions : identité des bénéficiaires. Une graphie normalisée →
+    # l'identité (la graphie canonique) de l'organisation, avec la règle et la
+    # preuve (normalisation, troncature, SIREN, jugement). Produit par
+    # scripts/enrich/identites_beneficiaires.py ; lu pour TOUTES les années.
+    # -------------------------------------------------------------------------
+    seed_beneficiaire_identites:
+      +column_types:
+        beneficiaire_normalise: STRING
+        identite: STRING
+        regle: STRING
+        preuve: STRING
+    seed_subventions_2015_noms_annexe:
+      +column_types:
+        annee: INT64
+        pseudonyme: STRING
+        montant: FLOAT64
+        code_postal: STRING
+        nom_annexe: STRING
+        preuve: STRING
+
+    # -------------------------------------------------------------------------
+    # Libellés des codes que la Ville n'avait jamais publiés en open data
+    # (budget exécuté 2025 lu dans la balance DGFiP) : recopiés du compte
+    # administratif imprimé, page citée. Lu par stg_budget_principal.
+    # -------------------------------------------------------------------------
+    seed_paris_ca_libelles:
+      +column_types:
+        axe: STRING
+        code: STRING
+        libelle: STRING
+        source_pdf: STRING
+        source_page: INT64
+
+    # -------------------------------------------------------------------------
+    # Totaux par chapitre imprimés dans le compte administratif (tome 1,
+    # III A et B « vue d'ensemble »). Contrôle : le budget exécuté d'une année
+    # hors open data doit retomber dessus (tests/cat4_accounting_balance).
+    # -------------------------------------------------------------------------
+    seed_paris_ca_totaux_imprimes:
+      +column_types:
+        annee: INT64
+        section: STRING
+        sens_flux: STRING
+        chapitre_code: STRING
+        montant_imprime: NUMERIC
+        source_pdf: STRING
+        source_page: INT64
+
+    # Bilan d'un exercice pas encore en open data, relevé dans l'annexe aux
+    # états financiers (PDF). Contrôle : scripts/audit/check_paris_bilan_pdf.py
+    seed_paris_bilan_pdf:
+      +column_types:
+        exercice_comptable: STRING
+        actif_passif: STRING
+        poste: STRING
+        detail: STRING
+        brut: NUMERIC
+        amortissements_et_provisions: NUMERIC
+        net: NUMERIC
+        source_pdf: STRING
+        source_page: INT64
+
     seed_mapping_thematiques:
       +column_types:
         chapitre_code: STRING
@@ -96,6 +187,17 @@ seeds:
         score: FLOAT64
         label: STRING
         reason: STRING
+    # Décisions du jugement en session de chaque paire candidate chantier ↔ marché
+    # (garde / retire + raison ; projet_marches_juge.py decisions). Trace
+    # d'audit : les paires gardées sont celles de seed_match_projet_marches.
+    seed_projet_marches_decisions:
+      +column_types:
+        projet_id: STRING
+        projet_year: INT64
+        numero_marche: STRING
+        decision: STRING
+        raison: STRING
+        etape: STRING
 
     # -------------------------------------------------------------------------
     # Cache AP → Géoloc (peuplé par enrich_geo_ap_llm.py)
@@ -124,17 +226,7 @@ seeds:
         ode_date_recherche: STRING
         ode_source: STRING
 
-    # -------------------------------------------------------------------------
-    # Marseille — cache Bénéficiaire → Thématique
-    # (peuplé par enrich_thematique_marseille.py ; grounded secteur + keywords)
-    # -------------------------------------------------------------------------
-    seed_marseille_cache_thematique:
-      +column_types:
-        beneficiaire_normalise: STRING
-        ode_thematique: STRING
-        ode_sous_categorie: STRING
-        ode_confiance: FLOAT64
-        ode_source: STRING
+
 
     # -------------------------------------------------------------------------
     # Budget Voté (BP) extrait des PDFs éditique BG (2020-2026)
@@ -305,19 +397,135 @@ seeds:
         source_url: STRING
         licence: STRING
 
+    seed_apur_sru_publie:
+      +column_types:
+        arrondissement: INT64
+        label: STRING
+        annee: INT64
+        logements_sociaux: INT64
+        taux_pct_publie: FLOAT64
+        source: STRING
+        source_url: STRING
+        licence: STRING
+
     # -------------------------------------------------------------------------
     # Country seeds — US (ADR-0010 D3). `us_seeds` lands in the dbt_us_*
     # dataset family via macros/generate_schema_name.sql.
     # -------------------------------------------------------------------------
+    # Seeds nationaux / Marseille PDF : les CSV portent des décimaux ("150.0",
+    # "24580000.0") que l'inférence agate typait INT64 → load BigQuery en
+    # échec à chaque `dbt seed` prod depuis mai. Type explicite.
+    seed_drees_retraites_branches:
+      +column_types:
+        montant_md_eur: FLOAT64
+        share: FLOAT64
+    seed_etat_autres_ministeres:
+      +column_types:
+        montant_md_eur: FLOAT64
+        share: FLOAT64
+    seed_unedic_prestations:
+      +column_types:
+        montant_md_eur: FLOAT64
+        share: FLOAT64
+
+    # -------------------------------------------------------------------------
+    # seeds/cities/marseille/ — dbt resolves seed configs by FOLDER path, so a
+    # seed living here must be configured under cities → marseille (a block at
+    # the project root with the same name is silently ignored: that is how
+    # seed_pdf_investissements_2023/2024 kept an inferred INT64 `montant` and
+    # failed to load on every prod `dbt seed` since May).
+    # -------------------------------------------------------------------------
+    cities:
+      marseille:
+        seed_marseille_cache_thematique:
+          +column_types:
+            beneficiaire_normalise: STRING
+            ode_thematique: STRING
+            ode_sous_categorie: STRING
+            ode_confiance: FLOAT64
+            ode_source: STRING
+        # -------------------------------------------------------------------------
+        # Marseille — cache Bénéficiaire → Thématique
+        # (peuplé par enrich_thematique_marseille.py ; grounded secteur + keywords)
+        # -------------------------------------------------------------------------
+        # Règles place ↔ subventions des lieux Marseille (ex build_marseille_place_money.py):
+        # par lieu, une regex « operator » (le lieu est lui-même le bénéficiaire, seuil
+        # min_montant_total) et une regex « residents » (l'objet nomme le lieu,
+        # exclude_regex écarte les écoles homonymes, max_rows plafonne la liste).
+        seed_marseille_place_subventions_rules:
+          +column_types:
+            place_slug: STRING
+            relation: STRING
+            match_regex: STRING
+            exclude_regex: STRING
+            min_montant_total: FLOAT64
+            max_rows: INT64
+            note: STRING
+        seed_pdf_investissements_2023:
+          +column_types:
+            montant: FLOAT64
+        seed_pdf_investissements_2024:
+          +column_types:
+            montant: FLOAT64
+
     countries:
       us:
         +schema: us_seeds
+        # Local finance crosswalk (2026-09-22): every state/Census spending
+        # category → one of 12 shared categories, with confidence and a
+        # counts_in_total flag (fund-to-fund transfers must not be summed).
+        seed_us_lf_category_map:
+          +column_types:
+            source_system: STRING
+            source_key: STRING
+            key_type: STRING
+            category_code: STRING
+            counts_in_total: BOOL
+            confidence: STRING
+            note: STRING
+        seed_us_lf_categories:
+          +column_types:
+            category_code: STRING
+            sort_order: INT64
+        seed_us_lf_revenue_map:
+          +column_types:
+            source_system: STRING
+            source_key: STRING
+            key_type: STRING
+            category_code: STRING
+            counts_in_total: BOOL
+            confidence: STRING
+            note: STRING
+        seed_us_lf_revenue_categories:
+          +column_types:
+            category_code: STRING
+            sort_order: INT64
+        seed_us_lf_natures:
+          +column_types:
+            nature_code: STRING
+            sort_order: INT64
+        seed_us_lf_nature_map:
+          +column_types:
+            source_system: STRING
+            source_value: STRING
+            nature_code: STRING
         # Manual bucket classification of top SF voucher payees (display
         # categorization only — amounts come from raw.us_sf_vouchers).
         # Extended 2026-07-16 (Block 2): the measured per-FY top-30 union +
         # all-time top-200 classified in-session; is_aggregation_line flags
         # the Controller's aggregated vendor lines (Single Payment Payees,
         # HSA AP Interface) that are not real entities.
+        # Raw vendor string → normalized payee (build_sf_payee_identity.py:
+        # exact core-name match + reviewed JV/predecessor merges). Joined
+        # row-level in core_us_sf_vouchers; identity only, never amounts.
+        seed_us_sf_payee_identity:
+          +column_types:
+            vendor: STRING
+            payee_slug: STRING
+            payee_name: STRING
+            core_key: STRING
+            merge_reason: STRING
+            is_curated: BOOLEAN
         seed_us_sf_payee_buckets:
           +column_types:
             vendor: STRING
@@ -475,6 +683,161 @@ seeds:
             paid_usd: FLOAT64
             match_evidence: STRING
       # -----------------------------------------------------------------------
+      # Canada / Vancouver seeds → dbt_ca_seeds (ca-municipal family).
+      # -----------------------------------------------------------------------
+      ca:
+        +schema: ca_seeds
+        # City population — Statistics Canada 2021 Census Profile, CSD
+        # 5915022. One row per census year; source/source_url travel with the
+        # number into core → mart → export (zero hardcoded figures).
+        seed_ca_vancouver_population:
+          +column_types:
+            year: INT64
+            population: INT64
+            geography: STRING
+            dguid: STRING
+            source: STRING
+            source_url: STRING
+        # SOFI documents fetched from the Internet Archive (fetch_sofi.py
+        # writes it): capture timestamp, original + archive URL, SHA-256.
+        seed_ca_vancouver_sofi_documents:
+          +column_types:
+            fiscal_year: INT64
+            part: STRING
+            wayback_timestamp: STRING
+            original_url: STRING
+            wayback_url: STRING
+            file: STRING
+            bytes: INT64
+            sha256: STRING
+        # Schedule totals the parsed rows do not reproduce, each with what was
+        # measured. assert_ca_sofi_controls_explained fails on any gap not here.
+        # Five-year-review rows a later report misprints, each with the
+        # document that proves it; core_ca_vancouver_finance_lines then reads
+        # that table-year from the previous report.
+        seed_ca_vancouver_sofi_review_misprints:
+          +column_types:
+            report_year: INT64
+            table_name: STRING
+            fiscal_year_from: INT64
+            fiscal_year_to: INT64
+            evidence: STRING
+        seed_ca_vancouver_sofi_known_gaps:
+          +column_types:
+            fiscal_year: INT64
+            schedule: STRING
+            category: STRING
+            reason: STRING
+        # One organisation printed under keys ca_org_key cannot join (an
+        # abbreviation it does not know, a cut name, an account number or
+        # office appended, a rename). Reviewed by hand over the 200 largest
+        # payees, one reason per row; core_ca_vancouver_sofi_payments maps
+        # printed_key → payee_key. assert_ca_payee_merges_reviewed guards it.
+        seed_ca_vancouver_payee_merges:
+          +column_types:
+            printed_key: STRING
+            payee_key: STRING
+            reason: STRING
+        # Housing-register operators whose organisation is a named SOFI payee
+        # that ca_org_key cannot join: the register's short or full name
+        # against the schedule's ("BC Housing" / "BC Housing Management
+        # Commission"). Reviewed by hand, one reason per row; only the misses
+        # of the exact join. mart_ca_vancouver_housing_buildings reads it;
+        # assert_ca_housing_operator_payees_reviewed guards it.
+        seed_ca_vancouver_housing_operator_payees:
+          +column_types:
+            operator: STRING
+            payee_key: STRING
+            reason: STRING
+        # The payroll schedule's department labels, written out where the City
+        # abbreviates them ("Dev Svcs, Bldg & Licensing", "VFRS"). Reviewed by
+        # hand, one reason per row; mart_ca_vancouver_payroll_departments adds
+        # department_display and keeps the City's label in `department`.
+        # assert_ca_payroll_department_names_reviewed guards it.
+        seed_ca_vancouver_payroll_department_names:
+          +column_types:
+            department: STRING
+            display_name: STRING
+            reason: STRING
+        # One capital program printed under several names across budget
+        # years (typos, abbreviations, a word added, Renewal → Replacement of
+        # a fleet). Reviewed pair by pair: same words, no budget year printing
+        # both, the open project budget carrying over. core_ca_vancouver_
+        # capital_budget_lines maps printed_key → program_key;
+        # assert_ca_capital_program_merges_reviewed guards it.
+        seed_ca_vancouver_capital_program_merges:
+          +column_types:
+            printed_key: STRING
+            program_key: STRING
+            reason: STRING
+        # The 2019–2022 plan's category names → the 2023–2026 plan's, and the
+        # spellings of one category across budget files ("Arts & Culture" /
+        # "Arts and Culture"). The reason gives how many programs carried from
+        # 2022 into 2023 land under the new name.
+        # assert_ca_capital_category_crosswalk_reviewed guards it.
+        # Vancouver's curated landmarks (the places section's scene, 2026-09-24):
+        # places a resident would recognise that the City owns, runs or funds,
+        # each with the rules that tie City money to it — the operator's SOFI
+        # payee keys (grants), whole-word name rules for capital programs and
+        # awarded contracts (ca_words), exclusions, the register ids it absorbs,
+        # a point (register, Wikidata or a stated manual source) and its
+        # evidence. core_ca_vancouver_landmark_money applies the rules;
+        # assert_ca_landmarks_reviewed guards the seed.
+        seed_ca_vancouver_landmarks:
+          +column_types:
+            slug: STRING
+            name: STRING
+            kind: STRING
+            family: STRING
+            lat: FLOAT64
+            lon: FLOAT64
+            coord_source: STRING
+            register_ids: STRING
+            operator: STRING
+            operator_payee_keys: STRING
+            capital_pattern: STRING
+            capital_exclude: STRING
+            contract_pattern: STRING
+            contract_exclude: STRING
+            wikidata: STRING
+            commons_file: STRING
+            evidence: STRING
+        seed_ca_vancouver_capital_category_crosswalk:
+          +column_types:
+            printed_category: STRING
+            category: STRING
+            reason: STRING
+        # Council minutes 1970–1979 on the Internet Archive (fetch_minutes_1970s.py
+        # writes it): item, meeting date, OCR files, page count, SHA-256, licence.
+        # Council minutes 1995–2015 as the Wayback Machine saved council.vancouver.ca
+        # (fetch_minutes_wayback.py writes it): meeting, document, capture, SHA-256.
+        seed_ca_vancouver_minutes_wayback:
+          +column_types:
+            meeting_date: STRING
+            file: STRING
+            prefix: STRING
+            meeting_kind: STRING
+            part: STRING
+            original_url: STRING
+            wayback_timestamp: STRING
+            wayback_url: STRING
+            mimetype: STRING
+            bytes: INT64
+            sha256: STRING
+        seed_ca_vancouver_minutes_1970s:
+          +column_types:
+            identifier: STRING
+            title: STRING
+            meeting_date: STRING
+            text_file: STRING
+            page_index_file: STRING
+            pdf_file: STRING
+            pages: INT64
+            text_bytes: INT64
+            sha256: STRING
+            license_url: STRING
+            item_url: STRING
+      # -----------------------------------------------------------------------
       # Brazil / Recife seeds → dbt_br_seeds (br-municipal family).
       # -----------------------------------------------------------------------
       br:
@@ -550,8 +913,18 @@ models:
     # its siren/dep/reg/geo columns restored before sync_national.py runs.
     # Kept as the roadmap seam for multi-scale expansion (cf. ADR-0011).
     # -------------------------------------------------------------------------
+    # Les communes de France (DGFiP, OFGL, DECP, REI, RNE, Fonds vert, SIRENE).
+    # Désactivé au niveau du dossier : chaque modèle s'active lui-même
+    # (config(enabled=true)). Datasets à part, dbt_paris_national_* en prod :
+    # le refresh de Paris les exclut (run_all.sh), la tâche nationale les bâtit.
     national:
       +enabled: false
+      staging:
+        +schema: national_staging
+      core:
+        +schema: national_analytics
+      marts:
+        +schema: national_marts
 
     # -------------------------------------------------------------------------
     # US models (Treasury Fiscal Data, Census) — dbt_us_* dataset family
@@ -628,6 +1001,45 @@ models:
         +materialized: table
         +schema: br_marts
         +tags: ['br', 'marts']
+        +meta:
+          owner: "contact@qipu.org"
+          cadence: "before each export run"
+          cost_bucket: "low"
+
+    # -------------------------------------------------------------------------
+    # CA models (Vancouver — ca-municipal) — dbt_ca_* dataset family
+    # (ADR-0010 D3). `ca_*` schema prefixes are mapped to dbt_ca_* by
+    # macros/generate_schema_name.sql, mirroring dbt_us_* / dbt_br_*.
+    # -------------------------------------------------------------------------
+    ca:
+      staging:
+        +materialized: view
+        +schema: ca_staging
+        +tags: ['ca', 'staging']
+        +meta:
+          owner: "contact@qipu.org"
+          cadence: "on-demand (sync run cadence)"
+          cost_bucket: "low"  # views, no storage
+      intermediate:
+        +materialized: table
+        +schema: ca_intermediate
+        +tags: ['ca', 'intermediate']
+        +meta:
+          owner: "contact@qipu.org"
+          cadence: "after stg refresh"
+          cost_bucket: "low-medium"
+      core:
+        +materialized: table
+        +schema: ca_analytics
+        +tags: ['ca', 'core']
+        +meta:
+          owner: "contact@qipu.org"
+          cadence: "after stg refresh"
+          cost_bucket: "low-medium"
+      marts:
+        +materialized: table
+        +schema: ca_marts
+        +tags: ['ca', 'marts']
         +meta:
           owner: "contact@qipu.org"
           cadence: "before each export run"

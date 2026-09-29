@@ -2,10 +2,10 @@
 -- Mart: SF payroll by department × job family × fiscal year — the drill
 --       grain, with the dial-B small-cell rule applied IN the mart
 --
--- Sources: core_us_sf_comp (year_type = 'Fiscal'), stg_us_sf_job_reclass
+-- Sources: core_us_sf_comp (year_type = 'Fiscal'), core_us_sf_comp (family_code)
 --          (103 junk job codes → real families, in-session seed),
---          stg_us_sf_job_family_display (60 family codes → 16 display
---          families, in-session seed), stg_us_sf_catalog (provenance).
+--          int_us_sf_job_families (60 family codes → 16 display
+--          families, in-session seed), core_us_sf_source_catalog (provenance).
 -- Grain:  department_code × job_family_code (effective) × fiscal year —
 --         plus one pooled "_POOLED" row per department-year where small
 --         cells could be pooled. ~5-6k rows over 13 years.
@@ -42,34 +42,18 @@ WITH fiscal AS (
       AND department_code IS NOT NULL
 ),
 
-reclass AS (
-    SELECT job_code, reclass_family_code, reclass_family
-    FROM {{ ref('stg_us_sf_job_reclass') }}
+-- family_code / is_reclassified_row come from core_us_sf_comp (the manual
+-- reclass of empty portal families is applied there, row-level).
+rows_with_family AS (
+    SELECT *
+    FROM fiscal
 ),
 
 display AS (
     SELECT job_family_code, canonical_label, display_family
-    FROM {{ ref('stg_us_sf_job_family_display') }}
+    FROM {{ ref('int_us_sf_job_families') }}
 ),
 
--- Effective family per row: reclass fills junk only.
-rows_with_family AS (
-    SELECT
-        f.*,
-        CASE
-            WHEN f.job_family_code IN ('0000', '__UNASSIGNED__')
-                 AND r.reclass_family_code IS NOT NULL
-                THEN r.reclass_family_code
-            ELSE f.job_family_code
-        END AS family_code,
-        (f.job_family_code IN ('0000', '__UNASSIGNED__')
-         AND r.reclass_family_code IS NOT NULL) AS is_reclassified_row
-    FROM fiscal f
-    LEFT JOIN reclass r
-        ON r.job_code = f.job_code
-),
-
--- Canonical department labels (same rule as mart_us_sf_payroll_by_dept_year).
 canonical_dept AS (
     SELECT
         department_code,
@@ -179,7 +163,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_employee_comp'
 )
 

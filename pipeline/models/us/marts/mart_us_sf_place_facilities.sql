@@ -8,46 +8,34 @@
 -- address/APN/size, plus campus aggregates (how many buildings, total sq ft,
 -- owned vs leased) and the DISTINCT APN list — the key the Building Permits
 -- join (6D) will use. Facility attributes are read LIVE from
--- stg_us_sf_city_facilities (the registry is the source of truth; the seed
+-- core_us_sf_places (the registry is the source of truth; the seed
 -- only fixes which facility_ids belong to the place).
 --
 -- Identity only — asserts no money. The APN list it exposes is what turns a
 -- place into a parcel key for downstream structured money joins.
 -- =============================================================================
 
-WITH xwalk AS (
-    SELECT * FROM {{ ref('stg_us_sf_place_facilities') }}
-),
 
-fac AS (
+WITH joined AS (
     SELECT
-        facility_id, common_name, address, city, zip_code,
-        block_lot, apn_block, apn_lot, owned_leased, is_city_owned,
-        department_name, gross_sq_ft, latitude, longitude, supervisor_district
-    FROM {{ ref('stg_us_sf_city_facilities') }}
-),
-
-joined AS (
-    SELECT
-        x.place_slug,
-        x.facility_id,
-        x.is_primary,
-        f.common_name,
-        f.address,
-        f.city,
-        f.zip_code,
-        f.block_lot,
-        f.apn_block,
-        f.apn_lot,
-        f.owned_leased,
-        f.is_city_owned,
-        f.department_name,
-        f.gross_sq_ft,
-        f.latitude,
-        f.longitude,
-        f.supervisor_district
-    FROM xwalk x
-    JOIN fac f USING (facility_id)
+        place_slug,
+        facility_id,
+        is_primary,
+        common_name,
+        address,
+        city,
+        zip_code,
+        block_lot,
+        apn_block,
+        apn_lot,
+        owned_leased,
+        is_city_owned,
+        department_name,
+        gross_sq_ft,
+        latitude,
+        longitude,
+        supervisor_district
+    FROM {{ ref('core_us_sf_places') }}
 ),
 
 primary_facility AS (

@@ -1,0 +1,8 @@
+category_code,sort_order,label_en,label_fr,description_en
+taxes,1,Local taxes,Impôts locaux,"Property tax, then sales, utility, hotel and other local taxes where the state splits them"
+intergovernmental,2,Aid from other governments,Aides d'autres administrations,"Federal, state and county money; split where the state records it (Iowa files it as one line)"
+charges,3,"Fees, charges and utility sales","Redevances, tarifs et ventes des régies","What residents and businesses pay for a service: water, sewer, electricity, parking, special assessments"
+licenses_fines,4,"Licenses, permits and fines","Licences, permis et amendes","Building permits, business licenses, court and parking fines"
+other_revenue,5,"Interest, rents and other revenue","Intérêts, loyers et autres recettes","Interest earned, rents, asset sales, donations"
+borrowing,6,Borrowing,Emprunts,"Not revenue: money the town will repay. Never counted in the total"
+transfers_in,7,Transfers between the town's funds,Virements entre fonds de la ville,"The same dollar moving from one fund to another. Never counted in the total"

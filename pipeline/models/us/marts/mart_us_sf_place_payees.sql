@@ -3,7 +3,7 @@
 --
 -- Grain: one row per (place_slug, vendor).
 --
--- place → its matched contracts (stg_us_sf_place_contracts) → vouchers
+-- place → its matched contracts (core_us_sf_place_contracts) → vouchers
 -- (core_us_sf_vouchers on contract_number) → vendor + ACTUAL $ paid, with the
 -- fiscal-year span. This is the "voucher/payee projects based in a location"
 -- reconstruction: the real builders/operators paid on the place's contracts.
@@ -15,7 +15,7 @@
 
 WITH place_contracts AS (
     SELECT DISTINCT place_slug, contract_no
-    FROM {{ ref('stg_us_sf_place_contracts') }}
+    FROM {{ ref('core_us_sf_place_contracts') }}
 ),
 
 voucher_lines AS (

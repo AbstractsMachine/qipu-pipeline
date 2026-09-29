@@ -1,0 +1,287 @@
+# =============================================================================
+# Vancouver (BC, Canada) — sources configuration
+#
+# Read by `pipeline/scripts/sync/sync_ods_dataset.py --city vancouver`
+# (via `sync_city.py vancouver`). Vancouver publishes on Opendatasoft, the
+# same Explore API v2.1 as Paris, so ingestion is CONFIG ONLY — no adapter
+# code (ADR-0010 D3; CLAUDE.md "same protocol ⇒ config + seeds, not code").
+#
+# Schema family: ca-municipal (NEW — Canadian municipal vocabulary: SOFI
+# remuneration, council votes, BC assessment roll; shares no columns with
+# M57 or US fund/character). Warehouse family `dbt_ca_*`, raw tables
+# `raw.ca_vancouver_*`, exports `website/public/data/ca/vancouver/`.
+#
+# LICENCE (verified 2026-09-08 against the portal API): 194 of 198 datasets
+# carry "Open Government Licence - Vancouver"
+# (https://opendata.vancouver.ca/pages/licence/) — attribution only, no
+# share-alike, commercial use allowed. The catalog snapshot records the
+# licence per dataset so no page hardcodes it.
+#
+# DATA AUDIT (verified live 2026-09-07/08, see scratchpad van/catalog.json):
+#   - property-tax-report: ONE ROW PER PROPERTY PER report_year (2020-2026,
+#     ~215-229k rows/yr). `year_built` on 215,408 properties in 2025
+#     (1886→2022); 33 rows carry the placeholder '1800' — null it in stg.
+#     Strata: a condo tower is many rows on one parcel — count PROPERTIES,
+#     never "buildings". Pulled ONE YEAR via `where` (protocol feature).
+#   - property-parcel-polygons ⋈ property-tax-report on
+#     tax_coord = land_coordinate, 1:1 per parcel (tested 2026-09-07).
+#   - council-voting-records: one row per councillor per vote, 2016-04-05→.
+#     `vote` ∈ In Favour / In Opposition / Absent / Abstain / No Vote /
+#     Declared Conflict / Ineligible. 6,602 rows name a rezoning address.
+#   - awarded-contracts: TENDER side (posted bids, 2013→). The PAYMENT side
+#     (suppliers paid >$25k) is PDF-only in the SOFI — not here.
+#   - employee-remuneration…: the SOFI remuneration schedule the City itself
+#     extracts to open data each April; >$75k only; NAMED individuals —
+#     never build a person page; aggregate by department / title.
+#   - `geom` arrives as a GeoJSON Feature dict → the adapter serialises it to
+#     a JSON string; stg parses `$.geometry` with ST_GEOGFROMGEOJSON.
+# =============================================================================
+
+city_slug: vancouver
+city_name: Vancouver
+country: ca
+schema_family: ca-municipal
+
+bq_raw_dataset: raw
+# The marts the exports read (scripts/ca_vancouver_city/warehouse.py): the prod
+# dataset, built by .github/workflows/dbt-ca-prod.yml (docs/ca/PROD-DBT.md).
+# A dev run sets CA_MARTS_DATASET=dbt_ca_dev_local_marts, which wins.
+bq_marts_dataset: dbt_ca_marts
+
+ods:
+  domain: opendata.vancouver.ca
+  api_version: v2.1
+  portal_name: "City of Vancouver Open Data Portal"
+  catalog_table: ca_vancouver_catalog
+
+sources:
+  # ── decisions ──────────────────────────────────────────────────────────────
+  - id: council_voting_records
+    type: ods_dataset
+    dataset_id: council-voting-records
+    target_table: ca_vancouver_council_voting_records
+    description: "Council voting records — one row per member per vote, 2016→ (80,722 rows on 2026-09-07)"
+
+  # ── money ──────────────────────────────────────────────────────────────────
+  - id: awarded_contracts
+    type: ods_dataset
+    dataset_id: awarded-contracts
+    target_table: ca_vancouver_awarded_contracts
+    description: "Awarded contracts (tender side) — bid, vendor, amount, award date, 2013→ (6,414 rows)"
+
+  - id: employee_remuneration
+    type: ods_dataset
+    dataset_id: employee-remuneration-and-expenses-earning-over-75000
+    target_table: ca_vancouver_employee_remuneration
+    description: "SOFI remuneration schedule — employees earning over $75k, 2008→ (49,742 rows). Named individuals: aggregate only."
+
+  - id: city_owned_properties
+    type: ods_dataset
+    dataset_id: city-owned-properties
+    target_table: ca_vancouver_city_owned_properties
+    description: "City-owned properties — land_coord joins the tax roll (4,455 rows)"
+
+  # ── capital (investments page) ─────────────────────────────────────────────
+  # The capital plan is four-year; each year's capital budget is published as
+  # its own dataset, with that year in the COLUMN NAMES ("2026_new_multi_year_…")
+  # — stg unpivots them to one shape. Measured 2026-09-13.
+  - id: capital_plan_2023_2026
+    type: ods_dataset
+    dataset_id: 2023-2026-capital-plan-and-2026-capital-budget-with-proposed-four-year-capital-plan-allocations
+    target_table: ca_vancouver_capital_plan_2023_2026
+    description: "2023-2026 Capital Plan as revised at the 2026 Capital Budget — one row per program (395 rows)"
+
+  - id: capital_budget_2021
+    type: ods_dataset
+    dataset_id: 2021-new-multi-year-capital-budget-requests-and-2021-capital-expenditure-budget
+    target_table: ca_vancouver_capital_budget_2021
+    description: "2021 multi-year capital project budgets and expenditure budget (496 rows)"
+
+  - id: capital_budget_2022
+    type: ods_dataset
+    dataset_id: 2022-new-multi-year-capital-budget-requests-and-2022-capital-expenditure-budget
+    target_table: ca_vancouver_capital_budget_2022
+    description: "2022 multi-year capital project budgets and expenditure budget (548 rows)"
+
+  - id: capital_budget_2023
+    type: ods_dataset
+    dataset_id: 2023-multi-year-capital-project-budget-requests-and-capital-expenditure-budget
+    target_table: ca_vancouver_capital_budget_2023
+    description: "2023 multi-year capital project budgets and expenditure budget (777 rows)"
+
+  - id: capital_budget_2024
+    type: ods_dataset
+    dataset_id: 2024-multi-year-capital-project-budget-requests-and-capital-expenditure-budget
+    target_table: ca_vancouver_capital_budget_2024
+    description: "2024 multi-year capital project budgets and expenditure budget (592 rows)"
+
+  - id: capital_budget_2025
+    type: ods_dataset
+    dataset_id: 2025-multi-year-capital-project-budget-requests-and-capital-expenditure-budget
+    target_table: ca_vancouver_capital_budget_2025
+    description: "2025 multi-year capital project budgets and expenditure budget (740 rows)"
+
+  - id: capital_budget_2026
+    type: ods_dataset
+    dataset_id: 2026-multi-year-capital-project-budget-requests-and-capital-expenditure-budget
+    target_table: ca_vancouver_capital_budget_2026
+    description: "2026 multi-year capital project budgets and expenditure budget (630 rows)"
+
+  # ── places (places page) ───────────────────────────────────────────────────
+  - id: libraries
+    type: ods_dataset
+    dataset_id: libraries
+    target_table: ca_vancouver_libraries
+    description: "Vancouver Public Library branches (22)"
+
+  - id: community_centres
+    type: ods_dataset
+    dataset_id: community-centres
+    target_table: ca_vancouver_community_centres
+    description: "Community centres (27)"
+
+  - id: fire_halls
+    type: ods_dataset
+    dataset_id: fire-halls
+    target_table: ca_vancouver_fire_halls
+    description: "Fire halls (20)"
+
+  - id: cultural_spaces
+    type: ods_dataset
+    dataset_id: cultural-spaces
+    target_table: ca_vancouver_cultural_spaces
+    description: "Cultural spaces — type, ownership, square feet (1,942)"
+
+  - id: homeless_shelter_locations
+    type: ods_dataset
+    dataset_id: homeless-shelter-locations
+    target_table: ca_vancouver_homeless_shelter_locations
+    description: "Homeless shelter locations (17)"
+
+  - id: parks
+    type: ods_dataset
+    dataset_id: parks
+    target_table: ca_vancouver_parks
+    description: "Parks — name, hectares, facilities flags (218)"
+
+  # ── fabric ─────────────────────────────────────────────────────────────────
+  - id: property_parcel_polygons
+    type: ods_dataset
+    dataset_id: property-parcel-polygons
+    target_table: ca_vancouver_property_parcel_polygons
+    description: "Parcel polygons — tax_coord is the join key to the tax roll (99,701 rows)"
+
+  - id: property_addresses
+    type: ods_dataset
+    dataset_id: property-addresses
+    target_table: ca_vancouver_property_addresses
+    description: "Civic addresses — civic_number + std_street → pcoord (parcel) (99,744 rows). Resolves the addresses council items cite."
+
+  - id: property_tax_report_2025
+    type: ods_dataset
+    dataset_id: property-tax-report
+    target_table: ca_vancouver_property_tax_report_2025
+    description: "BC Assessment roll as published by the City — 2025 report year only: year_built, land/improvement value, tax levy, zoning (≈226k rows)"
+    # Protocol feature: the export endpoint honours ODSQL `where`. The full
+    # dataset is 1.55 M rows (7 report years); the fabric needs one.
+    where: "report_year='2025'"
+
+  - id: issued_building_permits
+    type: ods_dataset
+    dataset_id: issued-building-permits
+    target_table: ca_vancouver_issued_building_permits
+    description: "Issued building permits 2017-01-03→ with project value, type of work (incl. demolition), contractor, geometry (51,931 rows)"
+
+  - id: heritage_sites
+    type: ods_dataset
+    dataset_id: heritage-sites
+    target_table: ca_vancouver_heritage_sites
+    description: "Vancouver Heritage Register — 2,495 sites, evaluation group A/B/C, designation flags"
+
+  - id: non_market_housing
+    type: ods_dataset
+    dataset_id: non-market-housing
+    target_table: ca_vancouver_non_market_housing
+    description: "Non-market housing buildings — operator, occupancy year, unit mix (641 rows)"
+
+  - id: water_distribution_mains
+    type: ods_dataset
+    dataset_id: water-distribution-mains
+    target_table: ca_vancouver_water_distribution_mains
+    description: "Water distribution mains — installation_date on 98 % of 67,496 pipes, 1892→ (the public city, dated)"
+
+  # ── the city map (the-city) — ground, buildings, streets, trees ───────────
+  # Geometry for the GL engine (ADR-0012). Each is a plain ODS export like
+  # every source above; the map's encoder reads them back from core models,
+  # not from disk, so the map honours raw → stg → core like the money does.
+  - id: building_footprints_2009
+    type: ods_dataset
+    dataset_id: building-footprints-2009
+    target_table: ca_vancouver_building_footprints_2009
+    description: "Building footprints 2009 WITH LiDAR heights — hgt_agl, avght_m, minht_m, maxht_m, base/top elevation, roof type (124,181 rows). The only footprint layer the City publishes with heights."
+
+  - id: building_footprints_2015
+    type: ods_dataset
+    dataset_id: building-footprints-2015
+    target_table: ca_vancouver_building_footprints_2015
+    description: "Building footprints 2015 from orthophotos — outline only, no height (154,124 rows). Newer than 2009; used to find buildings the 2009 layer lacks."
+
+  - id: block_outlines
+    type: ods_dataset
+    dataset_id: block-outlines
+    target_table: ca_vancouver_block_outlines
+    description: "City block outlines (4,633 polygons) — the massing unit of the map's first paint"
+
+  - id: local_area_boundary
+    type: ods_dataset
+    dataset_id: local-area-boundary
+    target_table: ca_vancouver_local_area_boundary
+    description: "The City's 22 local areas (planning areas) — the map's neighbourhoods"
+
+  - id: public_streets
+    type: ods_dataset
+    dataset_id: public-streets
+    target_table: ca_vancouver_public_streets
+    description: "Street centrelines with hundred-block name and street use (17,072 segments)"
+
+  - id: lanes
+    type: ods_dataset
+    dataset_id: lanes
+    target_table: ca_vancouver_lanes
+    description: "Lane (alley) centrelines (7,856 segments)"
+
+  - id: right_of_way_widths
+    type: ods_dataset
+    dataset_id: right-of-way-widths
+    target_table: ca_vancouver_right_of_way_widths
+    description: "Legal property-line-to-property-line right-of-way widths (26,858 rows) — the street widths the map draws"
+
+  - id: public_trees
+    type: ods_dataset
+    dataset_id: public-trees
+    target_table: ca_vancouver_public_trees
+    description: "Public trees (boulevards + parks): species, height class, diameter, date_planted on 78,323 of 185,845"
+
+  - id: parks_polygons
+    type: ods_dataset
+    dataset_id: parks-polygon-representation
+    target_table: ca_vancouver_parks_polygons
+    description: "Park polygons with name and classification (254 rows)"
+
+  - id: shoreline_2002
+    type: ods_dataset
+    dataset_id: shoreline-2002
+    target_table: ca_vancouver_shoreline_2002
+    description: "Shoreline digitised from 2002 orthophotos (2 features)"
+
+  - id: bikeways
+    type: ods_dataset
+    dataset_id: bikeways
+    target_table: ca_vancouver_bikeways
+    description: "Bikeways with type, status and year_of_construction (3,733 segments)"
+
+  - id: railways
+    type: ods_dataset
+    dataset_id: railways
+    target_table: ca_vancouver_railways
+    description: "Railway track alignments by operator (936 segments)"

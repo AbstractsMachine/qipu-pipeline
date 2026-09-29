@@ -1,0 +1,26 @@
+{
+  "description": "Capacité de désendettement de la Ville de Paris — deux lectures publiques coexistent. La Ville défend sa méthode, appuyée sur des comptes certifiés annuellement. La Chambre régionale des comptes (CRC) Île-de-France retire des recettes qu'elle juge non récurrentes (notamment 1,1 Md€ de loyers capitalisés sur baux emphytéotiques, cessions d'actifs) et obtient un ratio nettement plus élevé. Les deux chiffres sont sourcés et datés ; le site affiche les deux sans trancher.",
+  "unit": "années",
+  "by_year": {
+    "2019": {
+      "value_crc_ans": 11.3,
+      "source_crc": "CRC Île-de-France — Rapport sur la situation financière de la Ville de Paris (octobre 2023)",
+      "source_url_crc": "https://www.ccomptes.fr/sites/default/files/2023-10/rapport_en_bref_VP_situation-financiere.pdf",
+      "date_reference": "2023-10-01"
+    },
+    "2021": {
+      "value_crc_ans": 35,
+      "source_crc": "CRC Île-de-France — Rapport sur la situation financière de la Ville de Paris (octobre 2023), relayé par iFRAP",
+      "source_url_crc": "https://www.ifrap.org/etat-et-collectivites/la-gestion-de-paris-epinglee-en-5-chiffres-clefs",
+      "date_reference": "2023-10-01",
+      "notes": "Année du franchissement du seuil d'alerte de 12 ans selon la CRC."
+    },
+    "2024": {
+      "value_crc_ans": 39.6,
+      "source_crc": "CRC Île-de-France — Situation financière de la Ville de Paris (rapport IDR2025-42, octobre 2025)",
+      "source_url_crc": "https://www.ccomptes.fr/sites/default/files/2025-10/IDR2025-42.pdf",
+      "date_reference": "2025-10-01",
+      "notes": "Dernier chiffre CRC publié. Après retraitement des loyers capitalisés et des recettes non récurrentes."
+    }
+  }
+}

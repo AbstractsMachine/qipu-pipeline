@@ -18,8 +18,7 @@
 #
 # FRESHNESS:
 #   14 sources monitorées dbt source freshness :
-#   - 9 OpenData Paris core (`_synced_at` stamped par sync_opendata.py /
-#     upload_bilan_comptable.py, activé 2026-05-19 après le premier full
+#   - 9 OpenData Paris core (`_synced_at` stamped par sync_city.py paris, activé 2026-05-19 après le premier full
 #     sync CI qui a peuplé la colonne)
 #   - 5 sources internes (sirene_companies, deliberations_*,
 #     pdf_investissements_localises, dette_garantie) avec leur propre
@@ -208,6 +207,21 @@ sources:
       # SUBVENTIONS - Détail des bénéficiaires
       # =========================================================================
       
+      - name: subventions_versees_2013_2017
+        description: |
+          Annexe Compte Administratif - subventions versées 2013-2017 (M14-M52).
+          Première moitié de la même série que le jeu « à partir de 2018 » :
+          la Ville l'a coupée au changement de plan comptable et republiée sous
+          un autre identifiant (subventions-versees).
+          Particularité : les particuliers y sont présents sous pseudonyme
+          (« Nom 323 »), nature_juridique = « Personnes physiques ». Le staging
+          les agrège en une ligne par exercice (RGPD), comme la branche PDF.
+        columns:
+          - name: publication
+            description: "Exercice au format « CA 2014 »"
+          - name: montant_de_la_subvention
+            description: "Montant versé, en euros"
+
       - name: subventions_versees_annexe_compte_administratif_a_partir_de_2018
         description: |
           Annexe Compte Administratif - TOUTES subventions versées.
@@ -237,42 +251,6 @@ sources:
             description: "Montant versé (FLOAT)"
           - name: prestations_en_nature
             description: "Prestations en nature (FLOAT)"
-
-      - name: pdf_subventions_b811_paris
-        description: |
-          Annexe B8.1.1 du Compte Administratif (PDF Tome 3) — extraction
-          locale via `parse_subv_pdf_text.py` + chargement par
-          `sync_pdf_subventions_b811.py`.
-
-          Source nommée et exhaustive des subventions versées par la Ville
-          de Paris, imposée par la nomenclature M57 (CGCT L. 2313-1).
-          Utilisée pour combler le trou OpenData sur 2020 et 2021 où le
-          nom du bénéficiaire est NULL côté portail.
-
-          ~29k lignes, années 2020 et 2021 (extensible à d'autres exercices
-          si l'OpenData régresse).
-        loaded_at_field: loaded_at
-        columns:
-          - name: annee
-            description: "Année d'exercice (INTEGER, 2020 ou 2021)"
-          - name: source_pdf
-            description: "URL du PDF source (Tome 3 du CA)"
-          - name: source_section
-            description: "Section du PDF (B8.1.1 - Liste des concours...)"
-          - name: name
-            description: "Nom du bénéficiaire tel qu'imprimé dans le PDF"
-          - name: name_normalized
-            description: "Nom normalisé (UPPER, sans accents, sans articles)"
-          - name: montant_total
-            description: "Montant numéraire annuel (FLOAT)"
-          - name: prestations_nature
-            description: "Prestations en nature (FLOAT)"
-          - name: categorie
-            description: "Catégorie (Personnes de droit privé/public)"
-          - name: nature_juridique
-            description: "Nature juridique (Associations, Entreprises, Personnes physiques...)"
-          - name: nb_subventions
-            description: "Nombre de subventions agrégées (1 par défaut)"
 
       - name: subventions_associations_votees
         description: |
@@ -416,9 +394,9 @@ sources:
           Contient les valeurs brutes, amortissements et nettes.
 
           ~500 lignes, années 2016-2024
-        # freshness désactivée : upload_bilan_comptable.py demande un CSV
-        # local et n'est pas tourné automatiquement. À ré-activer quand le
-        # sync sera automatisé (Issue à créer).
+        # Chargé par sync_city.py paris (source `bilan_comptable`, jeu
+        # bilan-comptable du portail) depuis le 2026-09-23 ; avant, un CSV
+        # local chargé à la main. Le jeu est annuel : pas de fraîcheur.
         columns:
           - name: Exercice comptable
             description: "Année fiscale (INTEGER)"
@@ -588,6 +566,16 @@ sources:
           - name: date_extraction
             description: "Date d'extraction de cette ligne"
 
+      - name: paris_catalog
+        description: |
+          Snapshot of the Opendatasoft /catalog/datasets/{id} metadata for
+          every ods_dataset source in configs/cities/paris.yaml: one row per
+          (dataset, field) with the dataset title, opendata.paris.fr page URL,
+          license, publisher, `modified` (portal refresh timestamp →
+          rows_updated_at) and per-field labels/types. Provenance source of
+          truth for Paris models (stg_paris_catalog → core_paris_source_catalog);
+          refreshed by sync_ods_dataset.py on every run. All-STRING.
+
       - name: dette_garantie_paris
         description: |
           Annexe IV-B du compte administratif : emprunts garantis par
@@ -633,3 +621,59 @@ sources:
             description: "Annuité intérêts (FLOAT, €)"
           - name: annuite_garantie_au_cours_de_l_exercice_en_capital
             description: "Annuité capital (FLOAT, €)"
+
+  # ===========================================================================
+  # Annexe B8.1.1 extraite des PDF du compte administratif. Source à part pour
+  # une seule raison : pouvoir la charger dans un dataset de DEV
+  # (`sync_pdf_subventions_b811.py --dataset …` puis
+  # DBT_PARIS_RAW_PDF_SCHEMA=… dbt run --target dev) et vérifier un nouvel
+  # exercice sans écrire dans `raw` prod. Par défaut : `raw`, comme avant.
+  # ===========================================================================
+  - name: paris_raw_pdf
+    description: "Extraits PDF versionnés (annexe B8.1.1 du CA) chargés par sync_pdf_subventions_b811.py"
+    database: open-data-france-484717
+    schema: "{{ env_var('DBT_PARIS_RAW_PDF_SCHEMA', 'raw') }}"
+    tables:
+      - name: pdf_subventions_b811_paris
+        description: |
+          Annexe B8.1.1 du Compte Administratif (PDF Tome 3) — extraction
+          locale via `parse_subv_pdf_text.py` + chargement par
+          `sync_pdf_subventions_b811.py`.
+
+          Source nommée et exhaustive des subventions versées par la Ville
+          de Paris, imposée par la nomenclature M57 (CGCT L. 2313-1).
+          Utilisée pour combler le trou OpenData sur 2020 et 2021 où le
+          nom du bénéficiaire est NULL côté portail.
+
+          ~29k lignes pour 2020 et 2021, plus ~14k lignes pour 2010-2012
+          extraites de l'annexe M14 équivalente (B1.6/B1.7) par
+          `parse_subv_pdf_m14.py` — la Ville ne publie aucune subvention en
+          open data avant 2013, mais ces listes existaient en PDF sur un
+          mini-site archivé (labs.paris.fr, Wayback Machine).
+
+          2025 (et suivants) : le CA est publié en PDF le 1er juillet, avant
+          tout jeu open data ; extraction par `parse_subv_pdf_text.py
+          --controle-totaux`, refusée si le TOTAL GENERAL ou un sous-total
+          imprimé n'est pas retrouvé au centime.
+        loaded_at_field: loaded_at
+        columns:
+          - name: annee
+            description: "Année d'exercice (INTEGER : 2010-2012 M14, 2020-2021 et 2025+ M57)"
+          - name: source_pdf
+            description: "URL du PDF source (Tome 3 du CA)"
+          - name: source_section
+            description: "Section du PDF (B8.1.1 - Liste des concours...)"
+          - name: name
+            description: "Nom du bénéficiaire tel qu'imprimé dans le PDF"
+          - name: name_normalized
+            description: "Nom normalisé (UPPER, sans accents, sans articles)"
+          - name: montant_total
+            description: "Montant numéraire annuel (FLOAT)"
+          - name: prestations_nature
+            description: "Prestations en nature (FLOAT)"
+          - name: categorie
+            description: "Catégorie (Personnes de droit privé/public)"
+          - name: nature_juridique
+            description: "Nature juridique (Associations, Entreprises, Personnes physiques...)"
+          - name: nb_subventions
+            description: "Nombre de subventions agrégées (1 par défaut)"

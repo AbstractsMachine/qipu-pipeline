@@ -11,7 +11,7 @@
 --   - ode_thematique: thématique dashboard basée sur chapitre/fonction
 --   - ode_categorie_flux: catégorie de dépense (Personnel, Subventions, etc.)
 --
--- Output: ~24k lignes, années 2019-2024
+-- Output: ~29k lignes, années 2019-2025
 -- =============================================================================
 
 WITH budget AS (
@@ -55,6 +55,9 @@ enriched AS (
         b.fonction_libelle,
         b.montant,
         b.cle_technique,
+        -- 'open_data_ville' (open data de la Ville) ou 'balance_dgfip' (année
+        -- pas encore publiée par la Ville, voir stg_budget_principal)
+        b.source_budget,
         
         -- =====================================================================
         -- COLONNES ENRICHIES (préfixe ode_)

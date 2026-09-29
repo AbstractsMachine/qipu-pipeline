@@ -3,7 +3,7 @@
 --       counts and a $25k-bucket histogram (citywide only, v1)
 --
 -- Sources: int_us_sf_comp_employee_year (person grain — distribution
---          statements are per-person), stg_us_sf_catalog (provenance).
+--          statements are per-person), core_us_sf_source_catalog (provenance).
 -- Grain:  fiscal year, 2013-2025 (histogram as an ARRAY<STRUCT> column).
 --
 -- Percentiles are EXACT (PERCENTILE_CONT). p10 IS NOT PUBLISHED — the
@@ -92,7 +92,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_employee_comp'
 )
 

@@ -8,6 +8,8 @@
 --   - Renommage en snake_case court
 --   - SAFE_CAST des numériques
 --   - Filtre qualité: collectivite = 'Ville de Paris'
+--   - source_url n'est plus écrit ici : core_dette_garantie le prend dans
+--     core_paris_source_catalog (snapshot du catalogue ODS)
 -- =============================================================================
 
 {{ config(materialized='view', schema='staging', tags=['staging','hors_bilan']) }}
@@ -29,7 +31,6 @@ SELECT
     taux_initial_index AS taux_index,
     SAFE_CAST(taux_initial_taux_actuariel AS FLOAT64) AS taux_actuariel,
     SAFE_CAST(annuite_garantie_au_cours_de_l_exercice_en_interets AS FLOAT64) AS annuite_interets,
-    SAFE_CAST(annuite_garantie_au_cours_de_l_exercice_en_capital AS FLOAT64) AS annuite_capital,
-    'opendata.paris.fr/explore/dataset/dette-garantie' AS source_url
+    SAFE_CAST(annuite_garantie_au_cours_de_l_exercice_en_capital AS FLOAT64) AS annuite_capital
 FROM {{ source('paris_raw', 'dette_garantie_paris') }}
 WHERE collectivite = 'Ville de Paris'

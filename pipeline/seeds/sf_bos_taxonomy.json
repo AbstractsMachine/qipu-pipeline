@@ -1,0 +1,431 @@
+{
+  "what": "The topics, subtopics and actions every San Francisco Board of Supervisors record is classified into, 1906-2026.",
+  "why_three_columns": "One column could not hold it. 'Appropriating $232,530, Water Department, reconstruction of Market Street water mains' is an appropriation (what the Board DID) about water (what it was ABOUT). Forcing both into one field made 'money set aside' swallow every record that mentioned a sum, and it was the single largest source of disagreement when the rule pass was checked against a hand-read sample. So: `topic` and `subtopic` say what it is about, `action` says what the Board did.",
+  "read_by": [
+    "the classifier prompt (pipeline/scripts/us_sf_city/blocks/CLASSIFY-PROMPT.md)",
+    "the rule pass, which no longer classifies and only CHECKS the classifier"
+  ],
+  "counting": "A record has exactly one topic, at most one subtopic, and exactly one action. No record is therefore counted under two topics — but the topics sum to the records that carry one, not to every record: a decision whose line names an act and no subject keeps an empty topic. Do not add topics to tags.",
+  "topics": [
+    {
+      "slug": "the-street",
+      "label": "The street",
+      "note": "The strip outside a front door, and what runs under it. The largest thing in the record for the first half of the century.",
+      "subtopics": [
+        {
+          "slug": "street-works",
+          "label": "Paving, repairs and improvements"
+        },
+        {
+          "slug": "accepting-work",
+          "label": "Accepting finished work"
+        },
+        {
+          "slug": "contractor-time",
+          "label": "More time for the contractor"
+        },
+        {
+          "slug": "grades",
+          "label": "Street levels and grades"
+        },
+        {
+          "slug": "sidewalk-widths",
+          "label": "Sidewalk widths"
+        },
+        {
+          "slug": "set-back-lines",
+          "label": "Set-back lines"
+        },
+        {
+          "slug": "street-names",
+          "label": "Naming and renaming"
+        },
+        {
+          "slug": "closed-for-good",
+          "label": "Closed for good"
+        },
+        {
+          "slug": "closed-for-a-day",
+          "label": "Closed for a day"
+        },
+        {
+          "slug": "sewers",
+          "label": "Sewers and drains"
+        },
+        {
+          "slug": "street-lighting",
+          "label": "Street lighting"
+        },
+        {
+          "slug": "wires-underground",
+          "label": "Wires put underground"
+        }
+      ]
+    },
+    {
+      "slug": "getting-around",
+      "label": "Getting around",
+      "note": "Moving through the city, and the companies that were licensed to move people through it.",
+      "subtopics": [
+        {
+          "slug": "parking",
+          "label": "Parking"
+        },
+        {
+          "slug": "traffic",
+          "label": "Traffic rules and signs"
+        },
+        {
+          "slug": "transit",
+          "label": "Streetcars, trains and buses"
+        },
+        {
+          "slug": "railways-spur-tracks",
+          "label": "Railways and spur tracks"
+        },
+        {
+          "slug": "freeways",
+          "label": "Freeways"
+        },
+        {
+          "slug": "bicycles-walking",
+          "label": "Bicycles and walking"
+        }
+      ]
+    },
+    {
+      "slug": "land-and-building",
+      "label": "Land and building",
+      "note": "Who may build what, and who owns the ground.",
+      "subtopics": [
+        {
+          "slug": "zoning",
+          "label": "Zoning and land use"
+        },
+        {
+          "slug": "subdivisions",
+          "label": "Subdivisions and maps"
+        },
+        {
+          "slug": "city-buys-land",
+          "label": "The city buys land"
+        },
+        {
+          "slug": "city-sells-land",
+          "label": "The city sells land"
+        },
+        {
+          "slug": "city-leases",
+          "label": "The city leases"
+        },
+        {
+          "slug": "construction",
+          "label": "Building and construction"
+        },
+        {
+          "slug": "redevelopment",
+          "label": "Redevelopment"
+        },
+        {
+          "slug": "landmarks",
+          "label": "Landmarks and old buildings"
+        }
+      ]
+    },
+    {
+      "slug": "doing-business",
+      "label": "Doing business",
+      "note": "The permit trade. For four decades this was the single commonest thing the Board did: licensing small industry one address at a time. It is 27% of the 1900s and 0% after 1940.",
+      "subtopics": [
+        {
+          "slug": "storage-tanks",
+          "label": "Storage tanks"
+        },
+        {
+          "slug": "engines-boilers",
+          "label": "Engines and boilers"
+        },
+        {
+          "slug": "horses-and-cows",
+          "label": "Keeping horses and cows"
+        },
+        {
+          "slug": "laundries",
+          "label": "Laundries and cleaners"
+        },
+        {
+          "slug": "blasting",
+          "label": "Blasting"
+        },
+        {
+          "slug": "dance-halls-shows",
+          "label": "Dance halls, shows and entertainment"
+        },
+        {
+          "slug": "liquor",
+          "label": "Liquor licences"
+        },
+        {
+          "slug": "taxis-garages",
+          "label": "Taxis and garages"
+        },
+        {
+          "slug": "using-the-sidewalk",
+          "label": "Using the street or sidewalk"
+        },
+        {
+          "slug": "franchises",
+          "label": "Franchises"
+        },
+        {
+          "slug": "other-permits",
+          "label": "Other permits and licences"
+        }
+      ]
+    },
+    {
+      "slug": "city-services",
+      "label": "What the city runs",
+      "note": "The buildings and services the city owns and operates.",
+      "subtopics": [
+        {
+          "slug": "parks",
+          "label": "Parks and playgrounds"
+        },
+        {
+          "slug": "schools",
+          "label": "Schools"
+        },
+        {
+          "slug": "libraries",
+          "label": "Libraries"
+        },
+        {
+          "slug": "police",
+          "label": "Police"
+        },
+        {
+          "slug": "fire",
+          "label": "Fire"
+        },
+        {
+          "slug": "health",
+          "label": "Health and hospitals"
+        },
+        {
+          "slug": "housing-shelter",
+          "label": "Housing and shelter"
+        },
+        {
+          "slug": "port",
+          "label": "The port and waterfront"
+        },
+        {
+          "slug": "water-supply",
+          "label": "Water supply"
+        },
+        {
+          "slug": "power-utilities",
+          "label": "Power and utilities"
+        },
+        {
+          "slug": "environment",
+          "label": "The environment"
+        },
+        {
+          "slug": "emergencies",
+          "label": "Emergencies"
+        }
+      ]
+    },
+    {
+      "slug": "running-the-city",
+      "label": "Running the city",
+      "note": "The Board acting on itself and on the machinery of government.",
+      "subtopics": [
+        {
+          "slug": "vote-or-scheduling",
+          "label": "A vote or a scheduling step"
+        },
+        {
+          "slug": "appointments",
+          "label": "Appointing people"
+        },
+        {
+          "slug": "staff-and-jobs",
+          "label": "City staff and jobs"
+        },
+        {
+          "slug": "code-changes",
+          "label": "Changing the city's own rules"
+        },
+        {
+          "slug": "elections",
+          "label": "Elections and the ballot"
+        },
+        {
+          "slug": "hearings-appeals",
+          "label": "Hearings and appeals"
+        },
+        {
+          "slug": "oversight",
+          "label": "Investigations and oversight"
+        },
+        {
+          "slug": "business-districts",
+          "label": "Business improvement districts"
+        }
+      ]
+    },
+    {
+      "slug": "public-money",
+      "label": "Public money",
+      "note": "Only where money ITSELF is the subject. An appropriation FOR a park is a parks record whose action is `appropriated` — it does not belong here. This was the mistake that made an earlier version of this list unusable.",
+      "subtopics": [
+        {
+          "slug": "budget",
+          "label": "The budget"
+        },
+        {
+          "slug": "bonds",
+          "label": "Borrowing and bonds"
+        },
+        {
+          "slug": "taxes-revenue",
+          "label": "Taxes, fees and revenue"
+        },
+        {
+          "slug": "assessments",
+          "label": "Assessments on property owners"
+        },
+        {
+          "slug": "claims-refunds",
+          "label": "Claims and refunds"
+        },
+        {
+          "slug": "lawsuits",
+          "label": "Lawsuits and settlements"
+        },
+        {
+          "slug": "employee-fundraising",
+          "label": "Employee charitable giving"
+        }
+      ]
+    },
+    {
+      "slug": "civic-life",
+      "label": "Civic life",
+      "note": "The Board speaking rather than deciding.",
+      "subtopics": [
+        {
+          "slug": "commendations",
+          "label": "Commendations and proclamations"
+        },
+        {
+          "slug": "state-and-national",
+          "label": "Positions on state and national matters"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "slug": "granted",
+      "label": "Granted",
+      "note": "permission, a licence, a franchise, an extension of time"
+    },
+    {
+      "slug": "refused",
+      "label": "Refused",
+      "note": "denied an application. Frequent in the early record and easy to miss — a denial reads almost exactly like a grant."
+    },
+    {
+      "slug": "ordered",
+      "label": "Ordered",
+      "note": "directed that work be done, or that a thing happen"
+    },
+    {
+      "slug": "accepted",
+      "label": "Accepted",
+      "note": "accepted finished work, a deed, a gift, a report"
+    },
+    {
+      "slug": "appropriated",
+      "label": "Set money aside",
+      "note": "for anything. The topic says what for."
+    },
+    {
+      "slug": "paid",
+      "label": "Paid",
+      "note": "a claim, a contractor, a refund"
+    },
+    {
+      "slug": "settled",
+      "label": "Settled",
+      "note": "a lawsuit or a claim"
+    },
+    {
+      "slug": "amended",
+      "label": "Amended",
+      "note": "changed an existing rule, map or ordinance"
+    },
+    {
+      "slug": "appointed",
+      "label": "Appointed",
+      "note": "a person to a post"
+    },
+    {
+      "slug": "commended",
+      "label": "Commended or urged",
+      "note": "praised, proclaimed, or took a position"
+    },
+    {
+      "slug": "voted-or-scheduled",
+      "label": "Voted or scheduled",
+      "note": "adopted, continued, referred, tabled, second reading — the Board acting on its own calendar"
+    },
+    {
+      "slug": "other",
+      "label": "Something else"
+    }
+  ],
+  "record_types": [
+    {
+      "slug": "decision",
+      "label": "A decision",
+      "note": "a real record that says what it was about"
+    },
+    {
+      "slug": "vote-outcome-only",
+      "label": "A vote outcome only",
+      "note": "the description is in another record"
+    },
+    {
+      "slug": "page-furniture",
+      "label": "Page header or footer",
+      "note": "ONLY when that is the whole record. A footer trailing a real decision does not make it furniture — that mistake called four real decisions furniture in testing."
+    },
+    {
+      "slug": "index-row",
+      "label": "An index row"
+    },
+    {
+      "slug": "cut-in-half",
+      "label": "Cut in half by a page break"
+    },
+    {
+      "slug": "too-damaged",
+      "label": "Too damaged to read"
+    },
+    {
+      "slug": "departmental-work",
+      "label": "Departmental report text",
+      "note": "kind = W. Engineering annual reports, not Board acts. 0.9% of the corpus."
+    },
+    {
+      "slug": "public-comment",
+      "label": "Public comment",
+      "note": "What a member of the public said about a file, printed under the item they spoke to: \"Resolution urging … (File No. 190118). Anuba S; expressed support.\" It is a record of the meeting, not an act of the Board, and it carries no topic of its own — the topic belongs to the file being spoken to, which has its own row."
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 --   → website/public/data/budget_sankey_{year}.json
 --
 -- Sources:
---   - core_budget        → type_budget = 'execute' (CA, 2019-2024)
+--   - core_budget        → type_budget = 'execute' (CA, 2019-2025 ; source_budget dit d'où vient l'année)
 --   - core_budget_vote   → type_budget = 'vote'    (BP, 2020-2026)
 --
 -- Grain: ligne budgétaire (chapitre × nature × fonction × sens × annee × type_budget)
@@ -27,7 +27,8 @@ WITH executed AS (
         fonction_libelle,
         nature_libelle,
         ode_categorie_flux,
-        montant
+        montant,
+        source_budget
     FROM {{ ref('core_budget') }}
     WHERE montant > 0
 ),
@@ -42,7 +43,8 @@ voted AS (
         fonction_libelle,
         nature_libelle,
         ode_categorie_flux,
-        montant
+        montant,
+        'budget_primitif' AS source_budget
     FROM {{ ref('core_budget_vote') }}
     WHERE montant > 0
 )

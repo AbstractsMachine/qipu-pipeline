@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: SF adopted budget by fund type × fund category
 --
--- Sources: core_us_sf_budget, stg_us_sf_catalog.
+-- Sources: core_us_sf_budget, core_us_sf_source_catalog.
 -- Grain:  fiscal_year × side × fund_type × fund_category (~35 nonzero rows
 --         per modern FY).
 --
@@ -33,7 +33,7 @@ provenance AS (
     SELECT DISTINCT
         dataset_page_url,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_budget'
 )
 

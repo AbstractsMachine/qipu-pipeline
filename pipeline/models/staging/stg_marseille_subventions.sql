@@ -21,6 +21,11 @@
 -- Marseille SCDL carries NO siret, NO direction, NO catégorie dimension — the
 -- thematique comes from the in-session LLM cache (stg_marseille_cache_thematique)
 -- keyed on beneficiaire_normalise, cascaded in core_marseille_subventions.
+--
+-- Personnes physiques : le SCDL nomme les particuliers (prénom + nom, 2020-2022).
+-- Comme pour Paris, ils ne sont jamais publiés sous leur nom : UNE ligne agrégée
+-- par exercice (« Personnes physiques anonymisées RGPD (N aides individuelles) »),
+-- total de l'exercice inchangé. Garde-fou : audit/check_personnes_physiques.py.
 -- =============================================================================
 
 {{ config(materialized='view', schema='staging', tags=['staging', 'marseille', 'subventions']) }}
@@ -103,6 +108,89 @@ normalised AS (
     WHERE beneficiaire_raw IS NOT NULL
       AND TRIM(beneficiaire_raw) != ''
       AND COALESCE(montant_raw, 0) > 0
+),
+
+personnes_physiques AS (
+    SELECT
+        'marseille' AS commune_slug,
+        'Marseille' AS collectivite,
+        annee,
+        CONCAT(
+            'Personnes physiques anonymisées RGPD (',
+            CAST(COUNT(*) AS STRING),
+            ' aides individuelles)'
+        ) AS beneficiaire,
+        'PERSONNES PHYSIQUES ANONYMISEES RGPD' AS beneficiaire_normalise,
+        CAST(NULL AS STRING) AS categorie,
+        'Personnes physiques' AS nature_juridique,
+        SUM(montant) AS montant,
+        SUM(prestations_nature) AS prestations_nature,
+        CAST(NULL AS STRING) AS objet,
+        TRUE AS donnees_disponibles,
+        'scdl_datagouv' AS source_systeme,
+        CONCAT('marseille-subv-', CAST(annee AS STRING), '-PP-RGPD-AGGR') AS cle_technique
+    FROM normalised
+    WHERE nature_juridique = 'Personnes physiques'
+    GROUP BY annee
+),
+
+-- Homonymes : une ligne d'une autre nature privée (hors associations et
+-- personnes publiques) dont le nom exact est étiqueté « Personnes physiques »
+-- un autre exercice (ex. un particulier classé « Entreprises » avec son
+-- adresse) est agrégée par exercice et nature, comme pour Paris.
+noms_personnes_physiques AS (
+    SELECT DISTINCT UPPER(TRIM(REGEXP_REPLACE(beneficiaire, r'\s+', ' '))) AS cle_nom
+    FROM normalised
+    WHERE nature_juridique = 'Personnes physiques'
+),
+
+flagged AS (
+    SELECT
+        n.*,
+        COALESCE(
+            COALESCE(n.nature_juridique, '') != 'Personnes physiques'
+            AND COALESCE(n.nature_juridique, '') NOT IN (
+                'Associations', 'Etablissements publics', 'Établissements publics',
+                'Autres personnes de droit public', 'Etat', 'État', 'Communes',
+                'Département', 'Départements', 'Régions'
+            )
+            AND pp.cle_nom IS NOT NULL,
+            FALSE
+        ) AS homonyme_particulier
+    FROM normalised n
+    LEFT JOIN noms_personnes_physiques pp
+        ON UPPER(TRIM(REGEXP_REPLACE(n.beneficiaire, r'\s+', ' '))) = pp.cle_nom
+),
+
+homonymes_agreges AS (
+    SELECT
+        'marseille' AS commune_slug,
+        'Marseille' AS collectivite,
+        annee,
+        CONCAT(
+            'Bénéficiaires non nommés — ', COALESCE(nature_juridique, '—'),
+            ", même nom qu'un particulier (", CAST(COUNT(*) AS STRING),
+            IF(COUNT(*) = 1, ' ligne)', ' lignes)')
+        ) AS beneficiaire,
+        CONCAT('BENEFICIAIRES NON NOMMES HOMONYMES PARTICULIERS ', UPPER(COALESCE(nature_juridique, '—'))) AS beneficiaire_normalise,
+        MIN(categorie) AS categorie,
+        nature_juridique,
+        SUM(montant) AS montant,
+        SUM(prestations_nature) AS prestations_nature,
+        CAST(NULL AS STRING) AS objet,
+        TRUE AS donnees_disponibles,
+        'scdl_datagouv' AS source_systeme,
+        CONCAT('marseille-subv-', CAST(annee AS STRING), '-HOMONYMES-PP-',
+               SUBSTR(TO_HEX(MD5(COALESCE(nature_juridique, '—'))), 1, 6)) AS cle_technique
+    FROM flagged
+    WHERE homonyme_particulier
+    GROUP BY annee, nature_juridique
 )
 
-SELECT * FROM normalised
+SELECT * EXCEPT (homonyme_particulier) FROM flagged
+WHERE COALESCE(nature_juridique, '') != 'Personnes physiques'
+  AND NOT homonyme_particulier
+UNION ALL
+SELECT * FROM personnes_physiques
+UNION ALL
+SELECT * FROM homonymes_agreges

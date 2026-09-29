@@ -1,0 +1,65 @@
+source_system,source_key,key_type,category_code,counts_in_total,confidence,note
+ma_schedule_a_rev,taxes,exact,taxes,true,high,Property tax and the local excise taxes (motor vehicle; hotel; meals)
+ma_schedule_a_rev,federal_revenue,exact,intergovernmental,true,high,
+ma_schedule_a_rev,state_revenue,exact,intergovernmental,true,high,Chapter 70 school aid and unrestricted local aid
+ma_schedule_a_rev,other_governments,exact,intergovernmental,true,high,
+ma_schedule_a_rev,service_charges,exact,charges,true,high,
+ma_schedule_a_rev,special_assessments,exact,charges,true,high,
+ma_schedule_a_rev,licenses_and_permits,exact,licenses_fines,true,high,
+ma_schedule_a_rev,fines_and_forfeitures,exact,licenses_fines,true,high,
+ma_schedule_a_rev,miscellaneous,exact,other_revenue,true,high,
+ma_schedule_a_rev,other_financing_sources,exact,borrowing,false,medium,Bond proceeds and other financing sources: not revenue
+ma_schedule_a_rev,transfers,exact,transfers_in,false,high,
+ia_dom_revenue,Property Taxes,exact,taxes,true,high,
+ia_dom_revenue,Other City Taxes,exact,taxes,true,high,Local option sales tax; hotel-motel; utility excise
+ia_dom_revenue,TIF Revenues,exact,taxes,true,high,Tax increment financing: property tax on the increment of a district
+ia_dom_revenue,Intergovernmental,exact,intergovernmental,true,high,State and federal together: Iowa does not split them
+ia_dom_revenue,Charges for Service,exact,charges,true,high,
+ia_dom_revenue,Special Assessments,exact,charges,true,high,
+ia_dom_revenue,Licenses/Permits,exact,licenses_fines,true,high,
+ia_dom_revenue,Use of Money Property,exact,other_revenue,true,high,Interest and rents
+ia_dom_revenue,Miscellaneous,exact,other_revenue,true,high,
+ia_dom_revenue,Proceeds of Capital Asset Sales,exact,other_revenue,true,high,
+ia_dom_revenue,Proceeds of Debt,exact,borrowing,false,high,
+ia_dom_revenue,Total Transfers In,exact,transfers_in,false,high,
+fl_uas_revenue,31,prefix,taxes,true,high,Ad valorem; sales and fuel; utility service; communications; business tax
+fl_uas_revenue,32,prefix,licenses_fines,true,high,Permits and fees
+fl_uas_revenue,323,exact,taxes,true,medium,Franchise fees: a charge on utilities for the use of public rights of way; Census counts them with taxes
+fl_uas_revenue,324,exact,charges,true,high,Impact fees
+fl_uas_revenue,325,exact,charges,true,high,Special assessments
+fl_uas_revenue,329,exact,charges,true,medium,Other fees and special assessments
+fl_uas_revenue,33,prefix,intergovernmental,true,high,Federal (331-333); state grants and shared revenues (334-336); other local units (337-339)
+fl_uas_revenue,34,prefix,charges,true,high,Charges for services; 343 = the town's utilities
+fl_uas_revenue,341,exact,charges,true,low,Includes internal service fees charged to other funds
+fl_uas_revenue,35,prefix,licenses_fines,true,high,Judgments; fines and forfeits
+fl_uas_revenue,36,prefix,other_revenue,true,high,Interest; rents; asset sales; donations
+fl_uas_revenue,367,exact,licenses_fines,true,high,Licenses
+fl_uas_revenue,381,exact,transfers_in,false,high,Inter-fund transfers in
+fl_uas_revenue,382,exact,transfers_in,false,high,Contributions from enterprise operations
+fl_uas_revenue,383,exact,borrowing,false,high,Lease financing proceeds
+fl_uas_revenue,384,exact,borrowing,false,high,Debt proceeds
+fl_uas_revenue,385,exact,borrowing,false,high,Refunding bond proceeds
+fl_uas_revenue,386,exact,transfers_in,false,high,Transfers from constitutional officers
+fl_uas_revenue,38,prefix,other_revenue,true,medium,Other non-operating sources (asset dispositions; proprietary grants and donations)
+fl_uas_revenue,389,exact,intergovernmental,true,low,Proprietary non-operating grants and donations: mostly capital grants from governments
+ca_sco_revenue,Taxes|,prefix,taxes,true,high,
+ca_sco_revenue,Special Benefit Assessments|,prefix,charges,true,high,
+ca_sco_revenue,Licenses and Permits|,prefix,licenses_fines,true,high,
+ca_sco_revenue,"Fines, Forfeitures, Penalties, and Revenue from Use of Money and Property|Fines",prefix,licenses_fines,true,high,
+ca_sco_revenue,"Fines, Forfeitures, Penalties, and Revenue from Use of Money and Property|Revenue from Use",prefix,other_revenue,true,high,Interest and rents
+ca_sco_revenue,Intergovernmental,prefix,intergovernmental,true,high,Federal; state; county; taxes in lieu
+ca_sco_revenue,Charges for Current Services|,prefix,charges,true,high,
+ca_sco_revenue,Miscellaneous Revenues|,prefix,other_revenue,true,high,
+ca_sco_revenue,Water Enterprise Fund|Operating,prefix,charges,true,high,Water sold to residents and businesses
+ca_sco_revenue,Sewer Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,Electric Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,Gas Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,Solid Waste Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,Airport Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,Harbor and Port Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,Transit Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,Hospital Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,Other Enterprise Fund|Operating,prefix,charges,true,high,
+ca_sco_revenue,ENTERPRISE_NONOPERATING,exact,other_revenue,true,low,Enterprise non-operating revenue: interest; grants; gains — mixed
+ca_sco_revenue,Internal Service Fund|,prefix,transfers_in,false,high,Charges one department pays another: counted twice if kept
+ca_sco_revenue,Conduit Financing|,prefix,borrowing,false,high,Debt issued for third parties

@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: SF budget vs actual — candidate reconciliation perimeters, measured
 --
--- Sources: core_us_sf_budget, core_us_sf_actuals, stg_us_sf_catalog.
+-- Sources: core_us_sf_budget, core_us_sf_actuals, core_us_sf_source_catalog.
 -- Grain:  fiscal_year × side (Revenue | Spending), FY2010+ (budget floor).
 --
 -- WHY THIS TABLE EXISTS (docs/us/API-RECON.md §A.2/§A.7.3): the budget is
@@ -79,9 +79,9 @@ provenance AS (
         a.dataset_page_url  AS actuals_source_url,
         a.rows_updated_at   AS actuals_rows_updated_at
     FROM (SELECT DISTINCT dataset_page_url, rows_updated_at
-          FROM {{ ref('stg_us_sf_catalog') }} WHERE source_id = 'sf_budget') b
+          FROM {{ ref('core_us_sf_source_catalog') }} WHERE source_id = 'sf_budget') b
     CROSS JOIN (SELECT DISTINCT dataset_page_url, rows_updated_at
-          FROM {{ ref('stg_us_sf_catalog') }} WHERE source_id = 'sf_spending_revenue') a
+          FROM {{ ref('core_us_sf_source_catalog') }} WHERE source_id = 'sf_spending_revenue') a
 )
 
 SELECT

@@ -1,63 +1,71 @@
 {{
   config(
+    enabled=true,
     materialized='table',
     tags=['national', 'marts']
   )
 }}
 
 /*
-  Mart: Évolution pluriannuelle par ville
+  Mart: évolution pluriannuelle (OFGL, 7 ans)
 
-  Tendances budget sur plusieurs années, avec section Fonctionnement/Investissement.
+  Trajectoire financière de chaque commune : dépenses/recettes de fonctionnement,
+  épargne brute, encours de dette, dépenses d'équipement — par année et par
+  habitant. Déterministe (OFGL), sans enrichissement.
 */
 
-WITH budget AS (
-    SELECT *
-    FROM {{ ref('core_budget_national') }}
-),
-
-yearly AS (
+WITH ofgl AS (
     SELECT
-        commune_slug,
+        code_insee,
         commune_nom,
-        population,
         annee,
-
-        -- Totaux
-        SUM(CASE WHEN sens_flux = 'Recette' THEN montant_total ELSE 0 END) AS recettes_totales,
-        SUM(CASE WHEN sens_flux = 'Depense' THEN montant_total ELSE 0 END) AS depenses_totales,
-
-        -- Par section
-        SUM(CASE WHEN section = 'Fonctionnement' AND sens_flux = 'Recette' THEN montant_total ELSE 0 END) AS recettes_fonctionnement,
-        SUM(CASE WHEN section = 'Fonctionnement' AND sens_flux = 'Depense' THEN montant_total ELSE 0 END) AS depenses_fonctionnement,
-        SUM(CASE WHEN section = 'Investissement' AND sens_flux = 'Recette' THEN montant_total ELSE 0 END) AS recettes_investissement,
-        SUM(CASE WHEN section = 'Investissement' AND sens_flux = 'Depense' THEN montant_total ELSE 0 END) AS depenses_investissement,
-
-        -- Par catégorie dépense
-        SUM(CASE WHEN sankey_group = 'Personnel' AND sens_flux = 'Depense' THEN montant_total ELSE 0 END) AS depenses_personnel,
-        SUM(CASE WHEN sankey_group = 'Fonctionnement courant' AND sens_flux = 'Depense' THEN montant_total ELSE 0 END) AS depenses_fonctionnement_courant,
-        SUM(CASE WHEN sankey_group = 'Transferts & subventions' AND sens_flux = 'Depense' THEN montant_total ELSE 0 END) AS depenses_transferts,
-        SUM(CASE WHEN sankey_group = 'Charges financières' AND sens_flux = 'Depense' THEN montant_total ELSE 0 END) AS depenses_financieres,
-        SUM(CASE WHEN sankey_group = 'Investissements' AND sens_flux = 'Depense' THEN montant_total ELSE 0 END) AS depenses_investissements_directs,
-
-        -- Par catégorie recette
-        SUM(CASE WHEN sankey_group = 'Fiscalité' AND sens_flux = 'Recette' THEN montant_total ELSE 0 END) AS recettes_fiscalite,
-        SUM(CASE WHEN sankey_group = 'Dotations État' AND sens_flux = 'Recette' THEN montant_total ELSE 0 END) AS recettes_dotations
-
-    FROM budget
-    GROUP BY ALL
+        MAX(population) AS population,
+        MAX(CASE WHEN agregat = 'Dépenses de fonctionnement' THEN montant END) AS depenses_fonctionnement,
+        MAX(CASE WHEN agregat = 'Recettes de fonctionnement' THEN montant END) AS recettes_fonctionnement,
+        MAX(CASE WHEN agregat = 'Epargne brute' THEN montant END)               AS epargne_brute,
+        MAX(CASE WHEN agregat = 'Encours de dette' THEN montant END)            AS encours_dette,
+        MAX(CASE WHEN agregat = "Dépenses d'équipement" THEN montant END)       AS depenses_equipement,
+        -- Agrégats ajoutés le 2026-09-09 (sync --all-agregats) : ce que l'État
+        -- verse, ce que la commune verse, ce que l'intercommunalité reverse.
+        MAX(CASE WHEN agregat = 'Dotation globale de fonctionnement' THEN montant END) AS dgf,
+        MAX(CASE WHEN agregat = "Concours de l'Etat" THEN montant END)                 AS concours_etat,
+        MAX(CASE WHEN agregat = 'Subventions aux personnes de droit privé' THEN montant END) AS subventions_versees,
+        MAX(CASE WHEN agregat = "Subventions d'équipement versées" THEN montant END)   AS subventions_equipement_versees,
+        MAX(CASE WHEN agregat = 'Fiscalité reversée' THEN montant END)                 AS fiscalite_reversee,
+        MAX(CASE WHEN agregat = 'Impôts locaux' THEN montant END)                      AS impots_locaux,
+        MAX(CASE WHEN agregat = 'Frais de personnel' THEN montant END)                 AS frais_personnel,
+        MAX(CASE WHEN agregat = 'Achats et charges externes' THEN montant END)         AS achats_charges_externes,
+        MAX(CASE WHEN agregat = "Taxe d'enlévement des ordures ménagères" THEN montant END) AS teom,
+        MAX(CASE WHEN agregat = 'Dépenses totales' THEN montant END)                   AS depenses_totales,
+        MAX(CASE WHEN agregat = 'Recettes totales' THEN montant END)                   AS recettes_totales
+    FROM {{ ref('stg_ofgl_communes') }}
+    GROUP BY code_insee, commune_nom, annee
 )
 
 SELECT
-    *,
-
-    -- Métriques dérivées
-    recettes_totales - depenses_totales AS solde,
-    recettes_fonctionnement - depenses_fonctionnement AS epargne_brute,
-
-    -- Variation N/N-1
-    LAG(recettes_totales) OVER (PARTITION BY commune_slug ORDER BY annee) AS recettes_n_1,
-    LAG(depenses_totales) OVER (PARTITION BY commune_slug ORDER BY annee) AS depenses_n_1
-
-FROM yearly
-ORDER BY commune_slug, annee
+    code_insee,
+    commune_nom,
+    annee,
+    population,
+    depenses_fonctionnement,
+    recettes_fonctionnement,
+    epargne_brute,
+    encours_dette,
+    depenses_equipement,
+    dgf,
+    concours_etat,
+    subventions_versees,
+    subventions_equipement_versees,
+    fiscalite_reversee,
+    impots_locaux,
+    frais_personnel,
+    achats_charges_externes,
+    teom,
+    depenses_totales,
+    recettes_totales,
+    SAFE_DIVIDE(depenses_fonctionnement, population) AS depenses_fonctionnement_hab,
+    SAFE_DIVIDE(recettes_fonctionnement, population) AS recettes_fonctionnement_hab,
+    SAFE_DIVIDE(encours_dette, population)           AS encours_dette_hab,
+    SAFE_DIVIDE(encours_dette, NULLIF(epargne_brute, 0)) AS capacite_desendettement
+FROM ofgl
+WHERE population > 0

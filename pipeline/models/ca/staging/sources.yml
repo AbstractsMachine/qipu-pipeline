@@ -1,0 +1,136 @@
+# =============================================================================
+# Sources: raw BigQuery tables — Canada / Vancouver (Opendatasoft portal)
+#
+# Dataset: raw (open-data-france-484717.raw), place-namespaced `ca_vancouver_*`.
+# Synced via scripts/sync/sync_ods_dataset.py --city vancouver, driven by
+# configs/cities/vancouver.yaml (ADR-0010 D3 protocol adapters; ODS is the
+# same protocol Paris uses, so this family shipped with zero ingest code).
+#
+# RAW CONVENTION (ODS adapter, unlike Socrata/CKAN): BigQuery types are
+# INFERRED by pandas → strings stay strings, ints/floats arrive typed, ISO
+# dates arrive as STRING, nested geo (`geom`, `geo_point_2d`) is serialised
+# to a JSON STRING. Typing/normalisation happens once, in stg.
+# =============================================================================
+
+version: 2
+
+sources:
+  - name: ca_vancouver_raw
+    description: "Vancouver raw tables (opendata.vancouver.ca, Open Government Licence – Vancouver)"
+    database: open-data-france-484717
+    schema: raw
+    loaded_at_field: _synced_at
+    freshness:
+      warn_after: {count: 90, period: day}
+      error_after: {count: 365, period: day}
+    tables:
+      - name: ca_vancouver_catalog
+        description: |
+          Snapshot of /catalog/datasets/{id} for every synced source — one row
+          per (dataset, field): title, dataset page URL, publisher, licence,
+          `modified` (→ rows_updated_at), records_count. Provenance source of
+          truth for every ca model and export; no model hardcodes a URL.
+      - name: ca_vancouver_council_voting_records
+        description: "One row per council member per vote, 2016-04-05→."
+      - name: ca_vancouver_awarded_contracts
+        description: "Awarded contracts register (tender side), 2013→, one row per BID RESPONSE per competition; awarded=Yes marks the awards."
+      - name: ca_vancouver_employee_remuneration
+        description: "SOFI remuneration schedule, employees >$75k, one row per person-year, 2008→. Named individuals — aggregate only."
+      - name: ca_vancouver_city_owned_properties
+        description: "City-owned properties; land_coord joins the tax roll."
+      - name: ca_vancouver_property_parcel_polygons
+        description: "Parcel polygons; tax_coord joins the tax roll 1:1 (verified 2026-09-07)."
+      - name: ca_vancouver_property_addresses
+        description: "Civic address points; civic_number + std_street → pcoord."
+      - name: ca_vancouver_property_tax_report_2025
+        description: "Assessment roll, report_year 2025 only (ODSQL where). One row per PROPERTY (strata units are rows)."
+      - name: ca_vancouver_issued_building_permits
+        description: "Issued building permits 2017→ with value, type of work, contractor, geometry."
+      - name: ca_vancouver_heritage_sites
+        description: "Heritage Register, 2,495 sites."
+      - name: ca_vancouver_non_market_housing
+        description: "Non-market housing buildings, 641 rows."
+      - name: ca_vancouver_water_distribution_mains
+        description: "Water mains with installation_date, 1892→."
+      # ── the city map (ADR-0012) ──────────────────────────────────────────
+      - name: ca_vancouver_building_footprints_2009
+        description: "Building footprints 2009 with the City's LiDAR height statistics."
+      - name: ca_vancouver_building_footprints_2015
+        description: "Building footprints 2015 from orthophotos, outline only."
+      - name: ca_vancouver_building_heights_lidar
+        description: "MEASURED: LiDAR height distribution per 2015 footprint, NRCan HRDEM 2016 (measure_building_heights.py)."
+      - name: ca_vancouver_block_outlines
+        description: "City block outlines."
+      - name: ca_vancouver_local_area_boundary
+        description: "The 22 local areas."
+      - name: ca_vancouver_public_streets
+        description: "Street centrelines with hundred-block label and use."
+      - name: ca_vancouver_lanes
+        description: "Lane centrelines."
+      - name: ca_vancouver_right_of_way_widths
+        description: "Legal right-of-way widths, labelled points."
+      - name: ca_vancouver_public_trees
+        description: "Public trees, date_planted on ~42 %."
+      - name: ca_vancouver_parks_polygons
+        description: "Park polygons."
+      - name: ca_vancouver_shoreline_2002
+        description: "Shoreline 2002."
+      - name: ca_vancouver_bikeways
+        description: "Bikeways with year_of_construction."
+      - name: ca_vancouver_railways
+        description: "Railway alignments."
+      - name: ca_vancouver_council_item_places
+        description: "DERIVED: council item × parcel, resolved from the agenda text against property-addresses (place_council_items.py)."
+      - name: ca_vancouver_minutes_1970s_motions
+        description: "DERIVED: council motions 1970–1979, one row per motion, parsed from the Internet Archive's OCR of the City's minutes (parse_minutes_1970s.py)."
+      - name: ca_vancouver_minutes_wayback_motions
+        description: "DERIVED: council motions 1995–2015, one row per motion, parsed from the City's minutes as the Wayback Machine saved council.vancouver.ca (parse_minutes_wayback.py)."
+      - name: ca_vancouver_minutes_places
+        description: "DERIVED: minutes motion × parcel for both collections, from legal descriptions and civic addresses in the text (place_minutes.py)."
+      - name: ca_vancouver_council_readings
+        description: "DERIVED: each council record read once — a plain-English line, its interest (0–100) and its classification — by pipeline/scripts/ca_vancouver_city/reading/ (READING-COMPACT.md, ingest_readings.py). One row per record, latest reading; `held` rows failed a mechanical check and never publish."
+      - name: ca_vancouver_council_year_ranks
+        description: "DERIVED: each year's council decisions ranked by public interest (which would a resident most want to know?) by pipeline/scripts/ca_vancouver_city/reading/ (RANKING.md, ingest_year_ranks.py): the year's top 25 (`public_rank`), and `item_group` joining the rows that are steps of one matter. Only rows the ranking names."
+      - name: ca_vancouver_council_significance
+        description: "DERIVED: how much each council decision belongs in the story of the city (would a resident be surprised, moved, or say 'so that's when that happened'?), 0-100, with its kind (event, stand, landmark, rule, none), by pipeline/scripts/ca_vancouver_city/reading/ (SIGNIFICANCE.md, ingest_significance.py). A second measure beside the reading's `interest`."
+      - name: ca_vancouver_voting_resolutions
+        description: "DERIVED: each voting-record decision's item as that meeting's minutes print it — the resolutions, amounts and outcome under the matching heading — by pipeline/scripts/ca_vancouver_city/match_voting_resolutions.py from the Wayback Machine's copies of the City's council minutes (fetch_minutes_wayback.py --to 2026). One row per matched vote; unmatched votes have no row."
+      - name: ca_vancouver_census_2021_blocks
+        description: "Statistics Canada 2021 Census: the City of Vancouver's dissemination blocks (CSDUID 5915022) — population, private dwellings, land area (Geographic Attribute File 92-151-X) and outlines (cartographic boundary file ldb_000b21s_e). fetch_census_blocks.py. Open Government Licence - Canada."
+      # ── SOFI (Statement of Financial Information), from the Internet Archive ──
+      - name: ca_vancouver_sofi_suppliers
+        description: "PARSED: payments to suppliers over $25,000, one row per printed line, 2011→ (parse_sofi.py). is_individual = conservative person-name rule; names of individuals never leave core."
+      - name: ca_vancouver_sofi_grants
+        description: "PARSED: grants and contributions by category, one row per printed line, 2011→ (parse_sofi.py)."
+      - name: ca_vancouver_sofi_controls
+        description: "PARSED: every printed total of the supplier and grant schedules, with the parser's own sum beside it (parse_sofi.py)."
+      - name: ca_vancouver_sofi_review
+        description: "PARSED: five-year statistical review, one row per report × table × line × fiscal year, reports 2019→2025 covering 2015→2025 (parse_sofi_review.py)."
+      # ── capital budgets and plan (investments page) ─────────────────────────
+      - name: ca_vancouver_capital_plan_2023_2026
+        description: "2023-2026 Capital Plan as revised at the 2026 Capital Budget, one row per program."
+      - name: ca_vancouver_capital_budget_2021
+        description: "2021 capital budget (2019-2022 plan columns)."
+      - name: ca_vancouver_capital_budget_2022
+        description: "2022 capital budget (2019-2022 plan columns)."
+      - name: ca_vancouver_capital_budget_2023
+        description: "2023 capital budget (2023-2026 plan columns, year in column names)."
+      - name: ca_vancouver_capital_budget_2024
+        description: "2024 capital budget."
+      - name: ca_vancouver_capital_budget_2025
+        description: "2025 capital budget."
+      - name: ca_vancouver_capital_budget_2026
+        description: "2026 capital budget."
+      # ── places ──────────────────────────────────────────────────────────────
+      - name: ca_vancouver_libraries
+        description: "Library branches (point)."
+      - name: ca_vancouver_community_centres
+        description: "Community centres (point)."
+      - name: ca_vancouver_fire_halls
+        description: "Fire halls (point)."
+      - name: ca_vancouver_cultural_spaces
+        description: "Cultural spaces inventory: type, primary use, ownership, square feet, seats, active flag."
+      - name: ca_vancouver_homeless_shelter_locations
+        description: "Homeless shelters (point)."
+      - name: ca_vancouver_parks
+        description: "Parks register: hectares, facilities flag, address (no geometry)."

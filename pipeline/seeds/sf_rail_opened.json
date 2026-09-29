@@ -1,0 +1,141 @@
+{
+  "_what": "The date each rail line OPENED FOR SERVICE, with the Board of Supervisors' own record of paying to build it kept alongside as corroboration.",
+  "_why": [
+    "base/rail.json is today's network and carries no opening date, so the layer that",
+    "reads it drew at the present and nowhere else while the streets and the building",
+    "footprints beside it arrived by year from the record. That was the one inconsistency",
+    "in the century scrub: the city grew around a rail network that was always finished.",
+    "",
+    "The gate is NOT a route's branding date. The F Market line was branded in 1995 and",
+    "Market Street has carried rail since the 1860s; gating the F's steel at 1995 would",
+    "leave Market bare for ninety years of a century that had five streetcar lines on it.",
+    "What is wanted is the date rail service began ON THAT ALIGNMENT.",
+    "",
+    "Every line below carries the date it OPENED and, independently, the Board paying to",
+    "BUILD it. See _two_sources. Nothing here is recalled."
+  ],
+  "_predating": [
+    "The map's first year is 1906. The cable lines and Market Street all carried rail",
+    "before it, so they need no date and are drawn from the first year the map draws --",
+    "the same convention `streets.ts` uses for a street the record is silent about.",
+    "This is stated rather than sourced: the scanned Journal of Proceedings begins in",
+    "1906, so the corpus CANNOT reach a franchise granted in 1878, and claiming a",
+    "citation for it would be false. California Street, Powell-Mason and Powell-Hyde are",
+    "19th-century cable franchises; Market Street's rail is older than the fire."
+  ],
+  "_source": {
+    "publisher": "Internet Archive, from the San Francisco Public Library deposit",
+    "series": "Journal of proceedings, Board of Supervisors, City and County of San Francisco",
+    "enumerated_by": "creator, never by title -- see pipeline/scripts/us_sf_city/MINUTES.md",
+    "seed": "pipeline/seeds/countries/us/seed_us_sf_bos_minutes.tsv",
+    "opened_by": {
+      "publisher": "San Francisco Municipal Transportation Agency",
+      "page": "Muni History",
+      "url": "https://www.sfmta.com/getting-around/muni/muni-history",
+      "what": "the operator's own dated account of its lines opening"
+    }
+  },
+  "lines": {
+    "CA": {
+      "year": 0,
+      "name": "California Street cable",
+      "basis": "predates the map's first year; the scanned series begins 1906"
+    },
+    "PM": {
+      "year": 0,
+      "name": "Powell-Mason cable",
+      "basis": "predates the map's first year; the scanned series begins 1906"
+    },
+    "PH": {
+      "year": 0,
+      "name": "Powell-Hyde cable",
+      "basis": "predates the map's first year; the scanned series begins 1906"
+    },
+    "F": {
+      "year": 0,
+      "name": "F Market historic streetcar",
+      "basis": "the ROUTE was branded in 1995 but its alignment, Market Street, carried rail before the map's first year. Gated on the track, not the brand."
+    },
+    "J": {
+      "year": 1917,
+      "name": "J Church",
+      "volume": "journalofproceed1917sanfrich",
+      "url": "https://archive.org/details/journalofproceed1917sanfrich",
+      "opened": "1917-08-11",
+      "opened_quote": "The J Church streetcar line begins service on August 11, 1917",
+      "built_quote": "For construction of Church street line, from Market street and Van Ness avenue to Sixteenth and Church streets, Section \"A\", Contract No. 23"
+    },
+    "K": {
+      "year": 1918,
+      "name": "K Ingleside",
+      "volume": "journalofproceed1918sanfrich",
+      "url": "https://archive.org/details/journalofproceed1918sanfrich",
+      "note": "the record names the alignment, not the modern letter: the K runs the Twin Peaks Tunnel line, whose construction the Board was paying for in 1917-18.",
+      "opened": "1918-02",
+      "opened_quote": "The K Ingleside begins operation with the opening of the tunnel (Twin Peaks Tunnel, February 1918)",
+      "conflict": "the 1918 Journal of Proceedings says service through the Twin Peaks tunnel 'was inaugurated in January'. A month earlier than the operator's date; both are recorded, neither is reconciled.",
+      "built_quote": "Eaton & Smith, fifth payment, construction of Twin Peaks tunnel line, Municipal Railways, contract 95"
+    },
+    "L": {
+      "year": 1919,
+      "name": "L Taraval",
+      "volume": "journalofproceed1919sanfrich",
+      "url": "https://archive.org/details/journalofproceed1919sanfrich",
+      "note": "the same volume carries a resolution headed \"Operation of Taraval Cars from Ferry to the Beach\".",
+      "opened": "1919-04-12",
+      "opened_quote": "Muni's L Taraval line opened to 33rd Avenue on April 12, 1919",
+      "built_quote": "Eaton & Smith, 1st payment, construction of Taraval street line of Municipal Railways (claim dated Feb. 3, 1919)"
+    },
+    "M": {
+      "year": 1925,
+      "name": "M Ocean View",
+      "volume": "journalofproceed1925sanfrich",
+      "url": "https://archive.org/details/journalofproceed1925sanfrich",
+      "opened": "1925",
+      "opened_quote": "In 1925, the M Ocean View starts service through the Twin Peaks Tunnel",
+      "built_quote": "Eaton & Smith, fourth payment, construction of track and paving, Ocean View line of Municipal Railways (claim dated August 13, 1925)"
+    },
+    "N": {
+      "year": 1928,
+      "name": "N Judah",
+      "volume": "journalofproceed23sanfrich",
+      "url": "https://archive.org/details/journalofproceed23sanfrich",
+      "note": "the same volume pays for \"construction of Duboce avenue Sunset tunnel\", the bore the N runs through.",
+      "opened": "1928-10-21",
+      "opened_quote": "By 1928, the Sunset Tunnel is completed and the N Judah line begins to operate; the Sunset Tunnel opened October 21, 1928",
+      "built_quote": "Eaton & Smith, second payment, construction of Sunset line of Municipal Railways (claim dated May 28, 1928)"
+    },
+    "T": {
+      "year": 2007,
+      "name": "T Third",
+      "volume": "meeting2007aprmayminutes102sanfrich",
+      "url": "https://archive.org/details/meeting2007aprmayminutes102sanfrich",
+      "note": "the Board calling it NEW in April 2007 is the attestation; the January-March 2007 volume has no mention of it at all.",
+      "opened": "2007-04",
+      "opened_quote": "The T Third line starts operation in April 2007, following the completion of Phase 1 of the Third Street Light Rail Project",
+      "built_quote": "070445 [Status of the new T-Third Street MUNI line] Supervisor Elsbernd Hearing on the status of the new T-Third Street MUNI line and its impact on other services. 4/10/07"
+    }
+  },
+  "_two_sources": [
+    "Each line carries two independent statements that agree.",
+    "",
+    "OPENED: the operator's own published history (SFMTA, 'Muni History'), which is what",
+    "a date like '11 August 1917' can only come from -- the Board's Journal records Board",
+    "BUSINESS, not openings, and carries them only by accident.",
+    "",
+    "BUILT: a construction payment, contract or claim quoted from the Journal of",
+    "Proceedings for that year, found independently by searching the OCR for payment",
+    "language near each line's name.",
+    "",
+    "The two agree on the year for all six municipally built lines, which is the reason",
+    "to trust either. Where they differ they are BOTH recorded: the 1918 Journal says",
+    "service through the Twin Peaks tunnel 'was inaugurated in January' while the",
+    "operator dates the K Ingleside to February 1918. A month apart, and not reconciled",
+    "here, because nothing in the record settles it."
+  ],
+  "_muni_began": {
+    "date": "1912-12-28",
+    "quote": "On December 28, 1912, the San Francisco Municipal Railway (Muni) inaugurates streetcar service on the A and B lines along Geary Street between downtown and 33rd Avenue",
+    "note": "Geary carries no rail today, so Muni's first line is not in this file at all. The map cannot show it."
+  }
+}

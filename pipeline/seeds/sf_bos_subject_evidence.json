@@ -1,0 +1,521 @@
+{
+ "Assessments on property owners": [
+  "assessment",
+  "assess",
+  "cost of",
+  "report of cost",
+  "lien"
+ ],
+ "Paving, repairs and improvements": [
+  "pav",
+  "repair",
+  "improv",
+  "grad",
+  "curb",
+  "resurfac",
+  "macadam",
+  "sidewalk",
+  "repave"
+ ],
+ "Parks and playgrounds": [
+  "park",
+  "playground",
+  "square",
+  "recreation",
+  "golf",
+  "zoo"
+ ],
+ "Schools": [
+  "school",
+  "kindergarten",
+  "classroom",
+  "pupil",
+  "board of education"
+ ],
+ "Fire": [
+  "fire",
+  "engine house",
+  "hydrant",
+  "cistern",
+  "alarm",
+  "truck company",
+  "fire department"
+ ],
+ "Sewers and drains": [
+  "sewer",
+  "drain",
+  "culvert",
+  "cesspool",
+  "storm water",
+  "outfall"
+ ],
+ "Streetcars, trains and buses": [
+  "railway",
+  "streetcar",
+  "street car",
+  "muni",
+  "municipal railway",
+  "bus",
+  "transit",
+  "trolley",
+  "track"
+ ],
+ "Health and hospitals": [
+  "hospital",
+  "health",
+  "clinic",
+  "nurse",
+  "sanitarium",
+  "medical",
+  "emergency hospital",
+  "quarantine"
+ ],
+ "Police": [
+  "police",
+  "policeman",
+  "patrol",
+  "station house",
+  "sheriff"
+ ],
+ "Water supply": [
+  "water",
+  "reservoir",
+  "hetch",
+  "spring valley",
+  "main",
+  "pumping"
+ ],
+ "Building and construction": [
+  "construct",
+  "building permit",
+  "erect",
+  "contract for",
+  "specifications",
+  "architect",
+  "demolition"
+ ],
+ "The budget": [
+  "budget",
+  "appropriat",
+  "fund",
+  "expenditure",
+  "set aside",
+  "sum of",
+  "allocat"
+ ],
+ "The city buys land": [
+  "purchase",
+  "acquisition",
+  "offer to sell",
+  "acquire",
+  "convey",
+  "deed",
+  "buy",
+  "land",
+  "lands",
+  "for property",
+  "property on the",
+  "offers to sell",
+  "jurisdictional transfer"
+ ],
+ "Street lighting": [
+  "lamp",
+  "light",
+  "lighting",
+  "illuminat",
+  "electrolier"
+ ],
+ "Claims and refunds": [
+  "claim",
+  "refund",
+  "payment",
+  "damages",
+  "in full payment",
+  "reimburse"
+ ],
+ "Street levels and grades": [
+  "grade",
+  "level",
+  "official grade",
+  "elevation"
+ ],
+ "The environment": [
+  "environmental",
+  "ceqa",
+  "negative declaration",
+  "impact report",
+  "pollution",
+  "emission"
+ ],
+ "Lawsuits and settlements": [
+  "lawsuit",
+  "settle",
+  "litigation",
+  "action filed",
+  "versus",
+  "v.",
+  "court",
+  "judgment"
+ ],
+ "Traffic rules and signs": [
+  "traffic",
+  "stop sign",
+  "speed",
+  "crosswalk",
+  "one-way",
+  "signal",
+  "turn"
+ ],
+ "Commendations and proclamations": [
+  "commend",
+  "proclaim",
+  "honor",
+  "honour",
+  "recogniz",
+  "recognis",
+  "congratulat",
+  "in memoriam",
+  "tribute"
+ ],
+ "Railways and spur tracks": [
+  "spur track",
+  "railroad",
+  "railway",
+  "tracks"
+ ],
+ "Naming and renaming": [
+  "nam",
+  "renam",
+  "designat.*as",
+  "in honor of"
+ ],
+ "City staff and jobs": [
+  "employee",
+  "position",
+  "salary",
+  "civil service",
+  "staff",
+  "personnel",
+  "wage"
+ ],
+ "Power and utilities": [
+  "telephone",
+  "electric",
+  "gas",
+  "power",
+  "utility",
+  "pole",
+  "conduit",
+  "pg&e",
+  "wires"
+ ],
+ "Elections and the ballot": [
+  "election",
+  "ballot",
+  "voter",
+  "precinct",
+  "initiative",
+  "measure to be submitted"
+ ],
+ "Taxes, fees and revenue": [
+  "tax",
+  "fee",
+  "revenue",
+  "levy",
+  "license fee",
+  "rate"
+ ],
+ "Positions on state and national matters": [
+  "urging",
+  "legislature",
+  "congress",
+  "state of california",
+  "assembly bill",
+  "senate bill",
+  "support.*bill",
+  "oppos.*bill"
+ ],
+ "Libraries": [
+  "library",
+  "librarian",
+  "branch library",
+  "books"
+ ],
+ "Changing the city's own rules": [
+  "administrative code",
+  "charter",
+  "rules of order",
+  "board rules",
+  "municipal code"
+ ],
+ "The city leases": [
+  "lease",
+  "sublease",
+  "rent",
+  "tenancy",
+  "leasehold"
+ ],
+ "Other permits and licences": [
+  "permit",
+  "licens",
+  "licenc",
+  "permission",
+  "revocable"
+ ],
+ "The city sells land": [
+  "sale",
+  "sell",
+  "auction",
+  "dispose",
+  "conveyance"
+ ],
+ "Using the street or sidewalk": [
+  "encroach",
+  "occupy",
+  "sidewalk",
+  "awning",
+  "marquee",
+  "revocable permission",
+  "obstruct"
+ ],
+ "Dance halls, shows and entertainment": [
+  "dance",
+  "theater",
+  "theatre",
+  "show",
+  "entertainment",
+  "amusement",
+  "concert",
+  "masquerade",
+  "carnival"
+ ],
+ "Sidewalk widths": [
+  "sidewalk width",
+  "width of sidewalk",
+  "narrow.*sidewalk",
+  "widen.*sidewalk"
+ ],
+ "Zoning and land use": [
+  "zoning",
+  "zone",
+  "conditional use",
+  "reclassif",
+  "district",
+  "planning code",
+  "use classification",
+  "variance",
+  "rezon"
+ ],
+ "Storage tanks": [
+  "tank",
+  "gallons",
+  "oil permit",
+  "gasoline",
+  "storage of oil",
+  "fuel"
+ ],
+ "Taxis and garages": [
+  "taxi",
+  "garage",
+  "cab",
+  "auto stand",
+  "jitney"
+ ],
+ "Set-back lines": [
+  "set-back",
+  "setback",
+  "set back line"
+ ],
+ "Borrowing and bonds": [
+  "bond",
+  "borrow",
+  "indebtedness",
+  "revenue note",
+  "debt",
+  "certificates of participation"
+ ],
+ "Hearings and appeals": [
+  "appeal",
+  "hearing",
+  "appellant",
+  "protest",
+  "rehearing",
+  "findings",
+  "conditional use authorization"
+ ],
+ "Franchises": [
+  "franchise"
+ ],
+ "Blasting": [
+  "blast",
+  "explosive",
+  "powder"
+ ],
+ "Subdivisions and maps": [
+  "subdivision",
+  "final map",
+  "tentative map",
+  "parcel map",
+  "condominium"
+ ],
+ "Emergencies": [
+  "emergency",
+  "disaster",
+  "earthquake",
+  "calamity"
+ ],
+ "Wires put underground": [
+  "underground",
+  "undergrounding",
+  "wires",
+  "conduit district"
+ ],
+ "Closed for good": [
+  "close",
+  "closing",
+  "vacat",
+  "abandon",
+  "discontinu"
+ ],
+ "Liquor licences": [
+  "liquor",
+  "alcohol",
+  "beverage",
+  "beer",
+  "wine",
+  "off-sale",
+  "on-sale",
+  "type 21",
+  "type 47"
+ ],
+ "Housing and shelter": [
+  "housing",
+  "shelter",
+  "affordable",
+  "homeless",
+  "dwelling",
+  "residential hotel",
+  "below market"
+ ],
+ "Investigations and oversight": [
+  "investigat",
+  "inquiry",
+  "audit",
+  "report on",
+  "oversight",
+  "urging.*report",
+  "review"
+ ],
+ "More time for the contractor": [
+  "extension of time",
+  "additional time",
+  "extend.*time",
+  "days.*extension"
+ ],
+ "Accepting finished work": [
+  "accept.*work",
+  "completed",
+  "acceptance of work",
+  "final acceptance"
+ ],
+ "Landmarks and old buildings": [
+  "landmark",
+  "historic",
+  "preservation",
+  "article 10",
+  "mills act",
+  "heritage"
+ ],
+ "Business improvement districts": [
+  "business improvement",
+  "community benefit district",
+  "assessment district"
+ ],
+ "Employee charitable giving": [
+  "charitable",
+  "combined giving",
+  "payroll deduction",
+  "united way"
+ ],
+ "Keeping horses and cows": [
+  "horse",
+  "cow",
+  "cattle",
+  "stable",
+  "corral",
+  "livestock"
+ ],
+ "Engines and boilers": [
+  "boiler",
+  "engine",
+  "horsepower",
+  "steam",
+  "furnace"
+ ],
+ "Closed for a day": [
+  "temporary closing",
+  "closing.*street.*from",
+  "street closure",
+  "parade",
+  "block party"
+ ],
+ "Appointing people": [
+  "appoint",
+  "nominat",
+  "confirm.*appointment",
+  "member of the"
+ ],
+ "Laundries and cleaners": [
+  "laundry",
+  "laundries",
+  "cleaner",
+  "dye works",
+  "wash house"
+ ],
+ "Parking": [
+  "parking",
+  "passenger zone",
+  "loading",
+  "white zone",
+  "yellow zone",
+  "meter",
+  "curb space",
+  "feet;",
+  "\\d{1,3}\\s*feet\\s*[,;—–-]"
+ ],
+ "Freeways": [
+  "freeway",
+  "expressway",
+  "state highway",
+  "interstate"
+ ],
+ "The port and waterfront": [
+  "port",
+  "waterfront",
+  "wharf",
+  "pier",
+  "harbor",
+  "harbour",
+  "seawall"
+ ],
+ "Redevelopment": [
+  "redevelopment",
+  "urban renewal",
+  "project area",
+  "agency"
+ ],
+ "A vote or a scheduling step": [
+  "continued",
+  "postpon",
+  "calendar",
+  "referred",
+  "laid over",
+  "motion"
+ ],
+ "Bicycles and walking": [
+  "bicycle",
+  "bike",
+  "pedestrian",
+  "walking"
+ ]
+}

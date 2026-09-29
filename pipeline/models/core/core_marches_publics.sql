@@ -210,8 +210,11 @@ decp_only_collapsed AS (
         MIN_BY(has_consideration_environnementale, decp_id) AS has_consideration_environnementale,
         MIN_BY(marche_innovant, decp_id)           AS marche_innovant,
         -- Titulaires : concaténés si multi-attributaire (siret agrégés ;
-        -- le nom retenu suit l'id canonique).
-        STRING_AGG(DISTINCT CAST(titulaire_siret AS STRING), '|') AS titulaire_siret,
+        -- le nom retenu suit l'id canonique). Ordre FIXÉ : sans ORDER BY,
+        -- BigQuery rendait les mêmes SIRET dans un ordre différent à chaque
+        -- construction, et la porte de parité voyait 38 « changements » dans
+        -- les exports marchés 2024-2026 là où rien n'avait bougé.
+        STRING_AGG(DISTINCT CAST(titulaire_siret AS STRING), '|' ORDER BY CAST(titulaire_siret AS STRING)) AS titulaire_siret,
         MIN_BY(titulaire_nom, decp_id)             AS titulaire_nom,
         COUNT(DISTINCT titulaire_siret)            AS titulaires_count,
         COUNT(*)                                   AS _nb_decp_rows  -- diagnostic

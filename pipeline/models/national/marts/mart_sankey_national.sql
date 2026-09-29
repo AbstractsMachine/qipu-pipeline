@@ -1,79 +1,39 @@
 {{
   config(
+    enabled=true,
     materialized='table',
+    cluster_by=['code_insee'],
     tags=['national', 'marts']
   )
 }}
 
 /*
-  Mart: Sankey Budget National
+  Mart: lignes budget national par nature (source d'export)
 
-  Agrège les données budget par (commune_slug, annee, sankey_group, sens_flux)
-  pour produire les nodes et links du Sankey.
+  Une ligne = (commune × année × section × sens × groupe sankey × catégorie).
+  L'exporteur (export_budget_national.py) lit ces lignes filtrées par code_insee
+  et construit nodes/links + drilldown, dans le MÊME contrat JSON que Paris /
+  Marseille (BudgetClient consomme les trois).
 
-  Format de sortie compatible avec BudgetData TypeScript.
+  Axe = NATURE (chapitre M14/M57), jamais fonction. type_budget = 'execute'
+  (balances comptables = comptes de gestion exécutés).
 */
 
-WITH budget AS (
-    SELECT *
-    FROM {{ ref('core_budget_national') }}
-    WHERE section IN ('Fonctionnement', 'Investissement')
-),
-
--- Agrégation par sankey_group
-by_group AS (
-    SELECT
-        commune_slug,
-        commune_nom,
-        population,
-        annee,
-        sankey_group,
-        sens_flux,
-        section,
-
-        SUM(montant_total) AS montant
-
-    FROM budget
-    GROUP BY ALL
-),
-
--- Totaux par ville/année
-totals AS (
-    SELECT
-        commune_slug,
-        annee,
-        SUM(CASE WHEN sens_flux = 'Recette' THEN montant ELSE 0 END) AS total_recettes,
-        SUM(CASE WHEN sens_flux = 'Depense' THEN montant ELSE 0 END) AS total_depenses
-
-    FROM by_group
-    WHERE sens_flux != 'Both'
-    GROUP BY commune_slug, annee
-)
-
 SELECT
-    g.commune_slug,
-    g.commune_nom,
-    g.population,
-    g.annee,
-    g.sankey_group,
-    g.sens_flux,
-    g.section,
-    g.montant,
-
-    t.total_recettes,
-    t.total_depenses,
-    t.total_recettes - t.total_depenses AS solde,
-
-    -- Pourcentage du total
-    CASE
-        WHEN g.sens_flux = 'Recette' AND t.total_recettes > 0
-            THEN ROUND(g.montant / t.total_recettes * 100, 2)
-        WHEN g.sens_flux = 'Depense' AND t.total_depenses > 0
-            THEN ROUND(g.montant / t.total_depenses * 100, 2)
-        ELSE 0
-    END AS pct_total
-
-FROM by_group g
-LEFT JOIN totals t ON g.commune_slug = t.commune_slug AND g.annee = t.annee
-WHERE g.montant > 0
-ORDER BY g.commune_slug, g.annee, g.sens_flux, g.montant DESC
+    code_insee,
+    siren,
+    commune_nom,
+    population,
+    dep_name,
+    reg_name,
+    annee,
+    'execute'         AS type_budget,
+    section,
+    sens_flux,
+    sankey_group_fr,
+    sankey_group_en,
+    category_fr,
+    category_en,
+    montant_total     AS montant
+FROM {{ ref('core_budget_national') }}
+WHERE montant_total > 0

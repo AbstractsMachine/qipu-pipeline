@@ -5,7 +5,7 @@
 -- distinct DPW project to any of the place's facility points.
 --
 -- The STRUCTURED spatial join: the place's facility coordinates
--- (stg_us_sf_city_facilities via the crosswalk) → DPW project points within
+-- (core_us_sf_places via the crosswalk) → DPW project points within
 -- PROXIMITY_M (ST_DWITHIN). DPW is SF's geolocated chantiers feed; this is the
 -- "construction physically on/near this place" view. Carries NO money of its
 -- own (client_contract_id bridges to a contract's $ where present) — an
@@ -25,20 +25,15 @@ WITH fac AS (
         x.place_slug,
         x.facility_id,
         f.geo
-    FROM {{ ref('stg_us_sf_place_facilities') }} x
-    JOIN (
-        SELECT facility_id,
-               CASE WHEN longitude IS NOT NULL AND latitude IS NOT NULL
-                    THEN ST_GEOGPOINT(longitude, latitude) END AS geo
-        FROM {{ ref('stg_us_sf_city_facilities') }}
-    ) f USING (facility_id)
-    WHERE f.geo IS NOT NULL
+    FROM {{ ref('core_us_sf_places') }} x
+    CROSS JOIN UNNEST([STRUCT(x.geo AS geo)]) AS f
+    WHERE x.geo IS NOT NULL
 ),
 
 proj AS (
     SELECT project_name, project_status, project_phase, facility_type,
            description, on_street, client_contract_id, start_date, end_date, geo
-    FROM {{ ref('stg_us_sf_dpw_projects') }}
+    FROM {{ ref('core_us_sf_dpw_projects') }}
     WHERE geo IS NOT NULL AND project_name IS NOT NULL AND project_status IS NOT NULL
 ),
 
@@ -57,7 +52,7 @@ matched AS (
         ST_DISTANCE(fac.geo, proj.geo) AS distance_m,
         ROW_NUMBER() OVER (
             PARTITION BY fac.place_slug, proj.project_name
-            ORDER BY ST_DISTANCE(fac.geo, proj.geo)
+            ORDER BY ST_DISTANCE(fac.geo, proj.geo), fac.facility_id
         ) AS rn
     FROM fac
     JOIN proj

@@ -1,0 +1,170 @@
+{
+  "what": "The eight themes the SF Board-decision map can be filtered by, and the patterns that assign them.",
+  "why_a_seed": "Authored, not derived. No register names these eight or writes these patterns — they were chosen and written by hand from measurements of the corpus, so the file that holds them has to be versioned beside the code that reads it. It was drafted in scratchpad/sf-theme-filter/ (SPEC.md, build_themes.json), which is gitignored; this is the copy that survives a clone.",
+  "read_by": "pipeline/scripts/us_sf_city/blocks/build_index.py — tags every decision at build time, against the item's own full source text.",
+  "matching_rule": "case-insensitive re.search of `pattern` against the item's own text (items.jsonl `t`), rows with len(t) > 25. A decision may carry several themes; the eight are NOT mutually exclusive and do NOT partition the record.",
+  "not_a_partition": "'All decisions' is the default view; these filter it down. They do not partition the record and they do not cover it — they overlap each other (Housing x What's being built is the largest at 852 decisions) and most of the record matches none of them. Roughly one row in eight also has no street reference at all and can never appear on the map whatever is selected.",
+  "coverage_correction": "The spec says '~60% of the mappable record'. That number is real but it belongs to the SEVENTEEN-theme citizen-facing list it was carried over from — 65,553 of 108,686 — and the eight are what survived the later cut. Measured on the same corpus, the eight cover 19.6% of rows that carry a street reference (21,367 of 109,034). Publish the measured number the build prints, never 60%.",
+  "kind": "`place` = the theme is sharp in space, so it is answered by clicking a dot. `era` = the theme is sharp in time, so it is answered by driving the time slider. The assignment comes from the spatial/temporal excess in `measured`, against a 0.469 Gini / 2.234 decade-entropy baseline.",
+  "measured_is_provenance_only": "The `measured` block records what the scoring pass found and WHY each theme earned its slot. Nothing published reads it — the build recounts every number against the corpus it is actually tagging, and prints both so a drift is visible.",
+  "pattern_rules": [
+    "Close every word boundary. `bus` without a trailing \\b matches *business*; `reparation` without one matches *p-reparation of plans* and scored a fake theme at 1,043 decisions when the true count was 3.",
+    "Never merge two families whose peaks fall in different decades — averaging opposite time-curves destroys the concentration that makes a theme worth a filter.",
+    "A word can be correctly bounded and still be a different word. `\\bshelter\\b` is bounded and matched `shelter-in-place` four times in a twelve-row sample; `redevelop` matched a park cleanup; `\\bentitlement` matched a federal grant. Where the sense turns on the NEXT word, put the next word in the pattern."
+  ],
+  "themes": [
+    {
+      "bit": 0,
+      "slug": "homelessness-shelter",
+      "label": "Homelessness & shelter",
+      "pattern": "\\bhomeless|encampment|navigation center|supportive housing|\\bsro\\b|single room occupancy|\\bhsh\\b|\\bhomekey\\b|continuum of care|\\bshelter\\b|\\brehousing\\b",
+      "kind": "place",
+      "measured": {
+        "total": 703,
+        "placed_pct": 84,
+        "peak_decade": 2020,
+        "share_last5_pct": 3.85,
+        "spatial_excess": 0.5,
+        "temporal_excess": 0.339,
+        "why": "0.00% of the 1960s-70s record, 3.85% of the last five years"
+      },
+      "pattern_before_20260903": "\\bhomeless|encampment|navigation center|supportive housing|\\bsro\\b|single room occupancy|\\bhsh\\b|\\bhomekey\\b|continuum of care|\\bshelter\\b",
+      "widened_20260903": "Added `rehousing`: `rapid rehousing` is the name of the City's own programme and the word `homeless` does not appear in its title."
+    },
+    {
+      "bit": 1,
+      "slug": "landmarks-old-buildings",
+      "label": "Landmarks & old buildings",
+      "pattern": "\\blandmark\\b|\\blandmarks\\b|landmark designation|historic(?:al)? (?:district|preservation|resource|building|property)|\\bmills act\\b|certificate of appropriateness",
+      "kind": "place",
+      "measured": {
+        "total": 1450,
+        "placed_pct": 95,
+        "peak_decade": 2020,
+        "share_last5_pct": 8.98,
+        "spatial_excess": 0.476,
+        "temporal_excess": 0.558,
+        "why": "sharp in space and in time; a landmark designation is an address by construction"
+      },
+      "pattern_before_20260903": "\\blandmark\\b|\\blandmarks\\b|historic (?:district|preservation|resource|building)|\\bmills act\\b|certificate of appropriateness",
+      "widened_20260903": "Allowed `historical` beside `historic` (the Mills Act instrument is a `historical property contract`) and added `historic property`."
+    },
+    {
+      "bit": 2,
+      "slug": "housing",
+      "label": "Housing",
+      "pattern": "\\bhousing|dwelling unit|apartment|affordable hous|\\bmohcd\\b|below market rate|\\binclusionary\\b",
+      "kind": "place",
+      "measured": {
+        "total": 4487,
+        "placed_pct": 88,
+        "peak_decade": 2020,
+        "share_last5_pct": 12.26,
+        "spatial_excess": 0.38,
+        "temporal_excess": 0.016,
+        "why": "highest modern share of any theme"
+      },
+      "widened_20260903": "Unchanged."
+    },
+    {
+      "bit": 3,
+      "slug": "whats-being-built",
+      "label": "What's being built",
+      "pattern": "\\bzoning\\b|\\brezoning\\b|\\breclassif|conditional use|\\bvariance\\b|use district|set-?back|(?:planning|project|development)\\s+entitlement|development agreement|\\bdemolition\\b|project authorization|general plan amendment",
+      "kind": "era",
+      "measured": {
+        "total": 8525,
+        "placed_pct": 96,
+        "peak_decade": 1980,
+        "share_last5_pct": 10.05,
+        "spatial_excess": 0.231,
+        "temporal_excess": 0.431,
+        "why": "best-placed large theme; 'zoning' is the Clerk's word, this is the resident's"
+      },
+      "pattern_before_20260903": "\\bzoning\\b|\\breclassif|conditional use|\\bvariance\\b|use district|set-?back|\\bentitlement|development agreement|\\bdemolition\\b|project authorization",
+      "widened_20260903": "`\\bentitlement` on its own was matching the FEDERAL sense — 'the City's FY2017-2018 HOPWA Program entitlement' is a grant, not a planning entitlement — so it now requires planning/project/development in front. Added `rezoning` and `general plan amendment`, both the resident's word for the same act."
+    },
+    {
+      "bit": 4,
+      "slug": "schools",
+      "label": "Schools",
+      "pattern": "\\bschool\\b|schools|board of education|unified school|school district|\\bsfusd\\b|kindergarten|classroom",
+      "kind": "era",
+      "measured": {
+        "total": 6625,
+        "placed_pct": 93,
+        "peak_decade": 1920,
+        "share_last5_pct": 1.05,
+        "spatial_excess": 0.186,
+        "temporal_excess": 0.73,
+        "why": "11% of the 1920s record, 1% now — where children were, and then were not"
+      },
+      "pattern_before_20260903": "\\bschool\\b|schools|board of education|unified school|kindergarten|classroom",
+      "widened_20260903": "Added `sfusd` and `school district`. The modern Clerk writes SFUSD, and a title reading 'Committee of the Whole - SFUSD's Resource Alignment Initiative' carried no school word at all."
+    },
+    {
+      "bit": 5,
+      "slug": "fire",
+      "label": "Fire",
+      "pattern": "fire department|firehouse|fire station|\\bfire house\\b|\\bfire alarm\\b|\\bfire hydrant\\b|\\bfire chief\\b|\\bfire engine\\b|\\bfireboat\\b|fire prevention|fire safety|fire apparatus|\\bfire code\\b|fire marshal|fire suppression|firefighter|\\bsffd\\b",
+      "kind": "era",
+      "measured": {
+        "total": 1697,
+        "placed_pct": 93,
+        "peak_decade": 1900,
+        "share_last5_pct": 1.0,
+        "spatial_excess": 0.348,
+        "temporal_excess": 0.643,
+        "why": "4% of the 1900s record — the firehouses rebuilt after 1906"
+      },
+      "pattern_before_20260903": "fire department|firehouse|fire station|\\bfire house\\b|\\bfire alarm\\b|\\bfire hydrant\\b|\\bfire chief\\b|\\bfire engine\\b|\\bfireboat\\b",
+      "widened_20260903": "The theme knew the fire service's PLACES and its people but not its WORK: 'Fire Prevention', 'Fire Safety Systems', 'Fire Apparatus' and the Fire Code are what the modern titles say. Added `firefighter`: 'Firefighter Personal Protective Equipment Containing PFAS' is an ordinance about the fire service that never says 'fire department'."
+    },
+    {
+      "bit": 6,
+      "slug": "redevelopment",
+      "label": "Redevelopment",
+      "pattern": "redevelopment\\s+(?:agency|plan|project|area|law)|redevelopment of|urban renewal|\\bocii\\b|successor agency|\\bblight",
+      "kind": "place",
+      "measured": {
+        "total": 1315,
+        "placed_pct": 85,
+        "peak_decade": 2000,
+        "share_last5_pct": 1.52,
+        "spatial_excess": 0.468,
+        "temporal_excess": 0.347,
+        "why": "the most spatially concentrated theme in the corpus — the Fillmore"
+      },
+      "pattern_before_20260903": "redevelop|urban renewal|\\bblight",
+      "widened_20260903": "`redevelop` on its own matched 'park redevelopment at India Basin', an EPA brownfield cleanup, which is the word in its ordinary sense and not this theme. It now requires the instrument that follows it — agency, plan, project, area — plus OCII, the body that holds them."
+    },
+    {
+      "bit": 7,
+      "slug": "libraries",
+      "label": "Libraries",
+      "pattern": "\\blibrar",
+      "kind": "place",
+      "measured": {
+        "total": 947,
+        "placed_pct": 89,
+        "peak_decade": 1900,
+        "share_last5_pct": 0.86,
+        "spatial_excess": 0.466,
+        "temporal_excess": 0.063,
+        "why": "small, and sharp in space"
+      },
+      "widened_20260903": "Unchanged."
+    }
+  ],
+  "cut_and_why": {
+    "bars-liquor": "scored highest of all twenty (121.1) and was CUT — zero for nine decades then flat 2%, which is the date the Board began making state ABC licence determinations, not a fact about San Francisco",
+    "your-street": "spatial excess +0.095 against a 0.469 baseline: uniform. Address search answers 'my street' better than a citywide paving filter. Its temporal concentration is the third highest measured, so it belongs as the opening time-lapse, not a checkbox",
+    "parking-traffic": "+0.240 spatial, -0.041 temporal — diffuse in both dimensions, the weakest score measured",
+    "parks-playgrounds": "the most diffuse thing measured (+0.146 / +0.167). Everywhere, always: excellent in 'All decisions', weak as a filter",
+    "water-sewers": "strong era theme, spatially uniform (+0.107). Deferred to round two",
+    "evictions-tenants": "scores 86.7 but only 110 reach the map",
+    "racial-equity": "3 real matches. A first pass scored 1,043 because `reparation` matched 'p-reparation of plans'",
+    "litigation": "only 23% placed, and the decline is likely a Clerk's-PDF phrasing artefact"
+  },
+  "span_rule": "Since 2026-09-03 the pattern is NOT matched against the item's whole text. themes.subject_span() decides the span: the Clerk's own file title where the item has one, else the item's text with four cuts — the shelter-in-place phrase, a public-comment speaker roll, anything past the next item's `NNNNNN [` header, and an appointment motion, which is about a person. Measured on 96 hand-read modern items, whole-text matching was 65.6% precise. The reader-reported failure was a landmark designation filed under SCHOOLS because its address list reads '117 Diamond Street (School)'."
+}

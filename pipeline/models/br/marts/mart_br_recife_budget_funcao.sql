@@ -2,11 +2,11 @@
 -- Mart: budget executed by FUNÇÃO (and subfunção) × ano — the budget page's
 -- primary altitude, "para que serve o dinheiro" (what the money is for).
 --
--- Source: stg_br_recife_funcional (Despesa Funcional Programática).
+-- Source: core_br_recife_funcional (Despesa Funcional Programática).
 -- Grain:  ano × função × subfunção. pago/empenhado summed over months
 --         (monthly-incremental, verified). 2024 Σpago = R$8.97 bn = the full
 --         executed municipal spend (broader than the credor spine).
--- Provenance (source_url + as_of) carried from stg_br_recife_catalog.
+-- Provenance (source_url + as_of) carried from core_br_recife_source_catalog.
 -- =============================================================================
 
 WITH by_funcao AS (
@@ -20,7 +20,7 @@ WITH by_funcao AS (
         SUM(liquidado) AS liquidado,
         SUM(pago)      AS pago,
         COUNT(*)       AS n_linhas
-    FROM {{ ref('stg_br_recife_funcional') }}
+    FROM {{ ref('core_br_recife_funcional') }}
     WHERE funcao IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5
 ),
@@ -32,7 +32,7 @@ provenance AS (
         ANY_VALUE(portal_name)       AS source_portal,
         ANY_VALUE(license_title)     AS source_license,
         MAX(rows_updated_at)         AS rows_updated_at
-    FROM {{ ref('stg_br_recife_catalog') }}
+    FROM {{ ref('core_br_recife_source_catalog') }}
     WHERE source_id LIKE 'funcional_%'
 )
 

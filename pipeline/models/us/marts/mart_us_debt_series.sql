@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: US public debt series — export shape for the debt time-machine
 --
--- Source: core_us_debt (+ stg_us_fiscaldata_catalog for provenance).
+-- Source: core_us_debt (+ core_us_fiscaldata_source_catalog for provenance).
 -- Grain:  (series, record_date), three series:
 --   - 'annual_fy_end' : fiscal-year-end totals 1790 → latest closed FY
 --                       (Historical Debt Outstanding)
@@ -23,7 +23,7 @@ WITH provenance AS (
         dataset_page_url,
         endpoint,
         update_frequency
-    FROM {{ ref('stg_us_fiscaldata_catalog') }}
+    FROM {{ ref('core_us_fiscaldata_source_catalog') }}
     WHERE source_id IN ('debt_to_penny', 'debt_outstanding')
 ),
 

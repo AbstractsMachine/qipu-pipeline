@@ -49,7 +49,9 @@ ROOT = Path(__file__).resolve().parents[3]
 # Sortie interne (cache) — pas publiée. Consommée par les scripts d'enrich.
 OUTPUT = ROOT / "pipeline" / "cache" / "subventions_pre_enrichment"
 
-OPENDATA_API = "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _paris_portal  # noqa: E402
+OPENDATA_API = _paris_portal.api("/catalog/datasets")
 DATASET_VOTEES = "subventions-associations-votees-"
 DATASET_ANNEXE_CA = "subventions-versees-annexe-compte-administratif-a-partir-de-2018"
 

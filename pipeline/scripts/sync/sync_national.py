@@ -279,87 +279,14 @@ def sync_ofgl_communes(communes: list[dict], dry_run: bool = False) -> dict:
 
 
 # =============================================================================
-# Source: DECP (Marchés Publics)
+# Source: DECP (Marchés Publics) — RETIRÉE (2026-09-13)
 # =============================================================================
-
-def sync_decp_marches(communes: list[dict], dry_run: bool = False) -> dict:
-    """
-    Sync DECP (public contracts) data for target communes.
-
-    Downloads the consolidated CSV from data.gouv.fr and filters by buyer SIREN.
-    """
-    print(f"\n{'='*60}")
-    print(f"  DECP MARCHÉS PUBLICS")
-    print(f"{'='*60}")
-
-    sirens = get_sirens(communes)
-
-    # The DECP consolidated dataset on data.gouv.fr
-    # We use the tabular API to filter server-side
-    resource_id = "22847056-61df-452d-837d-8b8ceadbfc52"
-    api_url = f"https://tabular-api.data.gouv.fr/api/resources/{resource_id}/data/"
-
-    all_records = []
-    for siren in sirens:
-        commune = next(c for c in communes if c["siren"] == siren)
-        print(f"\n  Fetching DECP for {commune['nom']} (SIREN prefix: {siren[:9]})...")
-
-        # DECP uses acheteur.id which is SIRET (14 digits), SIREN is first 9
-        siren_9 = siren[:9] if len(siren) > 9 else siren
-        page = 1
-        page_size = 500
-        city_count = 0
-
-        while True:
-            try:
-                params = {
-                    "page": page,
-                    "page_size": page_size,
-                    "acheteur_id__contains": siren_9,
-                }
-                response = requests.get(api_url, params=params, timeout=120)
-                response.raise_for_status()
-                data = response.json()
-
-                records = data.get("data", [])
-                if not records:
-                    break
-
-                for r in records:
-                    r["_commune_slug"] = commune["slug"]
-                    r["_commune_nom"] = commune["nom"]
-                all_records.extend(records)
-                city_count += len(records)
-
-                total = data.get("meta", {}).get("total", 0)
-                if page * page_size >= total:
-                    break
-
-                page += 1
-                time.sleep(0.2)
-
-            except Exception as e:
-                print(f"    Error on page {page}: {e}")
-                break
-
-        print(f"    {city_count:,} contracts found")
-
-    if not all_records:
-        return {"source": "decp_marches", "rows": 0, "status": "empty"}
-
-    df = pd.DataFrame(all_records)
-    print(f"\n  Total: {len(df):,} contracts across {len(sirens)} cities")
-
-    if dry_run:
-        print("  DRY RUN - skipping upload")
-        return {"source": "decp_marches", "rows": len(df), "status": "dry_run"}
-
-    rows = upload_to_bigquery(
-        df, "decp_marches",
-        project_id=PROJECT_ID, dataset_id=DATASET_ID,
-    )
-    return {"source": "decp_marches", "rows": rows, "status": "success"}
-
+# L'ancien chargeur filtrait la DECP par les SIREN de seed_communes_cibles.csv
+# puis écrasait raw_national.decp_marches (WRITE_TRUNCATE, schéma de l'API
+# tabulaire). Ce seed n'a plus de colonne siren : il plantait en silence. S'il
+# en avait retrouvé une, il aurait remplacé les 3,1 millions de lignes de la
+# table nationale par un sous-ensemble au mauvais schéma. La DECP des communes
+# se charge par scripts/sync/sync_decp_national.py.
 
 # =============================================================================
 # Source: Subventions Nationales (SCDL)
@@ -458,7 +385,6 @@ def sync_subventions_nationales(communes: list[dict], dry_run: bool = False) -> 
 SOURCES = {
     "dgfip_balances": sync_dgfip_balances,
     "ofgl_communes": sync_ofgl_communes,
-    "decp_marches": sync_decp_marches,
     "subventions_nationales": sync_subventions_nationales,
 }
 

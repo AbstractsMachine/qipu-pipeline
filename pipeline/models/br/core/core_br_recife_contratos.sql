@@ -47,7 +47,14 @@ SELECT
                             AS numero_contrato_publicavel,
     IF(slug_n = 1, slug_base, CONCAT(slug_base, '-', slug_hash))
                             AS contrato_id,
-    ano_contrato,
+    -- The register leaves the year empty on 2 129 contracts whose number still
+    -- ends with it (« 1401.0272/2003 »): read it there (2026-09-23), so they
+    -- reach the yearly charts. A year outside 1990-2030 is not a year.
+    COALESCE(
+        ano_contrato,
+        (SELECT y FROM UNNEST([SAFE_CAST(REGEXP_EXTRACT(numero_contrato, r'/\s*((?:19|20)\d{2})\s*$') AS INT64)]) y WHERE y BETWEEN 1990 AND 2030)
+    )                       AS ano_contrato,
+    ano_contrato IS NULL    AS ano_do_numero,
     orgao_contratante,
     objeto,
     modalidade,

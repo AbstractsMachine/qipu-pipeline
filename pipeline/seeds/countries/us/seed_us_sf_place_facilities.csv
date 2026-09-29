@@ -40,8 +40,7 @@ fire-station-14,696,Fire Station #14,551 26TH AVE,1518009,1518,009,true,15900,Fi
 fire-station-15,697,Fire Station #15,1000 OCEAN AVE,3180001,3180,001,true,12138,Fire Department,true,name,Fire Station #15,0
 fire-station-18,700,Fire Station #18,1935 32ND AVE,2102006,2102,006,true,15900,Fire Department,true,name,Fire Station #18,0
 glen-canyon-park,811,Glen Park Rec Center,70 ELK ST,7560002,7560,002,true,15200,Recreation And Parks,true,name,Glen Park,358
-glen-park-branch-library,1228,Park Branch Library,1833 PAGE ST,1229031,1229,031,true,8825,Public Library,true,name,Glen Park Branch Library,4369
-glen-park-branch-library,808,Glen Park Branch Library,2825 DIAMOND ST,6745073,6745,073,true,7185,Public Library,false,name,Glen Park Branch Library,77
+glen-park-branch-library,808,Glen Park Branch Library,2825 DIAMOND ST,6745073,6745,073,true,7185,Public Library,true,name,Glen Park Branch Library,77
 golden-gate-park,813,Golden Gate Park Senior Center,6101 FULTON ST,1263011,1263,011,true,,Recreation And Parks,true,name,Golden Gate Park,984
 hall-of-justice,874,Hall of Justice (HOJ),850 BRYANT ST,3759042,3759,042,true,615241,Gsa - Real Estate Division,true,name,Hall of Justice,68
 hall-of-justice,3060,HALL OF JUSTICE GAS STATION,950 BRYANT ST,3758127,3758,127,true,,Gsa - Office Of Contract Administration,false,name,Hall of Justice,263
@@ -87,14 +86,13 @@ mission-branch-library,1117,Mission Branch Library,300 BARTLETT ST,6515001,6515,
 mission-dolores-park,1122,Mission Dolores Park Clubhouse,646 DOLORES ST,3586001,3586,001,true,2100,Recreation And Parks,true,name,Mission Dolores Park,4
 moscone-center,2050,Moscone West,747 HOWARD ST,3724035,3724,035,true,775000,Gsa - Convention Facilities Management,true,name,Moscone West,206
 moscone-center,1139,MOSCONE CENTER Parking Garage,255 3RD ST,3735060,3735,060,true,255444,Municipal Transportation Agency,false,name,Moscone Center,175
-moscone-center,1138,Moscone Bathrooms,1800 CHESTNUT ST,0469001,0469,001,true,500,Recreation And Parks,false,name,Moscone,3559
-moscone-center,1142,Moscone Fieldhouse and Bleachers,1800 CHESTNUT ST,0469001,0469,001,true,,Recreation And Parks,false,name,Moscone,3545
-moscone-center,1143,Moscone Maintenance Facility,1800 CHESTNUT ST,0469001,0469,001,true,1200,Recreation And Parks,false,name,Moscone,3392
-moscone-center,2049,Moscone Rec Center,1800 CHESTNUT ST,0469001,0469,001,true,8929,Recreation And Parks,false,name,Moscone,3399
 moscone-center,1140,MOSCONE CENTER (South),747 HOWARD ST,3734091,3734,091,true,650000,Gsa - Convention Facilities Management,false,name,Moscone Center,27
 moscone-center,221,MOSCONE NORTH,730 HOWARD ST,3723115,3723,115,true,520000,Gsa - Convention Facilities Management,false,name,Moscone North,68
 moscone-center,1141,Moscone Esplanade Ballroom,747 HOWARD ST,3734091,3734,091,true,126000,Gsa - Convention Facilities Management,false,name,Moscone Esplanade Ballroom,113
 moscone-rec-center,2049,Moscone Rec Center,1800 CHESTNUT ST,0469001,0469,001,true,8929,Recreation And Parks,true,name,Moscone Rec Center,0
+moscone-rec-center,1143,Moscone Maintenance Facility,1800 CHESTNUT ST,0469001,0469,001,true,1200,Recreation And Parks,false,review,"reviewed: register gives 1800 CHESTNUT ST / 0469001, the Moscone Rec Center campus",21
+moscone-rec-center,1138,Moscone Bathrooms,1800 CHESTNUT ST,0469001,0469,001,true,500,Recreation And Parks,false,review,"reviewed: register gives 1800 CHESTNUT ST / 0469001, the Moscone Rec Center campus",160
+moscone-rec-center,1142,Moscone Fieldhouse and Bleachers,1800 CHESTNUT ST,0469001,0469,001,true,,Recreation And Parks,false,review,"reviewed: register gives 1800 CHESTNUT ST / 0469001, the Moscone Rec Center campus",162
 muni-presidio-division,1341,Presidio Division Bldg,949 PRESIDIO AVE,1072001,1072,001,true,158381,Municipal Transportation Agency,true,name,Presidio Division,292
 next-door-shelter,1182,Next Door Shelter,1001 POLK ST,0694004,0694,004,true,37125,Police Department,true,name,Next Door Shelter,0
 north-beach-branch-library,1188,North Beach Branch Library,850 COLUMBUS AVE,0075001,0075,001,true,8500,Public Library,true,name,North Beach Branch Library,142
@@ -105,7 +103,6 @@ palace-of-fine-arts,1219,Palace Of Fine Arts,3601 LYON ST,0916002,0916,002,true,
 palace-of-fine-arts,3075,Palace Of Fine Arts - Rotunda,3601 LYON ST,0916002,0916,002,true,,Recreation And Parks,false,name,Palace of Fine Arts,45
 palace-of-fine-arts,1220,Palace of Fine Arts -Theater,3601 LYON ST,0916002,0916,002,true,28300,Recreation And Parks,false,name,Palace of Fine Arts,59
 park-branch-library,1228,Park Branch Library,1833 PAGE ST,1229031,1229,031,true,8825,Public Library,true,name,Park Branch Library,2147
-park-branch-library,808,Glen Park Branch Library,2825 DIAMOND ST,6745073,6745,073,true,7185,Public Library,false,name,Park Branch Library,2147
 pier-27,3229,PIER 27 SHED,PIER 27,9900070,9900,070,true,,Port,true,name,Pier 27,18
 pier-27,31,2275 | Pier 27 Adm/Pier 29 Annex,PIER 27,9900070,9900,070,true,11800,Port,false,name,Pier 27,50
 pier-27,3228,PIER 27 OFFICE BUILDING,PIER 27,9900070,9900,070,true,,Port,false,name,Pier 27,112

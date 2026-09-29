@@ -3,8 +3,8 @@
 --       for the overtime lens
 --
 -- Sources: core_us_sf_comp (year_type = 'Fiscal', latest year),
---          stg_us_sf_job_reclass + stg_us_sf_job_family_display (family
---          context labels), stg_us_sf_catalog (provenance).
+--          int_us_sf_job_reclass + int_us_sf_job_families (family
+--          context labels), core_us_sf_source_catalog (provenance).
 -- Grain:  job_code, top 10 by overtime dollars in the latest fiscal year.
 --
 -- Title-level detail is fine HERE because the list is filtered to titles
@@ -28,12 +28,12 @@ latest AS (
 
 reclass AS (
     SELECT job_code, reclass_family_code
-    FROM {{ ref('stg_us_sf_job_reclass') }}
+    FROM {{ ref('int_us_sf_job_reclass') }}
 ),
 
 display AS (
     SELECT job_family_code, canonical_label, display_family
-    FROM {{ ref('stg_us_sf_job_family_display') }}
+    FROM {{ ref('int_us_sf_job_families') }}
 ),
 
 by_title AS (
@@ -64,7 +64,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_employee_comp'
 )
 
@@ -91,4 +91,4 @@ LEFT JOIN display d
     ON d.job_family_code = b.family_code
 CROSS JOIN provenance pr
 WHERE b.n_employees >= 100
-QUALIFY ROW_NUMBER() OVER (ORDER BY b.overtime_usd DESC) <= 10
+QUALIFY ROW_NUMBER() OVER (ORDER BY b.overtime_usd DESC, b.job_code) <= 10

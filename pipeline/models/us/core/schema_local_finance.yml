@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: core_us_lf_spending
+    description: |
+      US local government spending, one row per source line, mapped to 12
+      shared categories. `document` separates the voted budget from actuals;
+      `fund_scope` separates general-fund-only sources (MA) from all-funds
+      sources — never sum or compare across either.
+    columns:
+      - name: line_id
+        tests: [unique, not_null]
+      - name: document
+        tests:
+          - accepted_values:
+              values: ['voted_budget', 'actual']
+      - name: fund_scope
+        tests:
+          - accepted_values:
+              values: ['general_fund', 'all_funds']
+  - name: core_us_lf_revenue
+    description: |
+      US local government revenue, one row per source line, mapped to 7
+      shared categories. Borrowing and transfers between funds carry
+      counts_in_total = FALSE. Same document/fund_scope rules as spending.
+    columns:
+      - name: line_id
+        tests: [unique, not_null]
+      - name: document
+        tests:
+          - accepted_values:
+              values: ['voted_budget', 'actual']
+      - name: fund_scope
+        tests:
+          - accepted_values:
+              values: ['general_fund', 'all_funds']

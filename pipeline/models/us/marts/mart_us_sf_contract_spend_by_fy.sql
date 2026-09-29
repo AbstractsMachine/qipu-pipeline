@@ -4,7 +4,7 @@
 -- Sources: core_us_sf_vouchers (8.07M distribution lines, contract_number
 --          carried on $55.27B of lifetime payments),
 --          mart_us_sf_contracts_summary (the contract register, prime grain),
---          stg_us_sf_catalog (provenance).
+--          core_us_sf_source_catalog (provenance).
 -- Grain:  contract_no × fiscal_year, contracts present in the register only.
 --
 -- Join quality (docs/us/block-studies/3-contracts.md §6, query-verified):
@@ -47,7 +47,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_vouchers'
 )
 

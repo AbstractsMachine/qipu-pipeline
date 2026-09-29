@@ -1,0 +1,60 @@
+{
+ "generated_by": "hand \u2014 judged by reading, see components/us/city/FICHE.md \u00a721",
+ "meta": {
+  "judged_blocks": 8,
+  "blocks_with_a_record": 4679,
+  "THIS_PASS_IS_PARTIAL": "Only the blocks listed here were read. Every other block falls back to `blockLead()` \u2014 pickHeadline behind the OCR/procedural gate \u2014 which is NOT a judgement about significance and must not be described as one.",
+  "rubric": "would a person repeat this to someone else. TOP: something happened to people. HIGH: the place changed permanently; or a named person, business or address doing a particular thing. LOW: the city administering itself \u2014 appropriations, transfers, paving, kerbing, assessments, hearings, notices, filings. A dollar figure is not significance.",
+  "match": "the row whose `u` equals `u` and whose `t` starts with `t0`, inside the block's own shard. Never a copy of the line: the shown text is always the shard's."
+ },
+ "pick": {
+  "0811": {
+   "u": "journalofproceed1913sanfrich/505",
+   "y": 1913,
+   "t0": "Blasting Permits \u2014 The Contra Costa Construction Company",
+   "why": "the city dynamiting the hole City Hall now stands in, printed as a routine permit"
+  },
+  "0786A": {
+   "u": "journalofproceed1913sanfrich/120",
+   "y": 1913,
+   "t0": "Ordering Construction of City Hall at Civic Center.",
+   "why": "the Civic Center block being assembled \u2014 the algorithmic pick was the same event through an OCR-damaged car-dealership lease"
+  },
+  "3587": {
+   "u": "journalofproceed23sanfrich/1130",
+   "y": 1928,
+   "t0": "Denial of Laundry Permit \u2014 In the exercise of the sound ",
+   "why": "a named man refused a laundry licence at a named address; the record's own pattern of who was told no"
+  },
+  "0225": {
+   "u": "journalofproceed1924sanfrich/1160",
+   "y": 1924,
+   "t0": "Horn K. Jing and Big Chee be and are hereby granted, per",
+   "why": "two named people licensed to run a steam laundry in Chinatown; the algorithmic pick said the same thing through broken OCR ('Superlaundry')"
+  },
+  "2516": {
+   "u": "journalofproceed22sanfrich/359",
+   "y": 1927,
+   "t0": "Communication, from Building Trades Council of San Franc",
+   "why": "an amusement park proposed at Ocean Beach \u2014 the weakest of the eight; this block's record is mostly payment claims"
+  },
+  "3602": {
+   "u": "journalofproceed1915sanfrich/920",
+   "y": 1915,
+   "t0": "Stable Permits \u2014 Max J. Deitch, for 2 horses, at 630 Cas",
+   "why": "two horses at 630 Castro Street"
+  },
+  "0117": {
+   "u": "journalofproceed1922sanfrich/188",
+   "y": 1922,
+   "t0": "Masquerade Ball Permit \u2014 Permission is hereby granted Ma",
+   "why": "a masquerade ball at Fugazzi Hall, given by a named North Beach society"
+  },
+  "3759": {
+   "u": "journalofjulydecproceed93sanfrich/39",
+   "y": 1998,
+   "t0": "By Supervisor Ammiano, that letter of inquiry be sent to",
+   "why": "a supervisor asking whether the showers in C Pod of the jail have been fixed"
+  }
+ }
+}

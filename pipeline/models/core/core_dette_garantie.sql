@@ -1,7 +1,8 @@
 -- =============================================================================
 -- Core: emprunts garantis Paris (engagements hors bilan)
 --
--- Source: stg_dette_garantie
+-- Sources: stg_dette_garantie, core_paris_source_catalog (provenance :
+--          source_url = page opendata.paris.fr du dataset, jamais en dur)
 -- Grain: une ligne par emprunt × annee_de_publication
 --
 -- Enrichissements:
@@ -16,8 +17,16 @@
 
 {{ config(materialized='table', schema='analytics', tags=['core','hors_bilan']) }}
 
-WITH src AS (
-    SELECT * FROM {{ ref('stg_dette_garantie') }}
+WITH provenance AS (
+    SELECT dataset_page_url AS source_url
+    FROM {{ ref('core_paris_source_catalog') }}
+    WHERE source_id = 'dette_garantie'
+),
+
+src AS (
+    SELECT s.*, p.source_url
+    FROM {{ ref('stg_dette_garantie') }} s
+    CROSS JOIN provenance p
 ),
 
 classified AS (

@@ -19,7 +19,9 @@ par_thematique AS (
     SELECT
         annee,
         ode_thematique AS thematique,
-        COUNT(DISTINCT beneficiaire_normalise) AS nb_beneficiaires,
+        -- Une organisation publiée sous plusieurs graphies compte une fois
+        -- (ode_identite, cf. dim_beneficiaire).
+        COUNT(DISTINCT ode_identite) AS nb_beneficiaires,
         COUNT(*) AS nb_subventions,
         SUM(montant) AS montant_total
     FROM subventions

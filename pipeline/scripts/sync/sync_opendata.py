@@ -63,7 +63,10 @@ PROJECT_ID = "open-data-france-484717"
 DATASET_ID = "raw"
 
 # API Paris Open Data
-OPENDATA_API = "https://opendata.paris.fr/api/explore/v2.1"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _paris_portal  # noqa: E402
+# opendata.paris.fr, or the portal's own address when the name does not resolve (_paris_portal).
+OPENDATA_API = _paris_portal.api()
 
 # =============================================================================
 # Mapping des sources vers les datasets Paris Open Data

@@ -1,10 +1,58 @@
 version: 2
 
 models:
-  - name: stg_dgfip_balances
-    description: "Balances comptables DGFiP nettoyées - 1 ligne = 1 compte M57 par commune/année"
+  - name: stg_cfu_b8
+    description: "Subventions nominatives des communes (annexe B8), une ligne par bénéficiaire, totaux et personnes physiques écartés"
     columns:
-      - name: commune_slug
+      - name: code_insee
+        tests: [not_null]
+  - name: stg_sirene_sieges
+    description: "SIRENE, établissements sièges : une ligne par SIREN (commune, code postal, jamais l'adresse)"
+    columns:
+      - name: siren
+        tests: [not_null, unique]
+  - name: stg_naf_rev2
+    description: "Nomenclature NAF rév. 2 (Insee, niveau 5) : code et libellé de l'activité"
+    columns:
+      - name: code_naf
+        tests: [not_null, unique]
+  - name: stg_sru_inventaire
+    description: "Inventaire SRU, une ligne par commune soumise à la loi et par inventaire (1er janvier)"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [annee_inventaire, code_insee]
+    columns:
+      - name: annee_inventaire
+        tests: [not_null]
+      - name: code_insee
+        tests: [not_null]
+      - name: taux_sru
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              config:
+                severity: warn
+  - name: stg_etat_plf
+    description: "Budget de l'État, dépenses par destination, une ligne du jeu du ministère (sync_etat_plf.py)"
+    columns:
+      - name: exercice
+        tests: [not_null]
+      - name: mission
+        tests: [not_null]
+  - name: stg_eurostat_series
+    description: "Eurostat, une ligne par valeur, dimensions nommées (sync_eurostat_national.py)"
+    columns:
+      - name: dataset
+        tests: [not_null]
+      - name: geo
+        tests: [not_null]
+      - name: periode
+        tests: [not_null]
+  - name: stg_dgfip_balances
+    description: "Balances comptables DGFiP nettoyées (budget principal cbudg=1, M14+M57) - 1 ligne = 1 compte par commune/année. Dim commune jointe depuis OFGL par SIREN (ungated)."
+    columns:
+      - name: code_insee
         tests: [not_null]
       - name: annee
         tests: [not_null]
@@ -12,15 +60,17 @@ models:
         tests: [not_null]
 
   - name: stg_ofgl_communes
-    description: "Agrégats OFGL nettoyés - KPIs financiers par commune/année"
+    description: "OFGL base-communes-consolidée (LONG) - univers commune + agrégats de réconciliation (montant_bp). 1 ligne = commune × année × agrégat."
     columns:
-      - name: commune_slug
+      - name: code_insee
+        tests: [not_null]
+      - name: annee
         tests: [not_null]
 
   - name: stg_decp_marches
     description: "DECP marchés publics nettoyés - 1 ligne = 1 marché notifié"
     columns:
-      - name: commune_slug
+      - name: code_insee
         tests: [not_null]
       - name: marche_id
         tests: [not_null]
@@ -30,3 +80,39 @@ models:
     columns:
       - name: commune_slug
         tests: [not_null]
+
+  - name: stg_sirene_unites_legales
+    description: "SIRENE unités légales (INSEE) - 1 ligne = 1 SIREN ; est_personne_physique = catégorie juridique 1000"
+    columns:
+      - name: siren
+        tests: [not_null, unique]
+
+  - name: stg_rne_maires_historique
+    description: "RNE, versions archivées du fichier des maires - 1 ligne = 1 maire × 1 capture (snapshot_date = date de publication du fichier). Colonnes non sensibles seulement."
+    columns:
+      - name: code_insee
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "IS NULL OR LENGTH(code_insee) = 5"
+      - name: snapshot_date
+        tests: [not_null]
+      - name: source_url
+        tests: [not_null]
+
+  - name: stg_dgfip_nature_fonction
+    description: "Balances DGFiP nature × fonction typées - 1 ligne = 1 ligne du CSV publié (budget × fonction × compte × exercice), TOUTES collectivités (categ). Montants NUMERIC ; code_insee recomposé (métropole, Corse 2A/2B, outre-mer 971-976), NULL hors communes."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [annee, ligne]
+    columns:
+      - name: annee
+        tests: [not_null]
+      - name: ligne
+        tests: [not_null]
+      - name: categ
+        tests: [not_null]
+      - name: code_insee
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "IS NULL OR LENGTH(code_insee) = 5"

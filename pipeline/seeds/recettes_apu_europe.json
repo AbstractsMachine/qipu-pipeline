@@ -1,0 +1,71 @@
+{
+  "_about": "Bloc « europe » de website/public/data/national/recettes_apu.json : contribution de la France au budget de l'UE et fonds reçus. Compilation datée (PLF 2025, Cour des comptes 2024) — les comptes Eurostat des administrations ne la couvrent pas (les aides de la PAC vont directement aux agriculteurs). Lu tel quel par export_national_eurostat.build_recettes (2026-09-24).",
+  "psr_ue_brut_md_eur": 23.3,
+  "fonds_recus_md_eur": 17.5,
+  "contribution_nette_md_eur": 5.8,
+  "psr_source": "PLF 2025 — Prélèvement sur Recettes UE",
+  "psr_source_url": "https://www.budget.gouv.fr/documentation/documents-budgetaires/exercice-2025/projet-de-loi-de-finances",
+  "fonds_source": "Cour des comptes — Relations financières UE 2024",
+  "fonds_source_url": "https://www.ccomptes.fr/fr/publications/les-relations-financieres-entre-la-france-et-lunion-europeenne",
+  "notes_fr": "Contribution brute France au budget UE 2025 = 23,3 Md€ (RNB ~17 + TVA ~3,5 + plastique ~1,5 + NextGenerationEU ~1,3). Fonds européens reçus ~17,5 Md€ (PAC ~9 + FEDER/FSE ~3 + NGEU ~5). Net : ~5,8 Md€/an de contribution réelle.",
+  "psr_decomposition": [
+    {
+      "key": "ue_rnb",
+      "label_fr": "Ressource RNB (assise sur PIB)",
+      "label_en": "GNI-based own resource",
+      "annual_eur_md": 17.0,
+      "notes": "Principale ressource — calculée comme % du Revenu National Brut français. Variable selon GDP relatif. Décision sur les ressources propres 2020 (révisable 2027)."
+    },
+    {
+      "key": "ue_tva",
+      "label_fr": "Ressource TVA",
+      "label_en": "VAT-based own resource",
+      "annual_eur_md": 3.5,
+      "notes": "0,3 % de l'assiette TVA harmonisée nationale (assiette plafonnée à 50 % du RNB)."
+    },
+    {
+      "key": "ue_plastique",
+      "label_fr": "Contribution plastique (depuis 2021)",
+      "label_en": "Plastic contribution (since 2021)",
+      "annual_eur_md": 1.5,
+      "notes": "0,80 €/kg de déchets d'emballages plastiques non recyclés. Nouvelle ressource propre depuis 2021."
+    },
+    {
+      "key": "ue_ngeu_rembourse",
+      "label_fr": "Remboursement emprunt NextGenerationEU",
+      "label_en": "NextGenerationEU loan repayment",
+      "annual_eur_md": 1.3,
+      "notes": "Part française du remboursement de l'emprunt commun européen 2020-2058 (~750 Md€ levés au niveau UE pour la relance post-COVID)."
+    }
+  ],
+  "fonds_decomposition": [
+    {
+      "key": "ue_pac",
+      "label_fr": "PAC (Politique agricole commune)",
+      "label_en": "Common Agricultural Policy (CAP)",
+      "annual_eur_md": 9.0,
+      "notes": "Versée aux agriculteurs français via ASP (Agence de services et de paiement). Premier poste de retour UE pour la France. Programmation 2023-2027 du CFP."
+    },
+    {
+      "key": "ue_feder_fse",
+      "label_fr": "FEDER + FSE+ + FEAMPA (fonds structurels)",
+      "label_en": "FEDER + FSE+ + FEAMPA (structural funds)",
+      "annual_eur_md": 3.0,
+      "notes": "Fonds européen de développement régional (FEDER) + Fonds social européen Plus (FSE+) + Fonds européen pour les affaires maritimes, la pêche et l'aquaculture (FEAMPA). Versés aux régions et porteurs de projets."
+    },
+    {
+      "key": "ue_horizon",
+      "label_fr": "Horizon Europe (recherche)",
+      "label_en": "Horizon Europe (research)",
+      "annual_eur_md": 1.5,
+      "notes": "Programme cadre européen pour la recherche et l'innovation. Versé directement aux opérateurs (universités, CNRS, CEA, INSERM, start-ups) sur appels à projets compétitifs."
+    },
+    {
+      "key": "ue_ngeu",
+      "label_fr": "NextGenerationEU (subventions PNR)",
+      "label_en": "NextGenerationEU (grants)",
+      "annual_eur_md": 4.0,
+      "notes": "Volet subventions du plan de relance européen — France Relance (~40 Md€ étalé 2021-2026, ~5-7 Md€/an). Volet prêts non utilisé par la France."
+    }
+  ]
+}

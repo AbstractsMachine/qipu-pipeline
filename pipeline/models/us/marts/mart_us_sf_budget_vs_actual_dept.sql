@@ -1,8 +1,8 @@
 -- =============================================================================
 -- Mart: SF budget vs actual by DEPARTMENT — Operating perimeter, closed years
 --
--- Sources: core_us_sf_budget, core_us_sf_actuals, stg_us_sf_dept_names,
---          stg_us_sf_bva_outliers (GEN/PUC annotations), stg_us_sf_catalog.
+-- Sources: core_us_sf_budget, core_us_sf_actuals, int_us_sf_budget_vs_actual_dept (perimeter + display names,
+--          outlier flags) (GEN/PUC annotations), core_us_sf_source_catalog.
 -- Grain:  fiscal_year × side × department.
 --
 -- PERIMETER (replicates the ONLY honest comparison, measured in
@@ -28,56 +28,8 @@
 --     is_comparable = FALSE when either side is missing).
 -- =============================================================================
 
-WITH budget AS (
-    SELECT
-        fiscal_year,
-        revenue_or_spending                              AS side,
-        department_code,
-        ANY_VALUE(department)                            AS department,
-        ANY_VALUE(organization_group_code)               AS organization_group_code,
-        ANY_VALUE(organization_group)                    AS organization_group,
-        SUM(budget_amt)                                  AS budget_operating_usd
-    FROM {{ ref('core_us_sf_budget') }}
-    WHERE fiscal_year >= 2019
-      AND fund_category = 'Operating'
-      AND NOT is_transfer_character
-    GROUP BY 1, 2, 3
-    HAVING ABS(SUM(budget_amt)) > 0.005
-),
-
-actuals AS (
-    SELECT
-        fiscal_year,
-        revenue_or_spending                              AS side,
-        department_code,
-        ANY_VALUE(department)                            AS department,
-        ANY_VALUE(organization_group_code)               AS organization_group_code,
-        ANY_VALUE(organization_group)                    AS organization_group,
-        SUM(amount)                                      AS actual_operating_usd
-    FROM {{ ref('core_us_sf_actuals') }}
-    WHERE fiscal_year >= 2019
-      AND fund_category = 'Operating'
-      AND NOT is_related_govt_unit
-      AND NOT is_transfer_character
-    GROUP BY 1, 2, 3
-    HAVING ABS(SUM(amount)) > 0.005
-),
-
-joined AS (
-    SELECT
-        COALESCE(b.fiscal_year, a.fiscal_year)             AS fiscal_year,
-        COALESCE(b.side, a.side)                           AS side,
-        COALESCE(b.department_code, a.department_code)     AS department_code,
-        COALESCE(b.department, a.department)               AS department,
-        COALESCE(b.organization_group_code, a.organization_group_code)
-                                                           AS organization_group_code,
-        COALESCE(b.organization_group, a.organization_group)
-                                                           AS organization_group,
-        b.budget_operating_usd,
-        a.actual_operating_usd
-    FROM budget b
-    FULL OUTER JOIN actuals a
-        USING (fiscal_year, side, department_code)
+WITH joined AS (
+    SELECT * FROM {{ ref('int_us_sf_budget_vs_actual_dept') }}
 ),
 
 provenance AS (
@@ -87,9 +39,9 @@ provenance AS (
         a.dataset_page_url  AS actuals_source_url,
         a.rows_updated_at   AS actuals_rows_updated_at
     FROM (SELECT DISTINCT dataset_page_url, rows_updated_at
-          FROM {{ ref('stg_us_sf_catalog') }} WHERE source_id = 'sf_budget') b
+          FROM {{ ref('core_us_sf_source_catalog') }} WHERE source_id = 'sf_budget') b
     CROSS JOIN (SELECT DISTINCT dataset_page_url, rows_updated_at
-          FROM {{ ref('stg_us_sf_catalog') }} WHERE source_id = 'sf_spending_revenue') a
+          FROM {{ ref('core_us_sf_source_catalog') }} WHERE source_id = 'sf_spending_revenue') a
 )
 
 SELECT
@@ -99,7 +51,7 @@ SELECT
     j.organization_group,
     j.department_code,
     j.department,
-    n.display_name                          AS department_display_name,
+    j.department_display_name,
     j.budget_operating_usd,
     j.actual_operating_usd,
     j.actual_operating_usd - j.budget_operating_usd        AS residual_usd,
@@ -108,8 +60,8 @@ SELECT
     (j.budget_operating_usd IS NOT NULL
      AND j.actual_operating_usd IS NOT NULL
      AND j.budget_operating_usd > 0)                       AS is_comparable,
-    COALESCE(o.is_structural_outlier, FALSE)               AS is_structural_outlier,
-    o.outlier_note,
+    j.is_structural_outlier,
+    j.outlier_note,
     {{ us_sf_execution_status('j.fiscal_year', basis='actuals') }}
                                             AS execution_status,
     pr.budget_source_url,
@@ -118,10 +70,5 @@ SELECT
     pr.actuals_rows_updated_at,
     'USD'                                   AS unit
 FROM joined j
-LEFT JOIN {{ ref('stg_us_sf_dept_names') }} n
-    ON n.department_code = j.department_code
-LEFT JOIN {{ ref('stg_us_sf_bva_outliers') }} o
-    ON o.department_code = j.department_code
-   AND o.side = j.side
 CROSS JOIN provenance pr
 WHERE {{ us_sf_execution_status('j.fiscal_year', basis='actuals') }} = 'closed'

@@ -1,14 +1,121 @@
 version: 2
 
 models:
+  - name: mart_inflation_annuelle
+    description: "Indice des prix à la consommation (Insee), moyenne annuelle des années complètes"
+    columns:
+      - name: annee
+        tests: [not_null, unique]
+  - name: mart_communes_subventions_nominatives
+    description: "Subventions nominatives par commune et bénéficiaire (annexe B8), l'onglet « Ses subventions » de la page commune"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [code_insee, nom]
+  - name: mart_entreprises_titulaires
+    description: "Les entreprises titulaires d'au moins un marché public de commune (DECP), ce que leur fiche en dit ; jamais une personne physique"
+    columns:
+      - name: siren
+        tests: [not_null, unique]
+  - name: mart_sru_communes
+    description: "Taux de logements sociaux SRU par commune et par inventaire (1er janvier), lu par export_logement_sru.py"
+  - name: mart_etat_plf
+    description: "Lignes du Budget général lues par export_national_etat.py (page /etat)"
+  - name: mart_eurostat_series
+    description: "Séries Eurostat lues par export_national_eurostat.py (/dette, /fiscalite, /budget, simulateur)"
   - name: mart_sankey_national
-    description: "Données Sankey budget par (ville, année) - compatible BudgetData TypeScript"
+    description: "Lignes budget national par nature (source d'export). Grain (insee, année, section, sens, groupe, catégorie). Contrat JSON commun Paris/Marseille."
+    columns:
+      - name: code_insee
+        tests: [not_null]
+      - name: montant
+        tests: [not_null]
+
+  - name: mart_budget_reconciliation
+    description: "Self-check Step-1 : Σ(balances fonctionnement) vs OFGL montant_bp par (insee, année). Écarts relatifs dépense/recette. Adossé au test assert_budget_national_reconciliation."
+    columns:
+      - name: code_insee
+        tests: [not_null]
 
   - name: mart_benchmarking
     description: "KPIs financiers comparés - 5 villes avec métriques par habitant et rankings"
 
   - name: mart_evolution_national
     description: "Tendances pluriannuelles budget par ville"
+
+  - name: mart_communes_fonctions_complements
+    description: "Cellules fonction × compte que mart_communes_fonctions ne porte pas : équipement (20 hors 204, 21, 23), subventions d'équipement versées (204), remboursements sur rémunérations (crédits du 64), capital des emprunts remboursé — communes, budget principal, toutes années"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [annee, code_insee, genre, compartiment, fonction_reference, compte]
+    columns:
+      - name: genre
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['equipement', 'subv_equipement', 'credit_64', 'remb_capital']
+      - name: code_insee
+        tests: [not_null]
+      - name: compartiment
+        tests: [not_null]
+
+  - name: mart_communes_reperes
+    description: "Sept agrégats OFGL par commune et par année (montant, €/habitant), plus les dépenses DGFiP comptées comme le chiffre en tête de la page commune : l'index national des communes (communes-all), base des comparaisons « communes de sa taille »"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [annee, code_insee]
+    columns:
+      - name: annee
+        tests: [not_null]
+      - name: code_insee
+        tests: [not_null]
+      - name: commune_nom
+        tests: [not_null]
+
+  - name: mart_niveaux_reperes
+    description: "Échelle des niveaux (26/09) : les repères OFGL de chaque région, département et intercommunalité, par exercice (montant consolidé et euros par habitant) — source de export_territoires.py"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [niveau, annee, siren]
+    columns:
+      - name: niveau
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['region', 'departement', 'epci']
+      - name: siren
+        tests: [not_null]
+      - name: nom
+        tests: [not_null]
+
+  - name: mart_territoires
+    description: "Échelle des niveaux (26/09) : chaque commune de la dernière composition intercommunale OFGL, avec son intercommunalité, son département et sa région (SIREN des collectivités)"
+    columns:
+      - name: code_insee
+        tests: [not_null]
+      - name: siren_commune
+        tests: [not_null, unique]
+
+  - name: mart_niveaux_executifs
+    description: "Échelle des niveaux (26/09) : président et nombre d'élus du conseil de chaque région, département, intercommunalité (RNE, sans donnée sensible)"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [niveau, siren]
+
+  - name: mart_niveaux_marches
+    description: "Échelle des niveaux (26/09) : marchés publics (DECP) dont l'acheteur est une région, un département ou une intercommunalité, depuis 2019 ; entrepreneurs individuels jamais nommés ; plafonds invraisemblables jamais additionnés"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [siren, marche_id]
+
+  - name: mart_niveaux_fonctions_cellules
+    description: "Échelle des niveaux (26/09) : cellules fonction × compte des régions, départements, intercommunalités (macro fonctions_cellules, la même que mart_communes_fonctions), clé siren"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [annee, siren, compartiment, fonction_reference, compte, famille_nature]
+
+  - name: mart_niveaux_fonctions_complements
+    description: "Échelle des niveaux (26/09) : équipement, subventions d'équipement (204, 2324), crédits du 64, capital remboursé, par fonction (macro fonctions_complements)"
 
   - name: mart_marches_national
     description: "Marchés publics agrégés par (ville, année, catégorie CPV)"
@@ -18,3 +125,54 @@ models:
 
   - name: mart_bilan_national
     description: "Patrimoine/bilan KPIs par (ville, année)"
+
+  - name: mart_budget_national_comptes
+    description: "Détail des comptes (M57) derrière chaque groupe du budget par nature, libellés en français simple ; ligne « autres » = reste du groupe"
+    columns:
+      - name: compte
+        tests: [not_null]
+
+  - name: mart_chantiers_etat_national
+    description: "Projets Fonds vert dont la commune est bénéficiaire (SIREN), une ligne par projet"
+  - name: mart_maires_national
+    description: "Maire (nom, prénom, depuis) et taille du conseil par commune — RNE, colonnes non sensibles. Depuis quand : maire_depuis_premier, maire_depuis_borne (« au moins » : la chaîne atteint la plus ancienne capture) et mandats (« 2014,2020,2026 »), par chaînage de la même personne à travers les versions archivées du répertoire (stg_rne_maires_historique)."
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "maire_nom IS NULL OR mandats IS NOT NULL"
+      - dbt_utils.expression_is_true:
+          expression: "maire_depuis IS NULL OR maire_depuis_premier <= maire_depuis"
+    columns:
+      - name: code_insee
+        tests: [not_null, unique]
+
+  - name: mart_taux_fonciers_national
+    description: "Taux de taxe foncière (bâti, non-bâti, part intercommunale) par commune et année, REI DGFiP, avec la médiane de strate"
+
+  - name: mart_communes_fonctions
+    description: "À quoi sert l'argent des communes : cellules commune × exercice × référence fonctionnelle × compte, dépenses de fonctionnement (classe 6) du budget principal. Compartiment = clé de fonction, « nv » (non ventilable) ou « rev » (reversements). Source de export_communes_fonctions.py (fonctions.json par commune + manifeste)."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [annee, code_insee, fonction_reference, compte]
+    columns:
+      - name: annee
+        tests: [not_null]
+      - name: code_insee
+        tests: [not_null]
+      - name: nomenclature
+        tests: [not_null]
+      - name: compartiment
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['f0_services_generaux', 'f1_securite', 'f2_enseignement', 'f3_culture', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9_action_eco', 'nv', 'rev']
+      - name: fonction_reference
+        tests: [not_null]
+      - name: compte
+        tests: [not_null]
+      - name: montant
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "!= 0"
+      - name: premiere_ligne
+        tests: [not_null]

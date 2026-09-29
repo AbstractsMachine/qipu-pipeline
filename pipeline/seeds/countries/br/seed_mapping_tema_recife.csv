@@ -23,7 +23,7 @@ orgao_regex,(?i)(assist|direitos humanos|social|mulher|idoso|crian),Saúde e ass
 orgao_regex,(?i)(infraestrutura|obras|servi[çc]os urbanos|manuten[çc]|zeladoria|limpeza),Infraestrutura e obras,2
 orgao_regex,(?i)(cultura|esporte|lazer|turismo|juventude),"Cultura, esporte e lazer",2
 orgao_regex,(?i)(mobilidade|tr[âa]nsito|transporte|cttu),Transporte e mobilidade,2
-orgao_regex,(?i)(fazenda|financ|planejamento|gest[ãa]o|administra|controladoria|procuradoria|governo|gabinete),Gestão pública,2
+orgao_regex,(?i)(fazenda|financ|planejamento|gest[ãa]o|administra|controladoria|procuradoria|governo|gabinete),Gestão pública,3
 orgao_regex,(?i)(meio ambiente|sustentabilidade|verde|parques),Meio ambiente,2
 orgao_regex,(?i)(seguran[çc]a|defesa civil|guarda),Segurança urbana,2
 orgao_regex,(?i)(desenvolvimento|inova|trabalho|emprego|econom),Desenvolvimento econômico,2

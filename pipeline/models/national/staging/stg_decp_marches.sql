@@ -1,57 +1,79 @@
 {{
   config(
+    enabled=true,
     materialized='view',
     tags=['national', 'staging']
   )
 }}
 
 /*
-  Staging: DECP Marchés Publics
+  Staging: DECP marchés publics (national, ungated)
 
-  Nettoie les données DECP consolidées.
-  Chaque ligne = 1 marché public notifié.
+  Source = decp.parquet consolidé (data.gouv.fr), une ligne par marché×titulaire.
+  On rattache chaque marché à la COMMUNE acheteuse par SIREN (9 premiers chiffres
+  de acheteur_id) joint à l'univers OFGL — donc uniquement les marchés dont
+  l'acheteur est une commune, attribués à son INSEE.
+
+  Nettoyage et déduplication : stg_decp_marches_acheteurs (tous les acheteurs,
+  2026-09-26) ; ici, les seuls acheteurs communes. Déduplication : une ligne par marché (acheteur × id) pour ne pas compter le
+  montant plusieurs fois quand un marché a plusieurs titulaires ou plusieurs
+  modifications (avenants) — deux pièges classiques du DECP. On garde la
+  version en cours (donneesActuelles, puis la dernière modification), et le
+  titulaire au plus gros montant comme titulaire principal.
+
+  Dimension commune : UNE ligne par SIREN (dernier exercice OFGL). L'ancien
+  SELECT DISTINCT incluait la population, qui change chaque année → chaque
+  marché était multiplié par le nombre d'exercices (×7 : Lyon affichait
+  37 331 marchés pour 5 703 réels).
+
+  ⚠ Couverture DECP : ~50-70 % au national (seuil de publication 40 k€ HT). On
+  l'AFFICHE (nb marchés, montant), sans prétendre à l'exhaustivité.
 */
 
-WITH raw_decp AS (
-    SELECT *
-    FROM {{ source('national_raw', 'decp_marches') }}
+WITH d AS (
+    SELECT * FROM {{ ref('stg_decp_marches_acheteurs') }}
+),
+
+-- Une ligne par commune (dernier exercice OFGL), jamais une par année.
+commune_dim AS (
+    SELECT siren, code_insee, commune_nom, dep_name, reg_name, population
+    FROM {{ ref('stg_ofgl_communes') }}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY siren ORDER BY annee DESC) = 1
 )
 
 SELECT
-    -- Identifiant
-    CAST(COALESCE(uid, id) AS STRING) AS marche_id,
-
-    -- Commune
-    CAST(_commune_slug AS STRING) AS commune_slug,
-    CAST(_commune_nom AS STRING) AS commune_nom,
-
-    -- Acheteur
-    CAST(COALESCE(acheteur_id, siretacheteur) AS STRING) AS acheteur_siret,
-    CAST(COALESCE(acheteur_nom, nomacheteur) AS STRING) AS acheteur_nom,
-
-    -- Marché
-    CAST(objet AS STRING) AS objet,
-    CAST(nature AS STRING) AS nature_marche,
-    CAST(procedure AS STRING) AS type_procedure,
-    CAST(COALESCE(codecpv, code_cpv) AS STRING) AS code_cpv,
-    LEFT(CAST(COALESCE(codecpv, code_cpv) AS STRING), 2) AS cpv_division,
-
-    -- Montant
-    SAFE_CAST(montant AS FLOAT64) AS montant,
-    CAST(COALESCE(formeprix, forme_prix) AS STRING) AS forme_prix,
-
-    -- Dates
-    SAFE_CAST(COALESCE(datenotification, date_notification) AS STRING) AS date_notification,
-    EXTRACT(YEAR FROM SAFE.PARSE_DATE('%Y-%m-%d',
-        LEFT(CAST(COALESCE(datenotification, date_notification) AS STRING), 10)
-    )) AS annee_notification,
-
-    -- Durée
-    SAFE_CAST(COALESCE(dureemois, duree_mois) AS INT64) AS duree_mois,
-
-    -- Titulaire (premier titulaire)
-    CAST(COALESCE(titulaire_denominationsociale, titulaires) AS STRING) AS titulaire_nom,
-    CAST(COALESCE(titulaire_id, titulaire_siret) AS STRING) AS titulaire_siret
-
-FROM raw_decp
-WHERE SAFE_CAST(montant AS FLOAT64) > 0
+    d.marche_id,
+    c.code_insee,
+    c.commune_nom,
+    c.dep_name,
+    c.reg_name,
+    c.population,
+    d.acheteur_siren,
+    d.acheteur_nom,
+    d.objet,
+    d.nature_marche,
+    d.type_procedure,
+    d.code_cpv,
+    d.cpv_division,
+    d.montant,
+    d.forme_prix,
+    d.date_notification,
+    d.annee,
+    d.duree_mois,
+    d.titulaire_nom,
+    d.titulaire_siret,
+    d.titulaire_siren,
+    d.offres_recues,
+    d.ccag,
+    d.techniques,
+    d.considerations_sociales,
+    d.considerations_environnementales,
+    d.sous_traitance_declaree,
+    d.lieu_execution_code,
+    d.lieu_execution_type,
+    d.id_accord_cadre,
+    d.nb_titulaires,
+    d.nb_modifications
+FROM d
+INNER JOIN commune_dim c
+    ON d.acheteur_siren = c.siren

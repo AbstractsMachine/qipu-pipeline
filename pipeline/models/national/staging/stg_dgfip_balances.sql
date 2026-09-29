@@ -1,110 +1,91 @@
 {{
   config(
+    enabled=true,
     materialized='view',
     tags=['national', 'staging']
   )
 }}
 
 /*
-  Staging: DGFiP Balances Comptables
+  Staging: DGFiP Balances Comptables (national, ungated)
 
-  Nettoie et normalise les balances comptables de la DGFiP.
-  Chaque ligne = 1 compte M57 pour 1 commune sur 1 année.
+  Une ligne = 1 compte (article) du BUDGET PRINCIPAL (cbudg='1') d'une commune,
+  pour une année. Le filtre cbudg='1' + categ='Commune' est appliqué à l'INGEST
+  (sync_dgfip_balances_national.py) : toutes les communes, aucune restriction par
+  seed_communes_cibles.
 
-  Les balances DGFiP contiennent:
-  - Débits/Crédits pour chaque compte
-  - Le solde net = crédits - débits (pour comptes de classe 7)
-    ou débits - crédits (pour comptes de classe 6)
+  Nomenclatures M14 et M57 (+ variantes abrégées M14A/M57A) traitées ensemble :
+  au niveau du compte à 2 chiffres, la sémantique de classe est partagée
+    classe 6 = charges · 7 = produits · 2 = immobilisations · 1 = capitaux/dette.
 
-  Classification M57:
-  - Classe 6 (6xx) = Charges (dépenses de fonctionnement)
-  - Classe 7 (7xx) = Produits (recettes de fonctionnement)
-  - Classe 1 (1xx) = Comptes de capitaux (investissement/bilan)
-  - Classe 2 (2xx) = Immobilisations (investissement dépenses)
-  - Classe 3 (3xx) = Stocks
-  - Classe 4 (4xx) = Tiers
-  - Classe 5 (5xx) = Financier
+  La dimension commune (insee, nom, dép, rég, population) vient d'OFGL, jointe par
+  SIREN — c'est l'univers national, pas un seed. Le slug est attaché à l'export
+  (parité avec communes-all/index.json), pas ici.
 */
 
-WITH raw_balances AS (
-    SELECT *
-    FROM {{ source('national_raw', 'dgfip_balances') }}
-),
-
--- Join with communes cibles to get slug and city metadata
-communes AS (
-    SELECT * FROM {{ ref('seed_communes_cibles') }}
-),
-
-cleaned AS (
+WITH balances AS (
     SELECT
-        -- Identifiants commune
-        CAST(b.siren AS STRING) AS siren,
-        c.code_insee,
-        c.nom AS commune_nom,
-        c.slug AS commune_slug,
-        c.population,
+        SAFE_CAST(exer AS INT64)                    AS annee,
+        CAST(siren AS STRING)                       AS siren,
+        CAST(nomen AS STRING)                       AS nomen,
+        CAST(compte AS STRING)                      AS compte,
+        LEFT(CAST(compte AS STRING), 2)             AS nature_prefix,
+        LEFT(CAST(compte AS STRING), 1)             AS classe_compte,
+        COALESCE(SAFE_CAST(obnetdeb AS FLOAT64), 0) AS operations_nettes_debit,
+        COALESCE(SAFE_CAST(obnetcre AS FLOAT64), 0) AS operations_nettes_credit
+    FROM {{ source('national_raw', 'dgfip_balances') }}
+    WHERE compte IS NOT NULL
+),
 
-        -- Année
-        COALESCE(
-            SAFE_CAST(b.annee_balance AS INT64),
-            SAFE_CAST(b.exer AS INT64)
-        ) AS annee,
+-- Dimension commune universelle (une ligne par commune × année) depuis OFGL.
+commune_dim AS (
+    SELECT DISTINCT
+        annee,
+        siren,
+        code_insee,
+        commune_nom,
+        dep_code,
+        dep_name,
+        reg_code,
+        reg_name,
+        population
+    FROM {{ ref('stg_ofgl_communes') }}
+),
 
-        -- Compte M57
-        CAST(COALESCE(b.compte, b.ccompte) AS STRING) AS compte,
-        LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 2) AS nature_prefix,
-        LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 1) AS classe_compte,
-
-        -- Budget
-        CAST(COALESCE(b.budget, b.cbudg) AS STRING) AS code_budget,
-
-        -- Montants
-        COALESCE(SAFE_CAST(b.sd AS FLOAT64), 0) AS solde_debit,
-        COALESCE(SAFE_CAST(b.sc AS FLOAT64), 0) AS solde_credit,
-        COALESCE(SAFE_CAST(b.obnetdeb AS FLOAT64), 0) AS operations_nettes_debit,
-        COALESCE(SAFE_CAST(b.obnetcre AS FLOAT64), 0) AS operations_nettes_credit,
-
-        -- Section
-        CASE
-            WHEN LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 1) IN ('6', '7') THEN 'Fonctionnement'
-            WHEN LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 1) IN ('1', '2') THEN 'Investissement'
-            ELSE 'Autre'
-        END AS section,
-
-        -- Sens du flux
-        CASE
-            WHEN LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 1) = '6' THEN 'Depense'
-            WHEN LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 1) = '7' THEN 'Recette'
-            WHEN LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 1) = '2' THEN 'Depense'
-            WHEN LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 2) = '16' THEN 'Both'
-            WHEN LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 2) IN ('10', '13', '15') THEN 'Recette'
-            ELSE 'Bilan'
-        END AS sens_flux,
-
-        -- Libellé du compte
-        CAST(COALESCE(b.lcompte, b.libelle) AS STRING) AS libelle_compte
-
-    FROM raw_balances b
-    INNER JOIN communes c ON CAST(b.siren AS STRING) = c.siren
-    WHERE
-        -- Filtrer budget principal uniquement (BP = budget primitif / BA = budget annexe)
-        COALESCE(b.budget, b.cbudg, 'BP') IN ('BP', 'BA', '00')
-        -- Exclure les comptes techniques
-        AND LEFT(CAST(COALESCE(b.compte, b.ccompte) AS STRING), 1) IN ('1', '2', '3', '4', '5', '6', '7')
+nomenclature AS (
+    SELECT * FROM {{ ref('seed_nomenclature_comptes') }}
 )
 
 SELECT
-    *,
-    -- Montant net pour Sankey (simplifié)
-    CASE
-        WHEN classe_compte = '6' THEN operations_nettes_debit  -- Charges = débits
-        WHEN classe_compte = '7' THEN operations_nettes_credit  -- Produits = crédits
-        WHEN classe_compte = '2' THEN operations_nettes_debit  -- Immobilisations = débits
-        WHEN nature_prefix = '16' THEN operations_nettes_credit - operations_nettes_debit  -- Emprunts = net
-        WHEN nature_prefix IN ('10', '13', '15') THEN operations_nettes_credit  -- Dotations invest = crédits
-        ELSE operations_nettes_credit - operations_nettes_debit
-    END AS montant_net
+    b.annee,
+    b.siren,
+    d.code_insee,
+    d.commune_nom,
+    d.dep_code,
+    d.dep_name,
+    d.reg_code,
+    d.reg_name,
+    d.population,
 
-FROM cleaned
-WHERE annee IS NOT NULL
+    b.nomen,
+    b.compte,
+    b.nature_prefix,
+    b.classe_compte,
+    b.operations_nettes_debit,
+    b.operations_nettes_credit,
+
+    -- Nomenclature (M14/M57, par nature). Non mappé → NULL (classes 3/4/5 de bilan,
+    -- exclues plus bas dans core par le filtre de section).
+    n.section,
+    n.default_sens,
+    COALESCE(n.is_ordre, FALSE)                          AS is_ordre,
+    n.sankey_group_fr,
+    n.sankey_group_en,
+    n.category_fr,
+    n.category_en
+
+FROM balances b
+INNER JOIN commune_dim d
+    ON b.siren = d.siren AND b.annee = d.annee
+LEFT JOIN nomenclature n
+    ON b.nature_prefix = n.nature_prefix

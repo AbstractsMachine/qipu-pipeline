@@ -107,3 +107,15 @@ models:
         tests: [not_null]
       - name: source_url
         tests: [not_null]
+
+  - name: core_us_fiscaldata_source_catalog
+    description: >
+      Fiscal Data provenance dimension — one row per synced Treasury endpoint
+      (source_id), collapsed from the endpoint×column staging catalog.
+      National marts join it for dataset_title / table_name /
+      dataset_page_url / endpoint / update_frequency. Carries no amounts.
+    columns:
+      - name: source_id
+        tests: [not_null, unique]
+      - name: dataset_page_url
+        tests: [not_null]

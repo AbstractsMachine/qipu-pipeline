@@ -6,7 +6,7 @@
 --          core-keeps-both rule), int_us_sf_comp_employee_year (person
 --          grain — median and the OT-exceeds-salary counters are
 --          per-person statements), core_us_sf_population (per-resident,
---          Census years 2020-2025), stg_us_sf_catalog (provenance).
+--          Census years 2020-2025), core_us_sf_source_catalog (provenance).
 -- Grain:  fiscal year, 2013-2025.
 --
 -- n_employees = distinct pseudonymous employee identifiers (headcount-ish,
@@ -86,7 +86,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_employee_comp'
 )
 

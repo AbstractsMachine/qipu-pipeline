@@ -1,64 +1,51 @@
 {{
   config(
+    enabled=true,
     materialized='view',
     tags=['national', 'staging']
   )
 }}
 
 /*
-  Staging: OFGL Agrégats Communes
+  Staging: OFGL — base communes consolidée (format LONG)
 
-  Nettoie les agrégats OFGL pré-calculés.
-  Contient les KPIs financiers pour chaque commune par année.
+  Une ligne = commune × année × agrégat. Deux rôles :
+    1. Dimension commune universelle (siren, insee, nom, dép/rég, population).
+       C'est l'UNIVERS des ~35 000 communes — PAS le seed_communes_cibles.
+    2. Agrégats de réconciliation. `montant_bp` = budget principal seul, ce qui
+       se réconcilie directement avec les balances DGFiP filtrées sur cbudg='1'.
+
+  Source LONG ingérée par sync_ofgl_national.py.
 */
 
-WITH raw_ofgl AS (
-    SELECT *
-    FROM {{ source('national_raw', 'ofgl_communes') }}
-),
-
-communes AS (
-    SELECT * FROM {{ ref('seed_communes_cibles') }}
+WITH raw AS (
+    SELECT * FROM {{ source('national_raw', 'ofgl_communes') }}
+    WHERE categ = 'Commune'
+      -- Drop rows without a commune INSEE code (a handful of mislabeled EPCI
+      -- carry categ='Commune' with a null com_code — not real communes).
+      AND com_code IS NOT NULL
 )
 
 SELECT
-    c.code_insee,
-    c.nom AS commune_nom,
-    c.slug AS commune_slug,
-    c.population AS population_seed,
-
-    SAFE_CAST(COALESCE(o.exercice, o.annee) AS INT64) AS annee,
-
-    -- Population OFGL (plus précise car annuelle)
-    SAFE_CAST(o.population AS INT64) AS population_ofgl,
-
-    -- Agrégats financiers (noms de colonnes OFGL standards)
-    SAFE_CAST(COALESCE(o.produits_total, o.produits_de_fonctionnement) AS FLOAT64) AS produits_fonctionnement,
-    SAFE_CAST(COALESCE(o.charges_total, o.charges_de_fonctionnement) AS FLOAT64) AS charges_fonctionnement,
-    SAFE_CAST(o.produits_fiscaux AS FLOAT64) AS produits_fiscaux,
-    SAFE_CAST(o.impots_locaux AS FLOAT64) AS impots_locaux,
-    SAFE_CAST(COALESCE(o.dotation_globale_de_fonctionnement, o.dgf) AS FLOAT64) AS dgf,
-    SAFE_CAST(COALESCE(o.charges_de_personnel, o.charges_personnel) AS FLOAT64) AS charges_personnel,
-    SAFE_CAST(COALESCE(o.achats_et_charges_externes, o.achats_charges_externes) AS FLOAT64) AS achats_charges_externes,
-    SAFE_CAST(COALESCE(o.charges_financieres, o.interets_de_la_dette) AS FLOAT64) AS charges_financieres,
-    SAFE_CAST(COALESCE(o.subventions_versees, o.subventions_de_fonctionnement) AS FLOAT64) AS subventions_versees,
-
-    -- Investissement
-    SAFE_CAST(COALESCE(o.depenses_d_investissement, o.depenses_investissement) AS FLOAT64) AS depenses_investissement,
-    SAFE_CAST(COALESCE(o.recettes_d_investissement, o.recettes_investissement) AS FLOAT64) AS recettes_investissement,
-
-    -- Dette
-    SAFE_CAST(COALESCE(o.encours_de_la_dette, o.encours_dette, o.dette_totale) AS FLOAT64) AS encours_dette,
-    SAFE_CAST(COALESCE(o.annuite_de_la_dette, o.annuite_dette) AS FLOAT64) AS annuite_dette,
-
-    -- Épargne
-    SAFE_CAST(COALESCE(o.epargne_brute, o.autofinancement_brut) AS FLOAT64) AS epargne_brute,
-    SAFE_CAST(COALESCE(o.epargne_nette, o.autofinancement_net) AS FLOAT64) AS epargne_nette,
-
-    -- Ratios (si fournis par OFGL)
-    SAFE_CAST(o.taux_d_epargne_brute AS FLOAT64) AS taux_epargne_brute,
-    SAFE_CAST(o.ratio_de_desendettement AS FLOAT64) AS ratio_desendettement
-
-FROM raw_ofgl o
-INNER JOIN communes c
-    ON CAST(COALESCE(o.code_commune, o.code_insee) AS STRING) = c.code_insee
+    SAFE_CAST(exer AS INT64)                       AS annee,
+    CAST(siren AS STRING)                          AS siren,
+    -- INSEE : préserver les zéros de tête (dép 01-09) et les codes corses (2A/2B)
+    CASE
+        WHEN SAFE_CAST(com_code AS INT64) IS NOT NULL
+            THEN LPAD(CAST(SAFE_CAST(com_code AS INT64) AS STRING), 5, '0')
+        ELSE CAST(com_code AS STRING)
+    END                                            AS code_insee,
+    CAST(com_name AS STRING)                       AS commune_nom,
+    CAST(dep_code AS STRING)                        AS dep_code,
+    CAST(dep_name AS STRING)                        AS dep_name,
+    CAST(reg_code AS STRING)                        AS reg_code,
+    CAST(reg_name AS STRING)                        AS reg_name,
+    CAST(tranche_population AS STRING)              AS tranche_population,
+    SAFE_CAST(ptot AS INT64)                        AS population,
+    CAST(agregat AS STRING)                         AS agregat,
+    SAFE_CAST(montant AS FLOAT64)                   AS montant,
+    SAFE_CAST(montant_bp AS FLOAT64)                AS montant_bp,     -- budget principal
+    SAFE_CAST(montant_ba AS FLOAT64)                AS montant_ba,     -- budgets annexes
+    SAFE_CAST(euros_par_habitant AS FLOAT64)        AS euros_par_habitant
+FROM raw
+WHERE SAFE_CAST(exer AS INT64) IS NOT NULL

@@ -1,0 +1,13 @@
+category_code,sort_order,label_en,label_fr,description_en
+general_government,1,General government,Administration générale,"Council, executive, clerk, finance, legal, courts, public buildings"
+public_safety,2,"Police, fire and public safety","Police, pompiers et sécurité","Police, fire, ambulance, inspections, corrections, emergency management"
+public_works,3,Streets and public works,Voirie et travaux publics,"Streets, snow, solid waste, stormwater, airports, parking, transit"
+utilities,4,"Water, sewer and utilities","Eau, assainissement et réseaux","Water, sewer, electric and gas utilities, other enterprises"
+education,5,Schools,Écoles,Only where the town itself runs or funds the schools
+health_human_services,6,Health and human services,Santé et action sociale,"Health, hospitals, welfare, veterans, social services"
+culture_recreation,7,"Libraries, parks and recreation","Bibliothèques, parcs et loisirs","Libraries, parks, recreation, cultural services, special events"
+community_development,8,Planning and development,Urbanisme et développement,"Planning, zoning, housing, economic development"
+employee_benefits,9,Pensions and employee benefits,Retraites et avantages sociaux,Recorded separately by some states (MA fixed costs) instead of inside each function
+debt_service,10,Debt payments,Remboursement de la dette,Principal and interest on borrowing
+capital_projects,11,Capital projects,Investissements,Construction and equipment recorded outside the functions
+transfers_other,12,Transfers and other,Transferts et autres,"Transfers between funds, payments to other governments, unclassified"

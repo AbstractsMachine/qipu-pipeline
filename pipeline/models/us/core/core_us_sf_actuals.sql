@@ -21,14 +21,25 @@
 WITH actuals AS (
     SELECT *
     FROM {{ ref('stg_us_sf_actuals') }}
+),
+
+-- Editorial department display names — seed, display only (same as core_us_sf_budget).
+dept_names AS (
+    SELECT department_code, display_name, provenance
+    FROM {{ ref('stg_us_sf_dept_names') }}
 )
 
 SELECT
-    *,
-    related_govt_units = 'Yes'                         AS is_related_govt_unit,
-    STARTS_WITH(UPPER(COALESCE(character, '')), 'TRANSFER ADJUSTMENT')
+    a.*,
+    a.related_govt_units = 'Yes'                         AS is_related_govt_unit,
+    STARTS_WITH(UPPER(COALESCE(a.character, '')), 'TRANSFER ADJUSTMENT')
                                                        AS is_transfer_adjustment,
-    UPPER(COALESCE(character, '')) LIKE '%TRANSFER%'   AS is_transfer_character,
-    CURRENT_DATE('America/Los_Angeles') > DATE(fiscal_year, 6, 30)
+    UPPER(COALESCE(a.character, '')) LIKE '%TRANSFER%'   AS is_transfer_character,
+    CURRENT_DATE('America/Los_Angeles') > DATE(a.fiscal_year, 6, 30)
                                                        AS is_fiscal_year_complete
-FROM actuals
+    ,
+    n.display_name                     AS department_display_name,
+    n.provenance                       AS department_display_name_provenance
+FROM actuals a
+LEFT JOIN dept_names n
+    ON n.department_code = a.department_code

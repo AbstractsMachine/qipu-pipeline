@@ -18,7 +18,9 @@
 -- =============================================================================
 WITH subventions_par_beneficiaire AS (
     SELECT
-        beneficiaire_normalise,
+        -- Identité de l'organisation toutes années (une graphie par exercice
+        -- ne coupe plus un bénéficiaire en plusieurs rangs).
+        ode_identite AS beneficiaire_normalise,
         ode_thematique,
         ode_type_organisme,
         SUM(montant) AS montant_total,
@@ -26,7 +28,7 @@ WITH subventions_par_beneficiaire AS (
         MIN(annee) AS premiere_annee,
         MAX(annee) AS derniere_annee
     FROM {{ ref('core_subventions') }}
-    WHERE beneficiaire_normalise IS NOT NULL
+    WHERE ode_identite IS NOT NULL
     GROUP BY 1, 2, 3
 ),
 

@@ -2,7 +2,7 @@
 -- Mart: SF payments sliced three ways — who paid, which service area, what
 -- kind of payee
 --
--- Sources: core_us_sf_vouchers, stg_us_sf_payee_buckets, stg_us_sf_catalog.
+-- Sources: core_us_sf_vouchers, int_us_sf_payees, core_us_sf_source_catalog.
 -- Grain:   fiscal_year × dimension × key.
 --
 -- WHY. The who-gets-paid page had exactly ONE breakdown (what the money
@@ -119,7 +119,7 @@ by_kind AS (
         COUNT(DISTINCT v.vendor)                      AS n_payees,
         COUNT(*)                                      AS n_lines
     FROM vouchers v
-    LEFT JOIN {{ ref('stg_us_sf_payee_buckets') }} b
+    LEFT JOIN {{ ref('int_us_sf_payees') }} b
         ON b.vendor = v.vendor
     GROUP BY 1, 2, 3, 4
 ),
@@ -137,7 +137,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_vouchers'
 )
 

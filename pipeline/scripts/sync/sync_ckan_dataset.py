@@ -98,6 +98,51 @@ def get_with_retry(url: str, params: dict | None = None, log: Logger | None = No
     raise last_exc
 
 
+
+def download_resumable(url: str, path: Path, log: Logger, max_rounds: int = 30) -> None:
+    """Stream `url` to `path`, resuming where a dropped connection left off.
+
+    The portal's download URL 302-redirects to a TIME-SIGNED S3 object; the
+    signature lapses after about ten minutes, and at the portal's ~70 KB/s an
+    80 MB historical CSV (despesas orçamentárias 2002-2023) takes longer than
+    that — the body is cut mid-stream (IncompleteRead). Each round asks the
+    CKAN URL again (a fresh signature) with a Range header from the bytes
+    already written. A server that ignores Range (200 instead of 206) restarts
+    the file from zero."""
+    import time
+    total: int | None = None
+    for rnd in range(1, max_rounds + 1):
+        have = path.stat().st_size if path.exists() else 0
+        if total is not None and have >= total:
+            return
+        headers = {"Range": f"bytes={have}-"} if have else {}
+        try:
+            with requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT_S, stream=True, allow_redirects=True) as resp:
+                if resp.status_code == 416:  # nothing left to send
+                    return
+                resp.raise_for_status()
+                if resp.status_code == 206:
+                    cr = resp.headers.get("Content-Range", "")
+                    if "/" in cr and cr.rsplit("/", 1)[1].isdigit():
+                        total = int(cr.rsplit("/", 1)[1])
+                    mode = "ab"
+                else:
+                    cl = resp.headers.get("Content-Length")
+                    total = int(cl) if cl and cl.isdigit() else None
+                    mode = "wb"
+                with open(path, mode) as f:
+                    for chunk in resp.iter_content(chunk_size=1 << 20):
+                        if chunk:
+                            f.write(chunk)
+            done = path.stat().st_size
+            if total is None or done >= total:
+                return
+        except requests.exceptions.RequestException as e:
+            done = path.stat().st_size if path.exists() else 0
+            log.warning(f"download cut at {done / (1 << 20):,.1f} MiB — resuming ({rnd}/{max_rounds})", extra=str(e)[:120])
+            time.sleep(2)
+    raise RuntimeError(f"download did not complete after {max_rounds} rounds: {url}")
+
 def load_country_config(country_slug: str) -> dict:
     cfg_path = PIPELINE_ROOT / "configs" / "countries" / f"{country_slug}.yaml"
     if not cfg_path.exists():
@@ -206,11 +251,7 @@ def sync_resource(
     tmp_dir = Path(tempfile.mkdtemp(prefix=f"ckan_{source['id']}_"))
     csv_path = tmp_dir / "resource.csv"
     log.info("downloading", extra=download_url[:100])
-    with get_with_retry(download_url, log=log, stream=True) as resp:
-        with open(csv_path, "wb") as f:
-            for chunk in resp.iter_content(chunk_size=1 << 20):
-                if chunk:
-                    f.write(chunk)
+    download_resumable(download_url, csv_path, log)
     size_mb = csv_path.stat().st_size / (1 << 20)
     log.info("downloaded", extra=f"{size_mb:,.1f} MiB → {csv_path}")
 

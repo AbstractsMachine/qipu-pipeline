@@ -42,7 +42,8 @@ cleaned AS (
         -- MARCHÉ
         -- =====================================================================
         nature,
-        objet,
+        -- Apostrophe mal encodée par l'acheteur (« d¿articles ») : voir stg_decp_marches.
+        REGEXP_REPLACE(objet, r'(\pL)¿(\pL)', r'\1’\2') AS objet,
         procedure AS type_procedure,
         forme_prix,
         SAFE_CAST(date_notification AS DATE) AS date_notification,

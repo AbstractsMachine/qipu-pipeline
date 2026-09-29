@@ -1,13 +1,35 @@
 version: 2
 
 models:
-  - name: core_budget_national
-    description: "Budget national dénormalisé - agrégé par (ville, année, catégorie M57)"
+  - name: core_subventions_nominatives
+    description: "Subventions nominatives des communes, une ligne par ligne d'annexe B8 (argent et aide en nature à part)"
     columns:
-      - name: commune_slug
+      - name: code_insee
+        tests: [not_null]
+      - name: nom
+        tests: [not_null]
+  - name: core_entreprises
+    description: "Une ligne par entreprise (SIREN) : nom, activité en clair (NAF), tranche d'effectifs, commune du siège, drapeau personne physique"
+    columns:
+      - name: siren
+        tests: [not_null, unique]
+  - name: core_etat_plf
+    description: "Budget général (BG) de l'État, ligne à ligne"
+  - name: core_eurostat_series
+    description: "Séries Eurostat des pages nationales, telles que publiées"
+  - name: core_budget_national
+    description: "Budget national par nature (flux signés) - grain (insee, siren, année, section, sens, groupe, catégorie). Axe NATURE (M14/M57), pas fonction."
+    columns:
+      - name: code_insee
+        tests: [not_null]
+      - name: siren
         tests: [not_null]
       - name: annee
         tests: [not_null]
+      - name: sens_flux
+        tests:
+          - accepted_values:
+              values: ['Depense', 'Recette']
 
   - name: core_bilan_national
     description: "Bilan patrimonial national - actif/passif par ville et année"
@@ -17,3 +39,26 @@ models:
 
   - name: core_subventions_national
     description: "Subventions nationales > 23k€ dénormalisées par ville"
+
+  - name: core_dgfip_nature_fonction
+    description: "Balances DGFiP nature × fonction, row-level, toutes collectivités - 1 ligne = 1 ligne de balance (annee, ligne). Règles de lecture posées ligne par ligne : fonction_reference (préfixe 9x retiré), fonction_principale / fonction_cle (clés neutres, rubrique 01 = nv), est_reversement (6554, 6556), famille_nature (préfixes de la classe 6)."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [annee, ligne]
+    columns:
+      - name: annee
+        tests: [not_null]
+      - name: ligne
+        tests: [not_null]
+      - name: categ
+        tests: [not_null]
+      - name: fonction_cle
+        tests:
+          - accepted_values:
+              values: ['f0_services_generaux', 'f1_securite', 'f2_enseignement', 'f3_culture', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9_action_eco', 'nv']
+      - name: famille_nature
+        tests:
+          - accepted_values:
+              values: ['achats', 'impots', 'salaires', 'gestion', 'dette', 'exceptionnel', 'dotations']
+      - name: est_reversement
+        tests: [not_null]

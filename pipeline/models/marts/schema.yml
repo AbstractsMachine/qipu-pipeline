@@ -7,6 +7,57 @@
 version: 2
 
 models:
+  - name: mart_investissement_tendances
+    description: |
+      Section d'investissement exécutée, par année × chapitre (core_budget).
+      Alimente investissement_tendances.json (export_investissement_tendances.py) :
+      chiffre « hors dette » (sans 921-923) et barres par chapitre de la page
+      Investissements.
+    columns:
+      - name: annee
+        tests:
+          - not_null
+      - name: chapitre_code
+        tests:
+          - not_null
+      - name: depenses
+        tests:
+          - not_null
+      - name: recettes
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: ['annee', 'chapitre_code']
+
+  # ===========================================================================
+  # FRAÎCHEUR DES SOURCES (data_freshness.json)
+  # ===========================================================================
+  - name: mart_source_freshness
+    description: |
+      Une ligne par source Paris du catalogue ODS : page, licence,
+      `published_by_city_at` (quand la Ville a publié / mis à jour, portail),
+      `synced_at` (quand notre sync l'a relu), et — quand
+      mart_source_year_status existe — années complètes / partielles.
+
+      Seule table lue par export_data_freshness.py (layering E4). Alimente
+      /methode « Fraîcheur par source », le dialogue Provenance, les légendes
+      ChartSource et le `dateModified` du JSON-LD Dataset. Vocabulaire :
+      « publié par la Ville le · mis à jour sur Qipu le ».
+    config:
+      materialized: table
+    columns:
+      - name: source_id
+        tests:
+          - not_null
+          - unique
+      - name: dataset_page_url
+        tests:
+          - not_null
+      - name: published_by_city_at
+        tests:
+          - not_null
+
   # ===========================================================================
   # SUBVENTIONS TREEMAP
   # ===========================================================================
@@ -593,13 +644,15 @@ models:
         tests: [not_null]
 
   - name: mart_logement_sru
-    description: "Taux SRU par arrondissement et par année (2001-2019, APUR). Contrat pour l'export logement_sru_arrondissements.json."
+    description: "Taux SRU par arrondissement et par année (APUR : open data 2001-2019, note annuelle à partir de 2025). Contrat pour l'export logement_sru_arrondissements.json."
     columns:
       - name: arrondissement
         tests:
           - not_null
+      - name: residences_principales
+        description: "NULL quand la source ne publie que la part (note APUR, 2025)"
       - name: taux_sru_pct
-        description: "100 × logements_sociaux / residences_principales, arrondi à 0,1 pt"
+        description: "100 × logements_sociaux / residences_principales, arrondi à 0,1 pt ; taux publié par l'APUR quand les résidences principales manquent"
         tests:
           - not_null
 
@@ -653,3 +706,28 @@ models:
         description: "Source ODS de l'emprunt, conservée pour citation."
         tests:
           - not_null
+
+  - name: mart_marseille_subventions_beneficiaires
+    description: >
+      Miroir Marseille de mart_subventions_beneficiaires : agrégat par
+      (annee, beneficiaire, beneficiaire_normalise) de core_marseille_subventions,
+      départage déterministe des montants égaux. Consommé par
+      export_subventions_data.py --city marseille.
+
+  - name: mart_marseille_subventions_treemap
+    description: >
+      Miroir Marseille de mart_subventions_treemap : montants par
+      (annee, thematique) et totaux annuels de core_marseille_subventions.
+
+  - name: mart_marseille_place_money
+    description: >
+      Argent public par lieu Marseille : l'opérateur dominant (plus gros
+      cumul parmi les lignes operator, au-dessus de min_montant_total, avec
+      ses montants par année) et les résidents (autres bénéficiaires dont
+      l'objet nomme le lieu, top max_rows par montant, preuve = objet de la
+      plus grosse subvention). Export : export_marseille_place_money.py.
+    columns:
+      - name: place_slug
+        tests: [not_null]
+      - name: relation
+        tests: [not_null]

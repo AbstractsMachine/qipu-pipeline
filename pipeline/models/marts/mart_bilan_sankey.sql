@@ -13,7 +13,10 @@
 WITH bilan AS (
     SELECT *
     FROM {{ ref('core_bilan_comptable') }}
-    WHERE montant_net > 0
+    -- != 0 et non > 0 : les lignes négatives du passif (résultat déficitaire,
+    -- report à nouveau débiteur) entrent dans les totaux par poste, sinon
+    -- actif ≠ passif. Le détail (drill-down) ne garde que les lignes > 0.
+    WHERE montant_net != 0
 ),
 
 -- =============================================================================
@@ -57,7 +60,7 @@ details_par_poste AS (
         SUM(montant_brut) AS montant_brut,
         SUM(montant_amortissements) AS montant_amortissements
     FROM bilan
-    WHERE detail IS NOT NULL AND TRIM(detail) != ''
+    WHERE detail IS NOT NULL AND TRIM(detail) != '' AND montant_net > 0
     GROUP BY annee, type_bilan, poste, detail
 ),
 

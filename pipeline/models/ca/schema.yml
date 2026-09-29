@@ -1,0 +1,289 @@
+# =============================================================================
+# Schema: CA / Vancouver (ca-municipal) — descriptions + drift guards.
+#
+# Prove-before-ship (ADDING-A-PLACE step 4): the identities the source offers
+# are tests here. Row-count parity stg↔core for the two spines; contract Σ
+# parity (tests/ca/assert_ca_contracts_sum.sql); the catalog is unique on
+# source_id so provenance joins cannot fan out.
+# =============================================================================
+
+version: 2
+
+models:
+  - name: stg_ca_vancouver_catalog
+    description: "Typed ODS catalog snapshot, grain dataset × field."
+  - name: stg_ca_vancouver_council_votes
+    description: "Typed council votes, grain vote_detail_id."
+    columns:
+      - name: vote_detail_id
+        tests: [not_null, unique]
+  - name: stg_ca_vancouver_awarded_contracts
+    description: "Typed awarded contracts (tender side)."
+  - name: stg_ca_vancouver_remuneration
+    description: "Typed SOFI remuneration rows (named — never exported)."
+  - name: stg_ca_vancouver_population
+    description: "StatCan 2021 population with citation (from seed)."
+    columns:
+      - name: population
+        tests: [not_null]
+      - name: source_url
+        tests: [not_null]
+  - name: stg_ca_vancouver_property_tax
+    description: |
+      2025 assessment roll, one row per property; year_built placeholder '1800'
+      nulled. `land_coordinate` (the parcel key) is never null — measured on
+      226,360 rows, 2026-09-12. `pid` IS nullable: 545 real properties (LAND /
+      STRATA / OTHER, $2.7 bn of land value, $8.5 M of levy) carry no PID in
+      the published roll. Test the identity the source offers, not one assumed.
+    columns:
+      - name: land_coordinate
+        tests: [not_null]
+  - name: stg_ca_vancouver_parcels
+    description: "Parcel polygons with parsed GEOGRAPHY, grain tax_coord."
+
+  - name: core_ca_vancouver_source_catalog
+    description: "Provenance dimension, one row per synced source."
+    columns:
+      - name: source_id
+        tests: [not_null, unique]
+      - name: dataset_page_url
+        tests: [not_null]
+      - name: license_title
+        tests: [not_null]
+  - name: core_ca_vancouver_votes
+    description: "Council votes OBT with item_key and derived flags."
+    columns:
+      - name: vote_detail_id
+        tests: [not_null, unique]
+      - name: item_key
+        tests: [not_null]
+      - name: vote
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['In Favour', 'In Opposition', 'Absent', 'Abstain', 'No Vote', 'Declared Conflict', 'Ineligible']
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_ca_vancouver_council_votes')
+  - name: core_ca_vancouver_contracts
+    description: "Bid responses OBT — one row per bidder per competition; is_awarded marks the awards."
+    columns:
+      - name: response_id
+        tests: [not_null, unique]
+      - name: bid_number
+        tests: [not_null]
+      - name: vendor_key
+        tests: [not_null]
+      - name: bid_type_group
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['RFP', 'ITT', 'RFQ', 'RFA', 'RFEOI']
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_ca_vancouver_awarded_contracts')
+  - name: core_ca_vancouver_remuneration
+    description: "SOFI remuneration OBT, person × year (named — aggregate only downstream)."
+    columns:
+      - name: fiscal_year
+        tests: [not_null]
+    tests:
+      # A not_null test passes vacuously on an empty table (it did, on
+      # 2026-09-12, when the year parse silently returned NULL for every row
+      # and core's WHERE dropped them all). Row-count parity is the guard.
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_ca_vancouver_remuneration')
+  - name: core_ca_vancouver_population
+    description: "Population by census year with citation."
+  - name: core_ca_vancouver_parcel_polygons
+    description: |
+      One row per published polygon (the ground). Keeps the 492 polygons with
+      no tax_coord (unassessed land). Row count == staging.
+    columns:
+      - name: polygon_id
+        tests: [not_null, unique]
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_ca_vancouver_parcels')
+  - name: core_ca_vancouver_parcels
+    description: |
+      One row per PARCEL (tax_coord), multi-part polygons dissolved, ⋈ 2025
+      roll rolled up to the parcel. The money unit and the-city base layer.
+      Measured 2026-09-12: 3,032 parcels are multi-part (1725 E Broadway = 12
+      pieces), so polygon count ≠ parcel count by construction.
+    columns:
+      - name: tax_coord
+        tests: [not_null, unique]
+      - name: parcel_geog
+        tests: [not_null]
+
+  - name: mart_ca_vancouver_landing
+    description: "Hub headline figures, one row, each beside its provenance."
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "n_contracts > 0 AND n_votes_cast > 0 AND n_parcels > 0 AND population > 0"
+  - name: mart_ca_vancouver_top_contracts
+    description: "Top 25 awards by amount (losing bids excluded), with provenance."
+    columns:
+      - name: source_url
+        tests: [not_null]
+  - name: mart_ca_vancouver_contracts
+    description: "Bid responses, row-level, with provenance (contracts.json)."
+    columns:
+      - name: response_id
+        tests: [not_null, unique]
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('core_ca_vancouver_contracts')
+  - name: mart_ca_vancouver_bids
+    description: "Competitions — one row per bid_number with bidder/award rollups."
+    columns:
+      - name: bid_number
+        tests: [not_null, unique]
+      - name: bid_description
+        tests: [not_null]
+      - name: award_year
+        tests: [not_null]
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "n_awarded <= n_responses AND n_winners <= n_bidders AND n_bidders >= 1"
+  - name: mart_ca_vancouver_vendors
+    description: "Vendors — one row per vendor_key (spelling variants merged), won/lost record."
+    columns:
+      - name: vendor_key
+        tests: [not_null, unique]
+      - name: vendor_name
+        tests: [not_null]
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "n_competitions_won <= n_competitions AND n_awards <= n_responses"
+  - name: mart_ca_vancouver_contracts_years
+    description: "Register by award year — competitions, awards, awarded total, bidders per competition."
+    columns:
+      - name: award_year
+        tests: [not_null, unique]
+  - name: mart_ca_vancouver_contested_votes
+    description: "Top 25 most-opposed council items, tallies only, with provenance."
+    columns:
+      - name: item_key
+        tests: [not_null, unique]
+  # ── the city map (ADR-0012) ────────────────────────────────────────────────
+  - name: core_ca_vancouver_local_areas
+    description: "The 22 local areas with a stable index (the map's one-byte hood)."
+    columns:
+      - name: area_idx
+        tests: [not_null, unique]
+      - name: local_area
+        tests: [not_null, unique]
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "area_idx < 255"
+  - name: core_ca_vancouver_blocks
+    description: "Block outlines with a deterministic positional index and local area."
+    columns:
+      - name: block_idx
+        tests: [not_null, unique]
+  - name: core_ca_vancouver_minutes_motions
+    description: "Council motions as the minutes print them — the 1970s scans and the 1995–2015 Wayback copies — with the page each starts on."
+    columns:
+      - name: motion_key
+        tests: [not_null, unique]
+      - name: source_url
+        tests: [not_null]
+      - name: outcome
+        tests:
+          - accepted_values:
+              values: ['carried', 'lost', 'defeated', 'not put']
+  - name: mart_ca_vancouver_city_minutes
+    description: "The map's council record from the minutes: one row per motion, in the shape of the modern council items mart."
+    columns:
+      - name: item_key
+        tests: [not_null, unique]
+  - name: core_ca_vancouver_census_blocks
+    description: "2021 Census dissemination blocks, each attributed to the one city block its outline overlaps most (NULL when none)."
+    columns:
+      - name: dbuid
+        tests: [not_null, unique]
+  - name: mart_ca_vancouver_city_block_facts
+    description: "Per city block: 2021 Census residents and private dwellings of the census blocks attributed to it; NULL where none is."
+    columns:
+      - name: block_idx
+        tests: [not_null, unique]
+  - name: mart_ca_vancouver_city_marks
+    description: "The names the city map writes on its places (base/marks.json)."
+    columns:
+      - name: label
+        tests: [not_null]
+  - name: core_ca_vancouver_property_addresses
+    description: "Civic address points with the block each stands in (NULL outside every block). The register carries some points with no street name; they are kept and never enter the address faces."
+    columns:
+      - name: lon
+        tests: [not_null]
+  - name: mart_ca_vancouver_city_address_faces
+    description: "One row per street × side × block: the civic-number range the address register places on it."
+    columns:
+      - name: block_idx
+        tests: [not_null]
+      - name: civic_lo
+        tests: [not_null]
+  - name: core_ca_vancouver_streets
+    description: "Street and lane centrelines, one row per published segment."
+    columns:
+      - name: segment_idx
+        tests: [not_null, unique]
+      - name: kind
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['street', 'lane']
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_ca_vancouver_public_streets')
+          config:
+            where: "kind = 'street'"
+  - name: core_ca_vancouver_trees
+    description: "Public trees with a location; planted_year where published."
+    columns:
+      - name: tree_id
+        tests: [not_null, unique]
+  - name: core_ca_vancouver_parks
+    description: "Park polygons."
+    columns:
+      - name: park_idx
+        tests: [not_null, unique]
+  - name: core_ca_vancouver_buildings
+    description: "2015 footprints with LiDAR height, parcel, build year, zoning class, block and local area."
+    columns:
+      - name: footprint_id
+        tests: [not_null, unique]
+      - name: zone_cls
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1, 2, 3, 4, 5, 6]
+                quote: false
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_ca_vancouver_footprints_2015')
+
+  - name: core_ca_vancouver_places
+    description: "City places (facilities, parks, non-market housing) tied to parcel and block."
+    columns:
+      - name: place_id
+        tests: [not_null, unique]
+      - name: parcel_rule
+        tests:
+          - accepted_values:
+              values: ['contains', 'nearest_25m']
+  - name: core_ca_vancouver_capital_budget_lines
+    columns:
+      - name: line_id
+        tests: [not_null]
+  - name: core_ca_vancouver_finance_lines
+    columns:
+      - name: unit
+        tests:
+          - accepted_values:
+              values: ['cad_thousands', 'cad', 'persons', 'as_printed']
+

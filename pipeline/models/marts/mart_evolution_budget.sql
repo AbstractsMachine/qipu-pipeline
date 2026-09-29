@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: Évolution Budget
 --
--- Sources: core_budget (exécuté 2019-2024) + core_budget_vote (voté 2025-2026)
+-- Sources: core_budget (exécuté 2019-2025) + core_budget_vote (voté, années sans exécuté : 2026)
 -- Description: Agrégations temporelles du budget pour graphiques d'évolution
 --
 -- Granularités disponibles:
@@ -43,8 +43,9 @@ WITH budget_execute AS (
 ),
 
 budget_vote AS (
-    -- Budget voté (Budget Primitif) — utilisé pour 2025-2026 uniquement
-    -- (pour éviter les doublons avec core_budget sur 2019-2024)
+    -- Budget voté (Budget Primitif) — seulement pour les années sans budget
+    -- exécuté (2026 aujourd'hui ; 2025 est exécuté depuis le 28/09/2026), pour
+    -- éviter les doublons avec core_budget
     SELECT
         annee,
         section,
@@ -56,7 +57,7 @@ budget_vote AS (
         ode_thematique AS thematique_macro,
         'vote' AS type_budget
     FROM {{ ref('core_budget_vote') }}
-    WHERE annee > 2024
+    WHERE annee NOT IN (SELECT DISTINCT annee FROM {{ ref('core_budget') }})
 ),
 
 budget_base AS (

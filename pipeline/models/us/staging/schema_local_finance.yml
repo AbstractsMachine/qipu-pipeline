@@ -1,0 +1,94 @@
+version: 2
+
+# Staging tests for the US local finance sources. Grain tests guard against a
+# source silently duplicating rows (the failure family that doubled the Census
+# row count in a scratch parse on 2026-09-22: the same year read twice).
+
+models:
+  - name: stg_us_census_iuf_finance
+    description: "Census IUF finance records, amounts in dollars (converted from thousands)."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [file_year, unit_id, item_code]
+    columns:
+      - name: unit_id
+        tests: [not_null]
+      - name: item_code
+        tests: [not_null]
+  - name: stg_us_census_iuf_units
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [file_year, unit_id]
+  - name: stg_us_ia_city_expenditures
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [fiscal_year, city_code, function_name]
+    columns:
+      - name: city_code
+        tests: [not_null]
+  - name: stg_us_ia_city_revenues
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [fiscal_year, city_code, revenue_type]
+  - name: stg_us_in_budget_line_items
+    columns:
+      - name: unit_code
+        tests: [not_null]
+      - name: budget_year
+        tests: [not_null]
+  - name: stg_us_in_afr_disbursements
+    columns:
+      - name: unit_code
+        tests: [not_null]
+      - name: fiscal_year
+        tests: [not_null]
+  - name: stg_us_ma_operating_budget
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [dor_code, fiscal_year]
+  - name: stg_us_ma_general_fund_expenditures
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [dor_code, fiscal_year]
+  - name: stg_us_ma_general_fund_revenues
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [dor_code, fiscal_year]
+  - name: stg_us_fl_municipal_expenditures
+    columns:
+      - name: municipality
+        tests: [not_null]
+  - name: stg_us_fl_municipal_revenues
+    columns:
+      - name: municipality
+        tests: [not_null]
+  - name: stg_us_ca_city_expenditures
+    columns:
+      - name: row_number
+        tests: [unique, not_null]
+      - name: city_name
+        tests: [not_null]
+      - name: fiscal_year
+        tests: [not_null]
+  - name: stg_us_ia_city_budget_line_items
+    columns:
+      - name: unique_line_id
+        tests: [unique, not_null]
+      - name: function_name
+        tests:
+          - accepted_values:
+              values: ['General Government', 'Public Safety', 'Public Works', 'Health and Social Services',
+                       'Culture and Recreation', 'Community and Economic Development', 'Debt Service',
+                       'Capital Projects', 'Business Type / Enterprise', 'Transfers Out Total']
+  - name: stg_us_ca_city_revenues
+    columns:
+      - name: row_number
+        tests: [unique, not_null]
+      - name: city_name
+        tests: [not_null]
+  - name: stg_us_in_afr_debt
+    columns:
+      - name: unit_code
+        tests: [not_null]
+      - name: fiscal_year
+        tests: [not_null]

@@ -1,0 +1,2 @@
+key,value,unit,year,source,source_url,date_reference,notes
+population_france,68851996,personnes,2025,"INSEE — Population totale au 1er janvier 2025, France (Mayotte incluse), estimation provisoire, série 001641586",https://www.insee.fr/fr/statistiques/serie/001641586,2025-01-01,"Même année que les dépenses Eurostat du calculateur (eurostat_apu_subsectors.json, 2025). Remplace le 68 042 591 saisi à la main en mai 2026, qui ne correspondait à aucune série INSEE."

@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: SF payroll by department × fiscal year — PUBLISHED rows only
 --
--- Sources: core_us_sf_comp (year_type = 'Fiscal'), stg_us_sf_catalog.
+-- Sources: core_us_sf_comp (year_type = 'Fiscal'), core_us_sf_source_catalog.
 -- Grain:  department_code × fiscal year, 2013-2025 (~730 published rows).
 --
 -- KEYED ON department_code — the #1 payroll trap (block study §5, bug
@@ -104,7 +104,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_employee_comp'
 )
 

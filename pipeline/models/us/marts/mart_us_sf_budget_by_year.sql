@@ -2,7 +2,7 @@
 -- Mart: SF budget by fiscal year — net adopted totals per side
 --
 -- Sources: core_us_sf_budget, core_us_sf_population (per-resident),
---          stg_us_sf_catalog (provenance — dataset page URL +
+--          core_us_sf_source_catalog (provenance — dataset page URL +
 --          rows_updated_at as the export `as_of`).
 -- Grain:  fiscal_year × side (Revenue | Spending), FY2010-FY2027.
 --
@@ -41,7 +41,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_budget'
 )
 

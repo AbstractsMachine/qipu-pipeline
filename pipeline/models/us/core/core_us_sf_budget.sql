@@ -18,13 +18,36 @@
 WITH budget AS (
     SELECT *
     FROM {{ ref('stg_us_sf_budget') }}
+),
+
+-- Editorial plain-English gloss per (side, character) — seed, display only.
+character_glosses AS (
+    SELECT side, character_code, gloss, display_category, provenance
+    FROM {{ ref('stg_us_sf_character_glosses') }}
+),
+
+-- Editorial department display names — seed, display only.
+dept_names AS (
+    SELECT department_code, display_name, provenance
+    FROM {{ ref('stg_us_sf_dept_names') }}
 )
 
 SELECT
-    *,
-    STARTS_WITH(UPPER(COALESCE(character, '')), 'TRANSFER ADJUSTMENT')
+    b.*,
+    STARTS_WITH(UPPER(COALESCE(b.character, '')), 'TRANSFER ADJUSTMENT')
                                                        AS is_transfer_adjustment,
-    UPPER(COALESCE(character, '')) LIKE '%TRANSFER%'   AS is_transfer_character,
-    CURRENT_DATE('America/Los_Angeles') > DATE(fiscal_year, 6, 30)
+    UPPER(COALESCE(b.character, '')) LIKE '%TRANSFER%'   AS is_transfer_character,
+    CURRENT_DATE('America/Los_Angeles') > DATE(b.fiscal_year, 6, 30)
                                                        AS is_fiscal_year_complete
-FROM budget
+    ,
+    g.gloss                            AS character_gloss,
+    g.display_category                 AS character_display_category,
+    g.provenance                       AS character_gloss_provenance,
+    n.display_name                     AS department_display_name,
+    n.provenance                       AS department_display_name_provenance
+FROM budget b
+LEFT JOIN character_glosses g
+    ON g.side = b.revenue_or_spending
+   AND g.character_code = b.character_code
+LEFT JOIN dept_names n
+    ON n.department_code = b.department_code

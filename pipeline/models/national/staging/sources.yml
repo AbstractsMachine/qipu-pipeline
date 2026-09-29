@@ -3,9 +3,19 @@ version: 2
 sources:
   - name: national_raw
     database: open-data-france-484717
-    schema: raw_national
+    # NATIONAL_RAW_DATASET : le même réglage que les chargeurs (_national_raw.py), pour
+    # essayer une chaîne sur un jeu de dev ; raw_national sinon.
+    schema: "{{ env_var('NATIONAL_RAW_DATASET', 'raw_national') }}"
     description: "Données brutes nationales (DGFiP, OFGL, DECP, Subventions)"
     tables:
+      - name: drihl_paris
+        description: "DRIHL — demandes et attributions de logements sociaux, Paris et ses arrondissements, une année par classeur publié (2022→) ; lu par stg_drihl_paris. Chargé par sync_drihl_paris.py"
+      - name: sru_inventaire
+        description: "Inventaire SRU (ministère de la Transition écologique, data.gouv.fr « Communes et inventaire SRU ») : nombre de logements sociaux et taux au 1er janvier, une ligne par commune soumise à la loi et par inventaire (2022→). Chargé par sync_sru_inventaire.py"
+      - name: etat_plf
+        description: "Budget de l'État, dépenses selon destination (data.economie.gouv.fr), une année par jeu découvert au catalogue ; colonnes unifiées par sync_etat_plf.py"
+      - name: eurostat_series
+        description: "Eurostat — les cinq jeux des pages nationales (dette trimestrielle, prélèvements, COFOG, dépenses par sous-secteur, PIB), une ligne par valeur ; version = date « updated » de chaque jeu. Chargé par sync_eurostat_national.py"
       - name: dgfip_balances
         description: "Balances comptables DGFiP - toutes les lignes de comptes M57 pour les communes cibles"
       - name: ofgl_communes
@@ -14,3 +24,31 @@ sources:
         description: "DECP consolidés - marchés publics nationaux filtrés par SIREN acheteur"
       - name: subventions_nationales
         description: "Subventions SCDL - subventions > 23k€ filtrées par SIRET attributaire"
+      - name: sirene_unites_legales
+        description: "INSEE Sirene, StockUniteLegale (siren, catégorie juridique, état, dénomination, activité, catégorie, tranche d'effectifs) — sert à repérer les personnes physiques parmi les titulaires, et à dire la taille et l'activité d'un fournisseur"
+      - name: insee_ipc
+        description: "Insee, indice des prix à la consommation (série BDM 001759970, base 2015, ensemble des ménages, France), mensuel. Chargé par sync_insee_ipc.py"
+      - name: cfu_b8_lignes
+        description: "Subventions nominatives des communes : annexe B8 (ou B1.7) du CFU, du CA ou du BP, extraite des documents publiés par la commune (qipu-comms/cfu-national). Une ligne = un bénéficiaire (ou un total imprimé) ; jamais de personne physique. Chargé par sync_cfu_b8.py"
+      - name: sirene_sieges
+        description: "INSEE Sirene, StockEtablissement réduit aux établissements sièges : siren, commune, code postal, état (jamais d'adresse de rue). Chargé par sync_sirene_sieges.py"
+      - name: fonds_vert
+        description: "Fonds vert (ministère de la Transition écologique) — projets subventionnés 2023-2025, ramenés à un schéma commun par sync_fonds_vert.py"
+      - name: rne_conseillers_municipaux
+        description: "Répertoire national des élus, conseillers municipaux — colonnes non sensibles seulement (commune, nom, prénom, fonction, dates)"
+      - name: rne_maires_historique
+        description: "Répertoire national des élus, versions archivées du fichier des maires (Wayback Machine, une capture par an 2020-2025) — une ligne = un maire × une capture ; colonnes non sensibles seulement (code INSEE, commune, nom, prénom, dates de mandat et de fonction, snapshot_date, source_url). Chargé par sync_rne_maires_historique.py"
+      - name: rei_taux
+        description: "REI (DGFiP) — taux de taxe foncière votés par la commune et l'intercommunalité, 2021-2025, colonnes E12/E12VOTE/E32/B12 seulement"
+      - name: dgfip_balances_nature_fonction
+        description: "DGFiP — balances comptables des collectivités et EPL, présentation croisée nature-fonction. Copie fidèle du CSV publié (toutes catégories, 30 colonnes en texte) + annee, ligne (rang dans le CSV), source_fichier ; une partition par exercice. Chargé par sync_dgfip_nature_fonction.py"
+      - name: ofgl_regions
+        description: "OFGL — base régions consolidée (2012→), une ligne = région (ou CTU) × exercice × agrégat, tous les agrégats. Chargé par sync_ofgl_niveaux.py"
+      - name: ofgl_departements
+        description: "OFGL — base départements consolidée (2012→), dont Métropole de Lyon (ML) et Paris ; une ligne = département × exercice × agrégat. Chargé par sync_ofgl_niveaux.py"
+      - name: ofgl_gfp
+        description: "OFGL — base des groupements à fiscalité propre consolidée (2018→) : CC, CA, CU, métropoles, EPT ; une ligne = intercommunalité × exercice × agrégat. Chargé par sync_ofgl_niveaux.py"
+      - name: ofgl_compositions
+        description: "OFGL — composition des intercommunalités, dernière année publiée : une ligne par commune (insee, siren) avec le SIREN et le nom de son intercommunalité. État courant, chargé par sync_ofgl_compositions.py"
+      - name: rne_executifs
+        description: "Répertoire national des élus — conseils départementaux, régionaux, communautaires : collectivité (niveau, code, libellé), nom, prénom, fonction, dates (aucune donnée sensible). État courant, chargé par sync_rne_executifs.py"

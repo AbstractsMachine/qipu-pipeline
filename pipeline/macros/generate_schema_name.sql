@@ -16,6 +16,11 @@
     prod  dbt_paris           + 'br_staging' → dbt_br_staging
     dev   dbt_paris_dev_local + 'br_staging' → dbt_br_dev_local_staging
 
+  Custom schemas prefixed 'ca_' land in the mirrored dbt_ca_* family
+  (Vancouver — ca-municipal), same dev/ci/prod isolation:
+    prod  dbt_paris           + 'ca_staging' → dbt_ca_staging
+    dev   dbt_paris_dev_local + 'ca_staging' → dbt_ca_dev_local_staging
+
   Any target.schema that does not carry the dbt_paris base falls back to
   the stock behaviour (no silent surprises on exotic targets).
 #}
@@ -27,6 +32,8 @@
         {{ default_schema | replace('dbt_paris', 'dbt_us') }}_{{ custom_schema_name.strip()[3:] }}
     {%- elif custom_schema_name.strip().startswith('br_') and 'dbt_paris' in default_schema -%}
         {{ default_schema | replace('dbt_paris', 'dbt_br') }}_{{ custom_schema_name.strip()[3:] }}
+    {%- elif custom_schema_name.strip().startswith('ca_') and 'dbt_paris' in default_schema -%}
+        {{ default_schema | replace('dbt_paris', 'dbt_ca') }}_{{ custom_schema_name.strip()[3:] }}
     {%- else -%}
         {{ default_schema }}_{{ custom_schema_name | trim }}
     {%- endif -%}

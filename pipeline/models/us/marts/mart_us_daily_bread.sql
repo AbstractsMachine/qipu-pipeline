@@ -4,7 +4,7 @@
 --
 -- Sources: core_us_receipts_by_source + core_us_outlays_by_function
 --          (MTS Table 9 verified detail recipes), core_us_population
---          (per-resident scaling), stg_us_fiscaldata_catalog (provenance —
+--          (per-resident scaling), core_us_fiscaldata_source_catalog (provenance —
 --          same pattern as the stg_mapping_* dimension refs on the Paris
 --          side).
 -- Grain:  (side, row_type, category) for the latest record_date.
@@ -37,7 +37,7 @@ provenance AS (
         dataset_page_url,
         endpoint,
         update_frequency
-    FROM {{ ref('stg_us_fiscaldata_catalog') }}
+    FROM {{ ref('core_us_fiscaldata_source_catalog') }}
     WHERE source_id = 'mts_table_9'
 ),
 

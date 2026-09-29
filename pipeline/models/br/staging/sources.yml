@@ -38,6 +38,50 @@ sources:
         description: "Despesa Funcional Programática 2025."
       - name: br_recife_funcional_2026
         description: "Despesa Funcional Programática 2026 (in-year)."
+      - name: br_recife_despesa_orc_2002
+        description: "Despesas orçamentárias 2002 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2003
+        description: "Despesas orçamentárias 2003 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2004
+        description: "Despesas orçamentárias 2004 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2005
+        description: "Despesas orçamentárias 2005 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2006
+        description: "Despesas orçamentárias 2006 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2007
+        description: "Despesas orçamentárias 2007 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2008
+        description: "Despesas orçamentárias 2008 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2009
+        description: "Despesas orçamentárias 2009 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2010
+        description: "Despesas orçamentárias 2010 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2011
+        description: "Despesas orçamentárias 2011 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2012
+        description: "Despesas orçamentárias 2012 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2013
+        description: "Despesas orçamentárias 2013 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2014
+        description: "Despesas orçamentárias 2014 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2015
+        description: "Despesas orçamentárias 2015 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2016
+        description: "Despesas orçamentárias 2016 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2017
+        description: "Despesas orçamentárias 2017 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2018
+        description: "Despesas orçamentárias 2018 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2019
+        description: "Despesas orçamentárias 2019 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2020
+        description: "Despesas orçamentárias 2020 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2021
+        description: "Despesas orçamentárias 2021 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2022
+        description: "Despesas orçamentárias 2022 — older series, função × elemento × órgão × credor (','-decimal)."
+      - name: br_recife_despesa_orc_2023
+        description: "Despesas orçamentárias 2023 — older series, função × elemento × órgão × credor (','-decimal)."
       - name: br_recife_contratos
         description: "Contratos administrativos — full history (back to 2004), one row per contract."
       - name: br_recife_termo_aditivo
@@ -80,3 +124,44 @@ sources:
           matched to facilities by distinctive-name mention in the objeto
           (scripts/enrich/build_recife_place_obras.py). LEFT-joined onto places;
           evidence surfaced on the fiche. Not "total spent", only obra-mentions.
+
+  # ---------------------------------------------------------------------------
+  # Brazil, every município (2026-09-18): SICONFI (Tesouro Nacional) through
+  # the Base dos Dados public mirror, copied into raw (EU) by
+  # scripts/sync/sync_br_siconfi.py — BigQuery cannot read across regions
+  # (basedosdados is in US, our datasets in EU). Three filtered copies:
+  # DCA Anexo I-E 2017+ (three stages, coded contas), the municípios
+  # directory, and the IBGE population estimates.
+  # ---------------------------------------------------------------------------
+  - name: br_pncp_raw
+    description: "The contracts every município publishes on the PNCP (Portal Nacional de Contratações Públicas, Lei 14.133/2021) — fetched day by day by scripts/sync/sync_br_pncp.py, municipal rows only (esfera M), flattened."
+    database: open-data-france-484717
+    schema: raw
+    tables:
+      - name: br_pncp_contratos
+        description: "One row per publication of a contract (a rectification republishes it) : numero_controle_pncp, tipo, objeto, valor_global, dates, the paying unit with its IBGE code, the supplier. 2026-01-01 onwards ; a day's file is complete or absent."
+      - name: br_pncp_contratos_orgaos
+        description: "Per-body backfill (scripts/sync/sync_br_pncp_orgaos.py): the contracts a few bodies published before the national feed starts (Recife's executive bodies, control-number years 2021-2025), fetched one contract at a time from /v1/orgaos/{cnpj}/contratos/{ano}/{seq}. Same columns as br_pncp_contratos."
+  - name: br_siconfi_raw
+    description: "SICONFI DCA annual accounts for the 5 570 municípios, IBGE directory and population — copies of the Base dos Dados mirror (basedosdados.br_me_siconfi, br_bd_diretorios_brasil, br_ibge_populacao)"
+    database: open-data-france-484717
+    schema: raw
+    tables:
+      - name: br_siconfi_despesas_funcao
+        description: "DCA Anexo I-E — despesas por função e subfunção × estágio (empenhadas, liquidadas, pagas), one row per ano × município × conta, 2017+. id_conta_bd = '3.FF.SSS' (FF função, SSS subfunção, 000 = the função's total, 3.00.000 = the total)."
+      - name: br_siconfi_receitas
+        description: "DCA Anexo I-C — receitas orçamentárias × estágio (brutas realizadas, deduções FUNDEB / transferências constitucionais / outras), coded rows only (id_conta_bd, 18 characters, the standard chart), one row per ano × município × estágio × conta, 2017+. '1.0.0.0.0.00.00.00' = the total exceto intraorçamentárias."
+      - name: br_bd_municipios
+        description: "The 5 570 municípios: IBGE code, name, UF, regions (Base dos Dados directory)."
+      - name: br_ibge_populacao
+        description: "IBGE population estimates per município and year, 2017+."
+      - name: br_siconfi_despesas_natureza
+        description: "DCA Anexo I-D — despesas pagas by nature, the group level (3.1 staff, 3.2 debt interest, 3.3 other current, 4.4 investment, 4.5 financial investment, 4.6 debt repayment, and the 3.0 / 4.0 totals), 2017+. The 2017 codes carry one more « .00 »."
+      - name: br_siconfi_divida
+        description: "Balance sheet (DCA) — loans and financing owed: 2.1.2 short term, 2.2.2 long term, the município's level, 2017+."
+      - name: br_siconfi_impostos
+        description: "DCA Anexo I-C — the three local taxes (IPTU, ISS, ITBI), gross realized and other deductions, every level; codes changed in 2018, so the rows were taken by name."
+      - name: br_tse_prefeitos
+        description: "TSE — the mayors elected in 2012, 2016, 2020, 2024 (both rounds), with their civil and ballot names."
+      - name: br_tse_vagas
+        description: "TSE — council seats (vereador) per município, 2024."

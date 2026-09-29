@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: SF contract project teams — who is on each contract, in what role
 --
--- Sources: core_us_sf_contracts, stg_us_sf_catalog (provenance).
+-- Sources: core_us_sf_contracts, core_us_sf_source_catalog (provenance).
 -- Grain:  contract_no × supplier × role × LBE status (amendment rows for
 --         the same member are netted by the SUM, like the prime dedupe).
 --
@@ -39,7 +39,7 @@ provenance AS (
         dataset_page_url,
         attribution,
         rows_updated_at
-    FROM {{ ref('stg_us_sf_catalog') }}
+    FROM {{ ref('core_us_sf_source_catalog') }}
     WHERE source_id = 'sf_supplier_contracts'
 )
 

@@ -753,3 +753,62 @@ models:
               values: ['closed', 'recently_closed_preliminary', 'in_progress']
       - name: source_url
         tests: [not_null]
+
+  - name: mart_us_sf_payment_breakdowns
+    description: >
+      SF vendor payments per fiscal year sliced by department, organisation
+      group and payee kind (manual bucket from int_us_sf_payees, else
+      'unclassified'); every dimension sums to the year's total payments so
+      the lenses can be toggled. Provenance from core_us_sf_source_catalog.
+    columns:
+      - name: fiscal_year
+        tests: [not_null]
+      - name: dimension
+        tests: [not_null]
+
+  - name: mart_us_sf_spending_subobjects
+    description: >
+      Spending by sub-object per fiscal year from core_us_sf_vouchers: dollars,
+      line and payee counts, spend class from int_us_sf_sub_objects, an
+      exemplar line and the top payees per cell.
+    columns:
+      - name: fiscal_year
+        tests: [not_null]
+      - name: sub_object_code
+        tests: [not_null]
+
+  - name: mart_us_sf_place_projects
+    description: >
+      DPW projects within 120 m of a place's facility points (ST_DWITHIN on
+      core_us_sf_places × core_us_sf_dpw_projects), one row per place_slug ×
+      project_name keeping the nearest point and its distance. No money.
+    columns:
+      - name: place_slug
+        tests: [not_null]
+      - name: project_name
+        tests: [not_null]
+
+  - name: mart_us_sf_contracts_quality
+    description: >
+      One-row data-quality figures for the contracts méthode block: contract
+      numbers present only on sub-contractor rows (n_sub_only), distinct
+      contract numbers on vouchers, how many exist in the prime register and
+      the share of voucher dollars they carry. Coverage counts only, no
+      published money.
+    columns:
+      - name: n_sub_only
+        tests: [not_null]
+
+  - name: mart_us_sf_payees
+    description: >
+      Normalized SF payees, top 200 by lifetime dollars: one row per
+      payee_slug with total paid, per-FY series (zero-net years dropped),
+      first/last year, top paying departments, the spelling variants with
+      their own totals and merge reasons, kind (manual bucket, else nonprofit
+      flag, else other). Dollars summed from core_us_sf_vouchers over every
+      variant. Published by export_us_sf_payees.py.
+    columns:
+      - name: slug
+        tests: [not_null, unique]
+      - name: total_paid_usd
+        tests: [not_null]

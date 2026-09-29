@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Mart: QUEM RECEBE — organisations that received municipal payments.
 --
--- Source: core_br_recife_despesa, filtered to is_org (CNPJ) ONLY. CPF
+-- Source: int_br_recife_credor_ano (recipient × year rollup), core_br_recife_credor (name), filtered to is_org (CNPJ) ONLY. CPF
 -- individuals are NEVER included — no individual is ranked, searched or
 -- exposed (privacy doctrine). Grain: recipient_key (CNPJ) × ano.
 --
@@ -11,34 +11,13 @@
 -- (the remainder is CPF individuals — mostly payroll/leases — kept out).
 -- =============================================================================
 
-WITH org_rows AS (
-    SELECT * FROM {{ ref('core_br_recife_despesa') }}
-    WHERE is_org AND recipient_key IS NOT NULL
+WITH by_year AS (
+    SELECT * FROM {{ ref('int_br_recife_credor_ano') }}
 ),
 
--- canonical display name per CNPJ (most frequent spelling across all rows)
 names AS (
-    SELECT
-        recipient_key,
-        APPROX_TOP_COUNT(nome_credor, 1)[OFFSET(0)].value AS nome
-    FROM org_rows
-    WHERE nome_credor IS NOT NULL
-    GROUP BY 1
-),
-
-by_year AS (
-    SELECT
-        recipient_key,
-        ano,
-        COUNT(*)                                     AS n_empenhos,
-        SUM(pago_liquido)                            AS total_pago,
-        SUM(empenhado)                               AS total_empenhado,
-        SUM(IF(is_subvencao, pago_liquido, 0))       AS subvencao_pago,
-        LOGICAL_OR(is_subvencao)                     AS is_subvencao_any,
-        COUNT(DISTINCT orgao)                        AS n_orgaos,
-        APPROX_TOP_COUNT(orgao, 1)[OFFSET(0)].value  AS principal_orgao
-    FROM org_rows
-    GROUP BY 1, 2
+    SELECT cnpj AS recipient_key, nome
+    FROM {{ ref('core_br_recife_credor') }}
 ),
 
 provenance AS (
@@ -48,7 +27,7 @@ provenance AS (
         ANY_VALUE(portal_name)       AS source_portal,
         ANY_VALUE(license_title)     AS source_license,
         MAX(rows_updated_at)         AS rows_updated_at
-    FROM {{ ref('stg_br_recife_catalog') }}
+    FROM {{ ref('core_br_recife_source_catalog') }}
     WHERE source_id LIKE 'credor_%'
 )
 

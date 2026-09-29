@@ -303,3 +303,82 @@ models:
         tests: [not_null]
       - name: is_structural_outlier
         tests: [not_null]
+
+  # --- Block 6 lieux sources + display seeds (documented 2026-08-26) ---
+  - name: stg_us_sf_city_facilities
+    description: >
+      Typed view over raw.us_sf_city_facilities (DataSF nc68-ngbr): one row
+      per city facility — facility_id, common name, address, APN (block_lot),
+      owned/leased, department, gross sq ft, coordinates, supervisor district.
+      The structured-location backbone every SF place joins to.
+    columns:
+      - name: facility_id
+        tests: [not_null, unique]
+
+  - name: stg_us_sf_dpw_projects
+    description: >
+      Typed view over raw.us_sf_dpw_projects (DataSF btxj-k9uh): DPW internal
+      & external projects, one row per project × mapped point, with the JSON
+      point parsed to a GEOGRAPHY (geo) and client_contract_id blanked when
+      the source uses NONE/_NA. Carries no money.
+
+  - name: stg_us_sf_building_permits
+    description: >
+      Typed view over raw.us_sf_building_permits (DataSF i98e-djp9, ~1.29M
+      rows): permit number, APN block/lot, description, type, estimated and
+      revised declared cost, status and filed/issued/completed dates.
+
+  - name: stg_us_sf_go_bond_projects
+    description: >
+      Typed view over raw.us_sf_go_bond_projects (DataSF d3dc-v5yr): the named
+      planned projects under each GO-bond program item, per reporting year.
+      No dollars of its own.
+
+  - name: stg_us_sf_go_bond_spending
+    description: >
+      Typed view over raw.us_sf_go_bond_spending (DataSF m793-kis4): GO-bond
+      program × item × reporting year with revised budget and cumulative
+      expended dollars (the latest year per item is the current position).
+
+  - name: stg_us_sf_place_facilities
+    description: >
+      Wrapper over seed_us_sf_place_facilities, the reviewed place ↔
+      facility_id crosswalk (place_slug × facility_id, is_primary flag, match
+      method/evidence, distance to the seed point). Identity only.
+    columns:
+      - name: place_slug
+        tests: [not_null]
+      - name: facility_id
+        tests: [not_null]
+
+  - name: stg_us_sf_place_contracts
+    description: >
+      Wrapper over seed_us_sf_place_contracts: reviewed place ↔ prime contract
+      links (place_slug × contract_no) with the contract title, department,
+      prime contractor and the agreed / paid dollars recorded at review time.
+
+  - name: stg_us_sf_place_bonds
+    description: >
+      Wrapper over seed_us_sf_place_bonds: reviewed place ↔ GO-bond links
+      (place_slug × source_kind × item_name) — bond_item rows carry expended
+      and revised budget dollars, bond_project rows only name the work.
+
+  - name: stg_us_sf_subobject_class
+    description: >
+      Wrapper over seed_us_sf_subobject_class: spend class (purchase /
+      obligation / ledger / unclear) per sub_object_code with the basis of
+      the classification and a needs_review flag.
+    columns:
+      - name: sub_object_code
+        tests: [not_null, unique]
+
+  - name: stg_us_sf_payee_identity
+    description: >
+      Wrapper over seed_us_sf_payee_identity (build_sf_payee_identity.py): raw
+      Controller vendor string → normalized payee slug/name, with the curated
+      merge reason for JV / predecessor / spelling merges. Identity only.
+    columns:
+      - name: vendor
+        tests: [not_null, unique]
+      - name: payee_slug
+        tests: [not_null]

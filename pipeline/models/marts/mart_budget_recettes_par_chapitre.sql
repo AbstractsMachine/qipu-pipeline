@@ -5,8 +5,8 @@
 --   → website/public/data/evolution_budget.json (variation 6 ans, recettes par source)
 --
 -- Sources:
---   - core_budget        (exécuté, 2019-2024)
---   - core_budget_vote   (voté, 2025-2026 — exclut années où exécuté est dispo)
+--   - core_budget        (exécuté, 2019-2025)
+--   - core_budget_vote   (voté, seulement les années sans exécuté — 2026)
 --
 -- Grain: annee × chapitre_code (recettes seulement)
 -- La classification chapitre → source de recette (Impôts, Emprunts, Dotations…)
@@ -26,7 +26,8 @@ voted_future AS (
     SELECT annee, chapitre_code, montant
     FROM {{ ref('core_budget_vote') }}
     WHERE sens_flux = 'Recette'
-      AND annee > 2024 -- exclut années où exécuté est dispo (anti-doublon)
+      -- exclut les années où l'exécuté est disponible (anti-doublon)
+      AND annee NOT IN (SELECT DISTINCT annee FROM {{ ref('core_budget') }})
 ),
 
 unioned AS (

@@ -1,0 +1,337 @@
+{
+  "_what": "Rail routes as the Board of Supervisors described them: a sequence of STREET NAMES, a date, and the words it was written in.",
+  "_how": [
+    "Each route is a list of streets, copied from the ordinance, claim or contract",
+    "quoted beside it. build_rail_history.py resolves each name against DataSF's",
+    "street centrelines and stitches the geometry. Nothing here is drawn or traced;",
+    "the only thing being asserted is WHICH STREETS a line ran on and WHEN.",
+    "",
+    "`streets` is the ordered list the record gives. `quote` is verbatim OCR from the",
+    "volume named in `source`, lightly de-hyphenated where the scan broke a word.",
+    "",
+    "A route whose street cannot be resolved is REPORTED, never silently shortened --",
+    "a renamed or vanished street is a real gap and hiding it would make the map lie",
+    "about its own coverage."
+  ],
+  "_status": "first pass: the municipally built lines, whose construction the Board paid for and therefore described. The private companies -- United Railroads and the Market Street Railway, most of the mileage -- are in FRANCHISE ordinances and are not here yet.",
+  "routes": [
+    {
+      "name": "Church street line (J)",
+      "year": 1917,
+      "kind": "streetcar",
+      "streets": [
+        "Church"
+      ],
+      "source": "journalofproceed1917sanfrich",
+      "quote": "For construction of Church street line, from Market street and Van Ness avenue to Sixteenth and Church streets, Section \"A\", Contract No. 23",
+      "from": "Market",
+      "to": "Sixteenth"
+    },
+    {
+      "name": "Twin Peaks tunnel line, Taraval extension (L)",
+      "year": 1917,
+      "kind": "streetcar",
+      "streets": [
+        "Ulloa",
+        "Fifteenth",
+        "Taraval"
+      ],
+      "source": "journalofproceed1918sanfrich",
+      "quote": "Ordinance No. 4527 (New Series), approved by the Mayor September 25, 1917, providing for the construction of a line from the southwesterly portal of the Twin Peaks tunnel over Ulloa street, Fifteenth avenue and Taraval street to Twentieth avenue",
+      "to": "Twentieth",
+      "from": "West Portal",
+      "from_note": "the ordinance's terminus is 'the southwesterly portal of the Twin Peaks tunnel', which is a place and not a street. West Portal Avenue is the street at that portal and is named for it. This is the one INTERPRETATION in the file and it is marked: without it the run along Ulloa has no start and falls back to an arbitrary length."
+    },
+    {
+      "name": "Geary Street Municipal Railway, Richmond extension",
+      "year": 1912,
+      "kind": "streetcar",
+      "streets": [
+        "Geary",
+        "Thirty-third",
+        "Balboa",
+        "Forty-fifth",
+        "Cabrillo"
+      ],
+      "to": "Great Highway",
+      "source": "journalofproceed1912sanfrich",
+      "quote": "J. R. No. 307. Resolved, That the Board of Public Works, be and it is hereby authorized and directed to advertise for bids for track construction for the Geary Street Municipal Railway from Geary street along Thirty-third avenue, Balboa street, Forty-fifth avenue and Cabrillo street to the Great Highway, and when bids shall have been received the Finance Committee will recommend the necessary appropriation.",
+      "note": "Muni's OWN FIRST LINE and a vanished one: Geary carries no rail today, so this route exists on the map only because the Board wrote it down. It should score LOW against the surviving network, and that is the point of it.",
+      "ended_searched": "No abandonment for the Geary line is in this corpus. Searched: the 1955 and 1956 volumes for abandon/discontinue/remove-tracks/motor-coach near 'Geary' (nothing), and 1953/1954 for conversion language. 1953 carries only a BOND PROPOSAL -- 'Extension of No. 8 Trolley Coach Line and Conversion of B and J Lines to Trolley Coach Operation' -- and a proposal is not a conversion. The same sentence names the J, which was never converted and runs as rail today, so the proposal cannot be read as a record of what happened. The line is gone (0.0 % against today's network) and this record does not say when, so it carries no `ended`."
+    },
+    {
+      "name": "Market Street Railway, Bryant and Sterling",
+      "year": 0,
+      "ended": 1935,
+      "kind": "streetcar",
+      "streets": [
+        "Bryant",
+        "Sterling"
+      ],
+      "from": "Second",
+      "to": "Harrison",
+      "source": "journalofproceed30sanfrich",
+      "ended_source": "journalofproceed30sanfrich",
+      "quote": "Bill No. 710, Ordinance No. 15.0918: Authorizing Market Street Railway Company to abandon and discontinue street car service and remove its street railway tracks from Bryant Street from Second Street to Sterling Street, thence along Sterling Street to Harrison Street",
+      "note": "a PRIVATE company's track, which is most of the mileage this map cannot otherwise reach. The ordinance says when it was taken up and not when it was laid."
+    },
+    {
+      "name": "Market Street Railway, Harrison Street",
+      "year": 0,
+      "ended": 1935,
+      "kind": "streetcar",
+      "streets": [
+        "Harrison"
+      ],
+      "from": "Second",
+      "to": "Steuart",
+      "source": "journalofproceed30sanfrich",
+      "ended_source": "journalofproceed30sanfrich",
+      "quote": "to abandon and discontinue street car service and remove its street railway tracks from Harrison Street, commencing at the intersection of Second and Harrison Streets, thence along Harrison Street to Steuart Street"
+    },
+    {
+      "name": "Market Street Railway, Steuart Street",
+      "year": 0,
+      "ended": 1935,
+      "kind": "streetcar",
+      "streets": [
+        "Steuart"
+      ],
+      "from": "Harrison",
+      "to": "Folsom",
+      "source": "journalofproceed30sanfrich",
+      "ended_source": "journalofproceed30sanfrich",
+      "quote": "and on Steuart Street from Harrison Street to Folsom Street"
+    },
+    {
+      "name": "Market Street Railway, Sixth Street",
+      "year": 0,
+      "ended": 1935,
+      "kind": "streetcar",
+      "streets": [
+        "Sixth"
+      ],
+      "from": "Folsom",
+      "to": "Brannan",
+      "source": "journalofproceed30sanfrich",
+      "ended_source": "journalofproceed30sanfrich",
+      "quote": "Bill No. 682, Ordinance No. 15.0916: Authorizing Market Street Railway Company to abandon and remove its street railway tracks over and along Six[th] Street between Folsom Street and Brannan Street; also, on Brannan Street from Third Street to Eighth Street; and, also, on Eighth Street from Brannan Street to Bryant Street."
+    },
+    {
+      "name": "Market Street Railway, Brannan Street",
+      "year": 0,
+      "ended": 1935,
+      "kind": "streetcar",
+      "streets": [
+        "Brannan"
+      ],
+      "from": "Third",
+      "to": "Eighth",
+      "source": "journalofproceed30sanfrich",
+      "ended_source": "journalofproceed30sanfrich",
+      "quote": "Bill No. 682, Ordinance No. 15.0916: Authorizing Market Street Railway Company to abandon and remove its street railway tracks over and along Six[th] Street between Folsom Street and Brannan Street; also, on Brannan Street from Third Street to Eighth Street; and, also, on Eighth Street from Brannan Street to Bryant Street."
+    },
+    {
+      "name": "Market Street Railway, Eighth Street",
+      "year": 0,
+      "ended": 1935,
+      "kind": "streetcar",
+      "streets": [
+        "Eighth"
+      ],
+      "from": "Brannan",
+      "to": "Bryant",
+      "source": "journalofproceed30sanfrich",
+      "ended_source": "journalofproceed30sanfrich",
+      "quote": "Bill No. 682, Ordinance No. 15.0916: Authorizing Market Street Railway Company to abandon and remove its street railway tracks over and along Six[th] Street between Folsom Street and Brannan Street; also, on Brannan Street from Third Street to Eighth Street; and, also, on Eighth Street from Brannan Street to Bryant Street."
+    },
+    {
+      "name": "Market Street Railway, Twenty-fourth Street (bus substitution)",
+      "year": 0,
+      "ended": 1939,
+      "kind": "streetcar",
+      "streets": [
+        "Twenty-fourth"
+      ],
+      "source": "journalofproceed39sanfrich",
+      "ended_source": "journalofproceed39sanfrich",
+      "quote": "Ordinance No. 2374 (Series of 1939), amended by Bill No. 2681, Ordinance No. 2556: \"Providing for the Removal of Certain Street Railway Tracks of the Market Street Railway Company Due to the Substitution of Automobile Buses in Lieu of Street Car Service on Twenty-fourth Street, Fourteenth Street, Guerrero Street, San Jose Avenue, Thirtieth Street, First Street, Divisadero Street, and Fillmore Street\"",
+      "note": "the ordinance names EIGHT streets and gives no termini for any of them, so each is seeded as its own route over the whole named street. They are separate lines and chaining them would invent a connection the record does not describe."
+    },
+    {
+      "name": "Market Street Railway, Fourteenth Street (bus substitution)",
+      "year": 0,
+      "ended": 1939,
+      "kind": "streetcar",
+      "streets": [
+        "Fourteenth"
+      ],
+      "source": "journalofproceed39sanfrich",
+      "ended_source": "journalofproceed39sanfrich",
+      "quote": "Ordinance No. 2374 (Series of 1939), amended by Bill No. 2681, Ordinance No. 2556: \"Providing for the Removal of Certain Street Railway Tracks of the Market Street Railway Company Due to the Substitution of Automobile Buses in Lieu of Street Car Service on Twenty-fourth Street, Fourteenth Street, Guerrero Street, San Jose Avenue, Thirtieth Street, First Street, Divisadero Street, and Fillmore Street\"",
+      "note": "the ordinance names EIGHT streets and gives no termini for any of them, so each is seeded as its own route over the whole named street. They are separate lines and chaining them would invent a connection the record does not describe."
+    },
+    {
+      "name": "Market Street Railway, Guerrero Street (bus substitution)",
+      "year": 0,
+      "ended": 1939,
+      "kind": "streetcar",
+      "streets": [
+        "Guerrero"
+      ],
+      "source": "journalofproceed39sanfrich",
+      "ended_source": "journalofproceed39sanfrich",
+      "quote": "Ordinance No. 2374 (Series of 1939), amended by Bill No. 2681, Ordinance No. 2556: \"Providing for the Removal of Certain Street Railway Tracks of the Market Street Railway Company Due to the Substitution of Automobile Buses in Lieu of Street Car Service on Twenty-fourth Street, Fourteenth Street, Guerrero Street, San Jose Avenue, Thirtieth Street, First Street, Divisadero Street, and Fillmore Street\"",
+      "note": "the ordinance names EIGHT streets and gives no termini for any of them, so each is seeded as its own route over the whole named street. They are separate lines and chaining them would invent a connection the record does not describe."
+    },
+    {
+      "name": "Market Street Railway, San Jose Street (bus substitution)",
+      "year": 0,
+      "ended": 1939,
+      "kind": "streetcar",
+      "streets": [
+        "San Jose"
+      ],
+      "source": "journalofproceed39sanfrich",
+      "ended_source": "journalofproceed39sanfrich",
+      "quote": "Ordinance No. 2374 (Series of 1939), amended by Bill No. 2681, Ordinance No. 2556: \"Providing for the Removal of Certain Street Railway Tracks of the Market Street Railway Company Due to the Substitution of Automobile Buses in Lieu of Street Car Service on Twenty-fourth Street, Fourteenth Street, Guerrero Street, San Jose Avenue, Thirtieth Street, First Street, Divisadero Street, and Fillmore Street\"",
+      "note": "the ordinance names EIGHT streets and gives no termini for any of them, so each is seeded as its own route over the whole named street. They are separate lines and chaining them would invent a connection the record does not describe."
+    },
+    {
+      "name": "Market Street Railway, Thirtieth Street (bus substitution)",
+      "year": 0,
+      "ended": 1939,
+      "kind": "streetcar",
+      "streets": [
+        "Thirtieth"
+      ],
+      "source": "journalofproceed39sanfrich",
+      "ended_source": "journalofproceed39sanfrich",
+      "quote": "Ordinance No. 2374 (Series of 1939), amended by Bill No. 2681, Ordinance No. 2556: \"Providing for the Removal of Certain Street Railway Tracks of the Market Street Railway Company Due to the Substitution of Automobile Buses in Lieu of Street Car Service on Twenty-fourth Street, Fourteenth Street, Guerrero Street, San Jose Avenue, Thirtieth Street, First Street, Divisadero Street, and Fillmore Street\"",
+      "note": "the ordinance names EIGHT streets and gives no termini for any of them, so each is seeded as its own route over the whole named street. They are separate lines and chaining them would invent a connection the record does not describe."
+    },
+    {
+      "name": "Market Street Railway, First Street (bus substitution)",
+      "year": 0,
+      "ended": 1939,
+      "kind": "streetcar",
+      "streets": [
+        "First"
+      ],
+      "source": "journalofproceed39sanfrich",
+      "ended_source": "journalofproceed39sanfrich",
+      "quote": "Ordinance No. 2374 (Series of 1939), amended by Bill No. 2681, Ordinance No. 2556: \"Providing for the Removal of Certain Street Railway Tracks of the Market Street Railway Company Due to the Substitution of Automobile Buses in Lieu of Street Car Service on Twenty-fourth Street, Fourteenth Street, Guerrero Street, San Jose Avenue, Thirtieth Street, First Street, Divisadero Street, and Fillmore Street\"",
+      "note": "the ordinance names EIGHT streets and gives no termini for any of them, so each is seeded as its own route over the whole named street. They are separate lines and chaining them would invent a connection the record does not describe."
+    },
+    {
+      "name": "Market Street Railway, Divisadero Street (bus substitution)",
+      "year": 0,
+      "ended": 1939,
+      "kind": "streetcar",
+      "streets": [
+        "Divisadero"
+      ],
+      "source": "journalofproceed39sanfrich",
+      "ended_source": "journalofproceed39sanfrich",
+      "quote": "Ordinance No. 2374 (Series of 1939), amended by Bill No. 2681, Ordinance No. 2556: \"Providing for the Removal of Certain Street Railway Tracks of the Market Street Railway Company Due to the Substitution of Automobile Buses in Lieu of Street Car Service on Twenty-fourth Street, Fourteenth Street, Guerrero Street, San Jose Avenue, Thirtieth Street, First Street, Divisadero Street, and Fillmore Street\"",
+      "note": "the ordinance names EIGHT streets and gives no termini for any of them, so each is seeded as its own route over the whole named street. They are separate lines and chaining them would invent a connection the record does not describe."
+    },
+    {
+      "name": "Market Street Railway, Fillmore Street (bus substitution)",
+      "year": 0,
+      "ended": 1939,
+      "kind": "streetcar",
+      "streets": [
+        "Fillmore"
+      ],
+      "source": "journalofproceed39sanfrich",
+      "ended_source": "journalofproceed39sanfrich",
+      "quote": "Ordinance No. 2374 (Series of 1939), amended by Bill No. 2681, Ordinance No. 2556: \"Providing for the Removal of Certain Street Railway Tracks of the Market Street Railway Company Due to the Substitution of Automobile Buses in Lieu of Street Car Service on Twenty-fourth Street, Fourteenth Street, Guerrero Street, San Jose Avenue, Thirtieth Street, First Street, Divisadero Street, and Fillmore Street\"",
+      "note": "the ordinance names EIGHT streets and gives no termini for any of them, so each is seeded as its own route over the whole named street. They are separate lines and chaining them would invent a connection the record does not describe."
+    },
+    {
+      "name": "Mission Street tracks, Excelsior to the county line",
+      "year": 0,
+      "ended": 1951,
+      "kind": "streetcar",
+      "streets": [
+        "Mission"
+      ],
+      "from": "Excelsior",
+      "source": "journalofproceed46sanfrich",
+      "ended_source": "journalofproceed46sanfrich",
+      "quote": "File No. 7179, Resolution No. 10916 (Series of 1939): Extending Time to April 11, 1951, for Awarding Department of Public Works' Contract for Removal of Tracks on Mission Street Between Excelsior Avenue and the County Line.",
+      "note": "the resolution's far terminus is THE COUNTY LINE, which is not a street, so only the near one is resolved and the run is bounded."
+    },
+    {
+      "name": "Van Ness Avenue tracks",
+      "year": 0,
+      "ended": 1951,
+      "kind": "streetcar",
+      "streets": [
+        "Van Ness"
+      ],
+      "source": "journalofproceed46sanfrich",
+      "ended_source": "journalofproceed46sanfrich",
+      "quote": "File No. 7245, relating to the removal of tracks on Van Ness Avenue.",
+      "note": "the file names no termini, so the whole named avenue is drawn -- what the record describes and no more."
+    },
+    {
+      "name": "Eleventh Street and Potrero Avenue tracks",
+      "year": 0,
+      "ended": 1951,
+      "kind": "streetcar",
+      "streets": [
+        "Eleventh",
+        "Potrero"
+      ],
+      "source": "journalofproceed46sanfrich",
+      "ended_source": "journalofproceed46sanfrich",
+      "quote": "File No. 7900, relating to the removal of tracks and the reconstruction of the roadways of Eleventh Street and Potrero Avenue."
+    },
+    {
+      "name": "Municipal Railway extension, Great Highway to Cole (pre-tunnel N)",
+      "year": 1922,
+      "kind": "streetcar",
+      "streets": [
+        "Judah",
+        "Tenth",
+        "Irving",
+        "Carl"
+      ],
+      "from": "Great Highway",
+      "to": "Cole",
+      "source": "journalofproceed1922sanfrich",
+      "quote": "The Board of Public Works is hereby authorized and directed to prepare plans and specifications, advertise for bids and enter into a contract for the furnishing of the necessary materials for and the construction of an extension of the Municipal Railway from the Great Highway along Judah street, Tenth avenue, Irving street, Carl street to Cole street.",
+      "note": "six years before the Sunset Tunnel, so this is how the line reached the inner Sunset -- by TENTH avenue, where today's N uses Ninth. The difference is the record's, not a slip."
+    },
+    {
+      "name": "Market Street Railway, Brannan Street (First to Second)",
+      "year": 0,
+      "ended": 1936,
+      "kind": "streetcar",
+      "streets": [
+        "Brannan"
+      ],
+      "from": "First",
+      "to": "Second",
+      "source": "journalofproceed31sanfrich",
+      "ended_source": "journalofproceed31sanfrich",
+      "quote": "Bill No. 1128, Ordinance No. 15.09119: Authorizing Market Street Railway Company to abandon and remove its single street railway track over and along Brannan street, from First street to Second street.",
+      "note": "a DIFFERENT stretch of Brannan from the 1935 one (Third to Eighth) and a year later, so both are kept."
+    }
+  ],
+  "_dropped": "Ocean View line (M): its quote is a CONSTRUCTION PAYMENT and carries no street sequence. The streets first listed here were recalled rather than read, which is the exact failure this file exists to prevent, so the route is out until an ordinance describing it is found.",
+  "_ended": [
+    "A route may carry `ended`: the year the Board authorised the tracks to be",
+    "TAKEN UP. Until now every layer on this map only ever grew, because today's",
+    "registers describe what survived. An abandonment ordinance is the other half",
+    "and it is in the same record.",
+    "",
+    "`year` 0 on an abandoned route means the Journal proves the track EXISTED by",
+    "the year it was removed and does not say when it was laid -- so it is drawn",
+    "from the first frame, `streets.ts`'s own convention for a silent record.",
+    "That is a floor, not a claim about the year it was built."
+  ],
+  "_corpus_exhausted": "The Board's Journal stops being useful for rail routes after 1951. The 1953, 1954, 1957 and 1958 volumes contain NO 'street railway track' or 'removal of track' phrasing at all -- by then the conversions were Public Utilities Commission decisions and the Board's record carries bond issues and debate rather than route descriptions. Harvested and empty, so nobody searches them twice: 1913, 1914, 1920, 1926(v21), 1948(v43), 1949(v44), 1953(v48), 1954(v49), 1957(v52), 1958(v53)."
+}
