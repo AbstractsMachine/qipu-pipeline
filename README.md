@@ -34,6 +34,9 @@ in each ingestion script.
 
 ## License
 
-**MIT License** — free to use, modify and redistribute, including for commercial
-purposes, as long as the copyright notice and the license text are kept. See
+Code: **GNU Affero General Public License v3.0** (AGPL-3.0-only). You may use,
+modify and redistribute it. If you distribute it, or run a modified version as a
+network service, you must make its source available under the same license. See
 [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+Data keeps the license and terms of its source publishers (see [NOTICE](NOTICE)).
