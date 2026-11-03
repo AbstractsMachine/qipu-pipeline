@@ -29,8 +29,9 @@ cp pipeline/.env.example pipeline/.env   # then fill in as documented
 ## 2. Ingest the sources
 
 The `pipeline/scripts/sync/` scripts fetch each dataset from its official
-open-data portal into the raw layer. Run the ingestion (see `pipeline/README.md`
-for the per-source entrypoints).
+open-data portal into the raw layer, one script per source; the header of each
+script says what it reads and how to run it. `sync_city.py <city>` runs every
+source a city's file in `pipeline/configs/cities/` lists.
 
 ## 3. Build the transformations
 
@@ -59,6 +60,9 @@ deterministic marts.
 
 - **Financial aggregates** (budget, subventions, marchés, debt, housing figures)
   reproduce exactly from source.
-- **Classifications** (which theme or location a line is assigned to) come from
-  the frozen seeds shipped here rather than being recomputed, so they reproduce
-  exactly against those seeds — see [NOTICE](NOTICE).
+- **Locations** of investment lines come from a frozen seed shipped here rather
+  than being recomputed, so they reproduce exactly against it.
+- **Grant themes** do not reproduce exactly: the caches that assign a theme by
+  beneficiary name are not published, because some beneficiaries are private
+  people. Themes fall back to the rules downstream, so theme splits differ
+  from the site's while amounts and counts match. See [NOTICE](NOTICE).

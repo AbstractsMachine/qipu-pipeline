@@ -19,29 +19,29 @@ This repository includes:
   * Deterministic seed files (constants, mappings, thresholds, labels) derived
     from official public open-data sources.
 
-  * FROZEN enrichment-output cache files. These are the *outputs* of a
-    separate, closed enrichment process, included here as fixed inputs. The
-    process that generates them (prompts, models, compute) is not part of this
-    repository.
+  * One FROZEN enrichment-output cache file, the output of a separate, closed
+    classification process, included here as a fixed input. The process that
+    generates it (prompts, models, compute) is not part of this repository.
 
-      - seed_cache_thematique_beneficiaires.csv
       - seed_cache_geo_ap.csv
-        Read by the dbt models. Classification-dependent figures (which theme,
-        which location a line is assigned to) reproduce end to end against them.
+        Read by the dbt models: which location an investment line is assigned
+        to reproduces end to end against it.
 
 PERSONAL DATA
 -------------
-The subventions source data mixes organisations with private individuals. This
-repository is filtered accordingly:
+The grants (subventions) source data mixes organisations with private
+individuals. Caches keyed by a beneficiary's name are therefore not published:
 
-  * The name-to-SIRET lookup cache is not published. It linked a beneficiary
-    name to a full legal name, SIRET, postcode and city — identifying detail
-    about real people that is not present in the source. No model reads it and
-    no published figure depends on it.
+  * seed_cache_siret_by_name.csv linked a beneficiary name to a full legal
+    name, SIRET, postcode and city. No model reads it.
 
-  * Rows identifying natural persons are removed from the thematic cache above.
-    They carried no classification (they resolve to "Autre" either way), so the
-    published figures are unaffected.
+  * seed_cache_thematique_beneficiaires.csv (Paris) and
+    seed_marseille_cache_thematique.csv (Marseille) assigned a theme to each
+    beneficiary name. Their staging models here keep the same columns with zero
+    rows, so the build still runs and a grant's theme falls back to the rules
+    downstream (pattern, then direction, then category, then "Non classifié").
+    Theme splits built from this repository therefore differ from the site's;
+    amounts and counts do not.
 
 Underlying source data belongs to its respective publishers (e.g. Ville de
 Paris / Paris Open Data, data.economie.gouv.fr / DECP, DGFiP, and the
