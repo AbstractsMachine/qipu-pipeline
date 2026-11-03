@@ -1,39 +1,53 @@
 name: pipeline-ci
 
-# Proof-of-reproducibility: parse the dbt project and validate the graph on every
-# push / PR. A full `dbt build` requires BigQuery credentials and is intended to
-# run against an ephemeral `ci` dataset when a GCP identity is configured via
-# repository secrets (Workload Identity Federation); until then, parse + compile
-# guarantees the transformation graph is internally consistent.
+# Checks that run offline, with no cloud credentials:
+#   - the dbt project parses and its graph is consistent (dbt parse);
+#   - every ingestion script compiles (python -m compileall);
+#   - the size of the graph is printed, so the counts in the README can be checked.
+# A full `dbt build` needs BigQuery and is not run here: REPRODUCE.md explains how to run it in your own project.
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   dbt-parse:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: pipeline
+    env:
+      DBT_PROFILES_DIR: .
+      BQ_PROJECT: placeholder
+      GITHUB_RUN_ID: ${{ github.run_id }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: pip
 
-      - name: Install dbt
-        run: pip install dbt-bigquery
+      - name: Install dbt (pinned, so a new release cannot change the check)
+        run: pip install "dbt-core==1.12.6" "dbt-bigquery==1.12.1"
 
       - name: dbt deps
         run: dbt deps
 
       - name: dbt parse (validate the transformation graph)
         run: dbt parse --target ci
-        env:
-          DBT_PROFILES_DIR: .
-          BQ_PROJECT: placeholder
-          GITHUB_RUN_ID: ${{ github.run_id }}
+
+      - name: Graph size (models, tests, seeds, sources)
+        run: |
+          for kind in model test seed source; do
+            echo "$kind: $(dbt ls --target ci --resource-type "$kind" --output name --quiet | wc -l)"
+          done
+
+      - name: Ingestion scripts compile
+        run: python -m compileall -q scripts
